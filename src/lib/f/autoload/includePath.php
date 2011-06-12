@@ -59,7 +59,7 @@ class f_autoload_includePath
 
     public function register()
     {
-        set_include_path(implode(DIRECTORY_SEPARATOR, $this->_path));
+        set_include_path(implode(PATH_SEPARATOR, $this->_path));
         spl_autoload_register(array($this, 'load'));
         return $this;
     }
@@ -83,7 +83,7 @@ class f_autoload_includePath
 
     public function load($sClassName)
     {
-        @include str_replace($this->_separator, DIRECTORY_SEPARATOR, $sClassName);
+        @include str_replace($this->_separator, DIRECTORY_SEPARATOR, $sClassName . $this->_extension);
 
         if ($this->_throwException && !class_exists($sClassName, false)) {
             throw new f_autoload_exception(array(
