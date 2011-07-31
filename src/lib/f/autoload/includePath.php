@@ -3,10 +3,10 @@
 class f_autoload_includePath
 {
 
-    protected $_throwException = true;
-    protected $_extension      = '.php';
     protected $_path           = array();
+    protected $_extension      = '.php';
     protected $_separator      = '_';
+    
 
     public static function _()
     {
@@ -70,31 +70,10 @@ class f_autoload_includePath
         return $this;
     }
 
-    public function throwException($bThrowExcpetionOnError = null)
-    {
-        if (func_num_args()) {
-            $this->_throwException = $bThrowExcpetionOnError;
-            return $this;
-        }
-        else {
-            return $this->_throwException;
-        }
-    }
-
     public function load($sClassName)
     {
         @include str_replace($this->_separator, DIRECTORY_SEPARATOR, $sClassName . $this->_extension);
 
-        if ($this->_throwException && !class_exists($sClassName, false)) {
-            throw new f_autoload_exception(array(
-                'type'               => f_autoload_exception::CLASS_NOT_FOUND,
-                'msg'                => "Class $sClassName not found",
-                'get_include_path()' => get_include_path(),
-                'path'               => $this->_path,
-                'separator'          => $this->_separator,
-                'extension'          => $this->_extension,
-            ));
-        }
     }
 
 }
