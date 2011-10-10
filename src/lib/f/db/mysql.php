@@ -41,7 +41,7 @@ class f_db_mysql
     }
 
     /**
-     * Dodaje znaki unikowe dla potrzeb poleceń SQL, biorąc po uwagę zestaw znaków używany w połączeniu
+     * Dodaje znaki unikowe dla potrzeb poleceń SQL, biorąc po uwagę zestaw znakow używany w połączeniu
      *
      * @param $sString string
      * @return string
@@ -55,7 +55,7 @@ class f_db_mysql
      * Wykonuje zapytanie
      *
      * Zwraca
-     *  - zasób zapytania lub falsza dla SELECT, SHOW, EXPLAIN i DESCRIBE;
+     *  - zasob zapytania lub falsza dla SELECT, SHOW, EXPLAIN i DESCRIBE;
      *  - true lub false dla UPDATE, DELETE...
      *
      * @param string $sQuery Zapytanie SQL
@@ -122,7 +122,7 @@ class f_db_mysql
 	
     /**
      * Zwraca jedno wymiarową tablice numeryczną
-     * gdzie wartością pola tablicy jest pierwsze pole z wyselekcjonowanych rekordów
+     * gdzie wartością pola tablicy jest pierwsze pole z wyselekcjonowanych rekordow
      *
      * @param string $sQuery Zapytanie SQL
      * @return array|false
@@ -146,7 +146,7 @@ class f_db_mysql
     }
 
     /**
-     * Zwraca jedno wymiarową tablice asocjacyjną gdzie kluczem jest pierwsze pole a wartością drugie z wyselekcjonowanych rekordów
+     * Zwraca jedno wymiarową tablice asocjacyjną gdzie kluczem jest pierwsze pole a wartością drugie z wyselekcjonowanych rekordow
      *
      * @param string $sQuery Zapytanie SQL
      * @return array|false
@@ -236,7 +236,7 @@ class f_db_mysql
     }
 	
     /**
-     * Zwraca wartosc klucza głównego ostatnio dodanego rekordu
+     * Zwraca wartosc klucza głownego ostatnio dodanego rekordu
      *
      * @return int Wartosc klucza ostatnio dodanego rekordu
      */

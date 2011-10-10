@@ -292,70 +292,70 @@ class f_m implements IteratorAggregate, Countable
         foreach (self::$_m[$this->_class]['field'] as $field) {
             $this->{$field} = null;
         }
-        /** @TODO wyczyscic modele depend */
+        /** @todo wyczyscic modele depend */
     }
 
-	/**
-	 * Ustala lub pobiera wartość dla klucza glownego
-	 *
-	 * @param string|null $sValue Id
-	 * @return string|$this Id
-	 */
-	public function id($sValue = null)
-	{
-		if ($sValue === null) {
-			return $this->{$this->_key};
-		}
-		else {
-			$this->{$this->_key} = $sValue;
-			return $this;
-		}
-	}
+    /**
+     * Ustala lub pobiera wartość dla klucza glownego
+     *
+     * @param string|null $sValue Id
+     * @return string|$this Id
+     */
+    public function id($sValue = null)
+    {
+        if (func_num_args()) {
+            return $this->{$this->_key};
+        }
+        else {
+            $this->{$this->_key} = $sValue;
+            return $this;
+        }
+    }
 
-	/**
-	 * Selekcjonuje jeden rekord z tabeli, zapisuje go do pola _, zapisuje pobrane dane do pól publicznych obiektu
-	 *
-	 * @param array|integer|string $aisParam Parametry
-	 * @return $this
-	 */
-	public function select($aisParam = null)
-	{
-		if ($aisParam !== null && $data = $this->_db->row($this->_sql($aisParam, true, true, true))) {
-			$this->val($data);
+    /**
+     * Selekcjonuje jeden rekord z tabeli, zapisuje go do pola _, zapisuje pobrane dane do pol publicznych obiektu
+     *
+     * @param array|integer|string $aisParam Parametry
+     * @return $this
+     */
+    public function select($aisParam = null)
+    {
+        if ($aisParam !== null && $data = $this->_db->row($this->_sql($aisParam, true, true, true))) {
+            $this->val($data);
             $this->_ = $data;
-			if ($this->_key !== null && isset($data[$this->_key])) {
-				$this->{$this->_key} = $data[$this->_key];
-			}
-		}
+            if ($this->_key !== null && isset($data[$this->_key])) {
+                $this->{$this->_key} = $data[$this->_key];
+            }
+        }
         else {
             $this->removeVal();
         }
-		return $this;
-	}
-
-	/**
-	 * Selekcjonuje wiele rekordów z tabeli, zaisuje je do _, nie zapisuje pobranych danych do pól publicznych obiektu
-	 *
-	 * @param array|integer|string|null $aisParam Parametry
-	 * @return $this
-	 */
-	public function selectAll($aisParam = null)
-	{
-		$this->_ = $this->_db->rows($this->_sql($aisParam, true, true, true));
         return $this;
-	}
+    }
 
-	/**
-	 * Selekcjonuje rekordy, ktore pobierane sa metoda next()
+    /**
+     * Selekcjonuje wiele rekordow z tabeli, zaisuje je do _, nie zapisuje pobranych danych do pol publicznych obiektu
      *
-	 * @param array|integer|string|null $aisParam Parametry
+     * @param array|integer|string|null $aisParam Parametry
      * @return $this
-	 */
-	public function selectLoop($aisParam = null)
-	{
-		$this->_result = $this->_db->query($this->_sql($aisParam, true, true, true));
+     */
+    public function selectAll($aisParam = null)
+    {
+        $this->_ = $this->_db->rows($this->_sql($aisParam, true, true, true));
         return $this;
-	}
+    }
+
+    /**
+     * Selekcjonuje rekordy, ktore pobierane sa metoda next()
+     *
+     * @param array|integer|string|null $aisParam Parametry
+     * @return $this
+     */
+    public function selectLoop($aisParam = null)
+    {
+        $this->_result = $this->_db->query($this->_sql($aisParam, true, true, true));
+        return $this;
+    }
 
     /**
      * Pobiera kolejny rekod zapytania wykonanego przez metode selectLoop()
@@ -365,95 +365,99 @@ class f_m implements IteratorAggregate, Countable
     public function selectNext()
     {
         if ($data = $this->_db->fetch($this->_result)) {
-			$this->val($data);
+            $this->val($data);
             $this->_ = $data;
-			if ($this->_key !== null && isset($data[$this->_key])) {
-				$this->{$this->_key} = $data[$this->_key];
-			}
-		}
+            if ($this->_key !== null && isset($data[$this->_key])) {
+                $this->{$this->_key} = $data[$this->_key];
+            }
+        }
         else {
             $this->removeVal();
         }
-		return $this;
+        return $this;
     }
 
 
     /**
-	 * Pobiera wartosc pierwszego pola z pierwszego wyselekcjonowanego rekordu, zapisuje ja do _
-	 *
-	 * @param array|integer|string|null $aisParam Parametry
-	 * @return $this
-	 */
-	public function selectVal($aisParam = null)
-	{
-		$this->_ = $this->_db->val($this->_sql($aisParam, true, true, true));
-        return $this;
-	}
-
-	/**
-	 * Zwraca jedno wymiarową tablice numeryczną gdzie wartościami tablicy jest pierwsze pole z wyselekcjonowanych rekordów
-	 *
-	 * @param array|integer|string|null $aisParam Parametry
-	 * @return array|false Tablice | W przpadku nie wyselekcjonowania żadnych rekordów
-	 */
-	public function selectCol($aisParam = null)
-	{
-		$this->_ = $this->_db->col($this->_sql($aisParam, true, true, true));
-        return $this;
-	}
-
-	/**
-	 * Pobiera jedno wymiarową tablice asocjacyjną gdzie kluczem jest pierwsze pole a wartością drugie z wyselekcjonowanych rekordów
-	 *
-	 * @param array|integer|string|null $aisParam Parametry
-	 * @return $this
-	 */
-	public function selectCols($aisParam = null)
-	{
-		$this->_ = $this->_db->cols($this->_sql($aisParam, true, true, true));
-        return $this;
-	}
-
-	/**
-	 * Wykonuje zapytanie SELECT COUNT, wartosc zapytania zapisuje do pola _
-	 *
-	 * @param array|integer|string|null $aisParam Parametry
-	 * @param string $sExpr Domyślnie *
-	 * @return $this
-	 */
-	public function selectCount($aisParam = null, $sExpr = '*')
-	{
-		$this->_ = $this->_db->one("SELECT COUNT($sExpr)".$this->_sql($aisParam, false, true, true));
-        return $this;
-	}
-
-	/**
-	 * Wykonuje zapytanie SELECT COUNT, wartosc zapytania zapisuje do pola _
-	 *
-	 * @param array|integer|string|null $aisParam Parametry
-	 * @param string $sExpr Domyślnie *
-	 * @return $this
-	 */
-	public function count($aisParam = null, $sExpr = '*')
-	{
-		$this->selectCount($aisParam, $sExpr);
-        return $this->_;
-	}
-
-	/**
-	 * Dodaje rekordy do tabeli
+     * Pobiera wartosc pierwszego pola z pierwszego wyselekcjonowanego rekordu, zapisuje ja do _
      *
-	 * Nieprawidlowe klucze w tablicy są pomijane, musi sie zgadzac kolejnosc i ilosc
-	 *
-	 * @param array $aData Tablica dwuwymiarowa gdzie drugi wymiar to tablica asocjacyjna
-	 * @return this
-	 */
-	public function insertAll($aData)
-	{
-		$aModelField = array();
-		foreach ($this->_field as $i) {
-			$aModelField[$i] = true;
-		}
+     * @param array|integer|string|null $aisParam Parametry
+     * @return $this
+     */
+    public function selectVal($aisParam = null)
+    {
+        $this->_ = $this->_db->val($this->_sql($aisParam, true, true, true));
+        return $this;
+    }
+
+    /**
+     * Zwraca jedno wymiarową tablice numeryczną gdzie wartościami tablicy jest pierwsze pole z wyselekcjonowanych rekordow
+     *
+     * @param array|integer|string|null $aisParam Parametry
+     * @return array|false Tablice | W przpadku nie wyselekcjonowania żadnych rekordow
+     */
+    public function selectCol($aisParam = null)
+    {
+        $this->_ = $this->_db->col($this->_sql($aisParam, true, true, true));
+        return $this;
+    }
+
+    /**
+     * Pobiera jedno wymiarową tablice asocjacyjną gdzie kluczem jest pierwsze pole a wartością drugie z wyselekcjonowanych rekordow
+     *
+     * @param array|integer|string|null $aisParam Parametry
+     * @return $this
+     */
+    public function selectCols($aisParam = null)
+    {
+        $this->_ = $this->_db->cols($this->_sql($aisParam, true, true, true));
+        return $this;
+    }
+
+    /**
+     * Wykonuje zapytanie SELECT COUNT, wartosc zapytania zapisuje do pola _
+     *
+     * @param array|integer|string|null $aisParam Parametry
+     * @param string $sExpr Domyślnie *
+     * @return $this
+     */
+    public function selectCount($aisParam = null, $sExpr = '*')
+    {
+        $this->_ = $this->_db->one("SELECT COUNT($sExpr)".$this->_sql($aisParam, false, true, true));
+        return $this;
+    }
+
+    /**
+     * Wykonuje zapytanie SELECT COUNT, wartosc zapytania zapisuje do pola _
+     *
+     * @param array|integer|string|null $aisParam Parametry
+     * @param string $sExpr Domyślnie *
+     * @return $this
+     */
+    public function count($aisParam = null, $sExpr = '*')
+    {
+        $this->selectCount($aisParam, $sExpr);
+        return $this->_;
+    }
+
+    /**
+     * Dodaje rekordy do tabeli
+     *
+     * Nieprawidlowe klucze w tablicy są pomijane, musi sie zgadzac kolejnosc i ilosc
+     *
+     * @param array $aData Tablica dwuwymiarowa gdzie drugi wymiar to tablica asocjacyjna
+     * @return f_m
+     */
+    public function insertAll($aData = null)
+    {
+        if (func_num_args() == 0) {
+            $aData = $this->_;
+        }
+        
+        $aModelField = array();
+        foreach ($this->_field as $i) {
+            $aModelField[$i] = true;
+        }
 
         $aField  = array();
         $aValues = array();
@@ -486,15 +490,15 @@ class f_m implements IteratorAggregate, Countable
         $this->_db->query("INSERT INTO `{$this->_table}` (`".implode('`, `', array_keys($aField))."`) VALUES ".implode(', ', $aValues));
 
         return $this;
-	}
+    }
 
-	/**
-	 * Dodaje rekord do tabeli
+    /**
+     * Dodaje rekord do tabeli
      *
 	 * Nieprawidłowe klucze w tablicy są pomijane, musi sie zgadzac kolejność i ilość
 	 *
 	 * @param array $aData Tablica jedno wymiarowa asocjacyjna
-	 * @return this
+	 * @return f_m
 	 */
 	public function insert($aData = null)
 	{
