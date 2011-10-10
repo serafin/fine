@@ -7,7 +7,7 @@ class f_error
     const ERROR_NO_ACCESS = 'FORBIDDEN';
     const ERROR_INTERNAL  = 'INTERNAL';
 
-    const RENDER_FORMAT_HTML = 'RENDER_FORAMT_HMTL';
+    const RENDER_FORMAT_HTML = 'RENDER_FORAMT_HTML';
     const RENDER_FORMAT_TEXT = 'RENDER_FORAMT_TEXT';
 
     public static $phpError = array(

@@ -1,6 +1,6 @@
 <?php
 
-class app_main extends f_c
+class app_bootstrap extends f_c
 {
 
     public function __construct()
@@ -30,13 +30,13 @@ class app_main extends f_c
         // send response to client if not send before
         $this->response->send();
 
-        //
+        // don't user exit 
         $this->event->run('main_end');
     }
 
     public function dev()
     {
-
+        $this->debug->init();
     }
 
     public function prod()

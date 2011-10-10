@@ -21,6 +21,13 @@ class app_c extends f_c_container
         $this->db->query("SET NAMES '{$db->charset}'");
         return $this->db;
     }
+    
+    protected function _debug()
+    {
+        $this->debug = new f_debug();
+        $this->db    = new f_debug_component_db(array('component' => $this->db));
+        return $this->debug;
+    }
 
     protected function _dispacher()
     {

@@ -73,7 +73,6 @@ class f_autoload_includePath
     public function load($sClassName)
     {
         @include str_replace($this->_separator, DIRECTORY_SEPARATOR, $sClassName . $this->_extension);
-
     }
 
 }

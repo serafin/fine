@@ -11,9 +11,9 @@ class f_m implements IteratorAggregate, Countable
     public $_;
 
     protected static $_m = array();
-    protected static $_config = array(
-        'paging' => 'f_paging',
-        'prefix' => 'm_',
+    protected static $_configStatic = array(
+        'paging' => 'f_paging', // f_paging_interface
+        'prefix' => 'm_',       // class prefix for models
     );
     protected $_table;
     protected $_key;
@@ -40,27 +40,16 @@ class f_m implements IteratorAggregate, Countable
     }
 
     /**
-     * Ustala tabele, pola, klucz główny modelu i nazwe serwisu bazy danych
+     * Ustala tabele, pola, klucz glowny modelu i nazwe serwisu bazy danych
      */
     public function __construct(array $config = array())
     {
         $this->_class = $class = get_class($this);
 
         if (! isset(self::$_m[$class])) {
-            $part = explode('_', $class);
+            
+            $part = explode('_', substr($class, strlen(self::$_configStatic['prefix'])));
 
-            self::$_m[$class]['table'] = $table = end($part);
-
-            /**
-             * @TODO zprofilowac stare i nowe rozwiazanie
-             */
-            /*
-            foreach ($this as $public => $i) {
-                if ($public[0] != '_') {
-                    self::$_m[$class]['field'][] = $public;
-                }
-            }
-            */
             $reflection = new ReflectionClass($this);
             foreach ($reflection->getProperties(ReflectionProperty::IS_PUBLIC) as $property) {
                 $name = $property->getName();
@@ -69,17 +58,19 @@ class f_m implements IteratorAggregate, Countable
                 }
             }
 
-
-            $key = $table . '_id';
-            self::$_m[$class]['key'] = in_array($key, self::$_m[$class]['field']) ? $key : null;
-
-            if (count($part) == 2) {
+            if (count($part) == 1) {
                 self::$_m[$class]['prefix'] = 'm_';
                 self::$_m[$class]['db']     = 'db';
+                self::$_m[$class]['table']  = $part[0];
+                $key = $part[0] . '_id';
+                self::$_m[$class]['key'] = in_array($key, self::$_m[$class]['field']) ? $key : null;
             }
             else {
-                self::$_m[$class]['prefix'] = 'm_' . $part[2] . '_';
-                self::$_m[$class]['db']     = 'db_' . $part[2];
+                self::$_m[$class]['prefix'] = 'm_' . $part[1] . '_';
+                self::$_m[$class]['db']     = 'db_' . $part[1];
+                self::$_m[$class]['table']  = $part[1];
+                $key = $part[1] . '_id';
+                self::$_m[$class]['key'] = in_array($key, self::$_m[$class]['field']) ? $key : null;
             }
         }
 
@@ -100,17 +91,25 @@ class f_m implements IteratorAggregate, Countable
     public function __get($key)
     {
         switch ($key) {
-            case '_db' :
-                return $this->_db = f::$c->{self::$_m[$this->_class]['db']};
-            case '_paging' :
-                return $this->_paging = new f_paging();
-            default :
-                return $this->{$key} = $this->_modelDependent($key);
+            
+            case '_db':
+                $service   = self::$_m[$this->_class]['db'];
+                $this->_db = f::$c->{$service};
+                return $this->_db;
+                
+            case '_paging':
+                $paging        = self::$_configStatic['paging'];
+                $this->_paging = new $paging();
+                return $this->_paging;
+                        
+            default:
+                return $this->{$key} = $this->_modelLinked($key);
+                
         }
     }
 
     /**
-     * Dla interfesu IteratorAggregate
+     * Implementacja interfejsu IteratorAggregate
      * @return ArrayIterator
      */
     public function getIterator()
@@ -121,69 +120,75 @@ class f_m implements IteratorAggregate, Countable
         return new ArrayIterator($this->_);
     }
 
-	/**
-	 * Ustala lub pobiera nazwe tabeli w zależności od parametru
-	 *
-	 * @param string|null $sTable Nazwa tabeli
-	 * @return string|$this Nazwa tabeli
-	 */
-	public function table($sTable = null)
-	{
-            if ($sTable === null) {
-                return $this->_table;
-            }
-            else {
-                $this->_table = $sTable;
-                return $this;
-            }
-	}
+    /**
+     * Ustala lub pobiera nazwe tabeli w zależności od parametru
+     *
+     * @param string|null $sTable Nazwa tabeli
+     * @return string|$this Nazwa tabeli
+     */
+    public function table($sTable = null)
+    {
+        if (func_num_args() == 0) {
+            return $this->_table;
+        }
+        else {
+            $this->_table = $sTable;
+            return $this;
+        }
+    }
 
-	/**
-	 * Ustala lub pobiera nazwe klucza podstawowego
-	 *
-	 * @param string|null $sPrimaryKey Nazwa klucza podstawowego
-	 * @return string|$this Nazwa klucza podstawowego
-	 */
-	public function key($sPrimaryKey = null)
-	{
-		if ($sPrimaryKey === null) {
-			return $this->_key;
-		}
-		else {
-			$this->_key = $sPrimaryKey;
-			return $this;
-		}
-	}
+    /**
+     * Ustala lub pobiera nazwe klucza podstawowego
+     *
+     * @param string|null $sPrimaryKey Nazwa klucza podstawowego
+     * @return string|$this Nazwa klucza podstawowego
+     */
+    public function key($sPrimaryKey = null)
+    {
+        if (func_num_args() == 0) {
+            return $this->_key;
+        }
+        else {
+            $this->_key = $sPrimaryKey;
+            return $this;
+        }
+    }
 
-	/**
-	 * Ustala lub pobiera pola modelu
-	 *
-	 * @param array|boolean|string|null $asField Pola jako tablica lub string gdzie pola oddzielone są znakiem spacji,
+    /**
+     * Ustala lub pobiera pola modelu
+     *
+     * @param array|boolean|string|null $asField Pola jako tablica lub string gdzie pola oddzielone są znakiem spacji,
      *      true resetuje pola, false czysci pola (to samo co array())
-	 * @return array|$this Pola
-	 */
-	public function field($absField = null)
-	{
-        switch(true) {
-            case is_string($absField) :
-                $this->_field = explode(' ', $absField);
-                break;
-            case is_array($absField) :
-    			$this->_field = $absField;
-                break;
-            case $absField === false :
-    			$this->_field = array();
-                break;
-            case $absField === true :
-    			$this->_field = $this->_m[$this->_config][$this->_table]['field'];
-                break;
-            case $absField === null :
-                return $this->_field;
-            default :
-                throw new InvalidArgumentException("Oczekiwany argument typu: string, array, boolean lub null");
-		}
+     * @return array|$this Pola
+     */
+    public function field($absField = null)
+    {
+        if (func_num_args() == 0) {
+            return $this->_field;
+        }
+
+        $this->_fieldBack = $this->_field;
+        
+        if (is_string($absField)) {
+            $this->_field = explode(' ', $absField);
+        }
+        else if (is_array($absField)) {
+            $this->_field = $absField;
+        }
+        else if ($absField === false) {
+            $this->_field = array();
+        }
+        else if ($absField === true) {
+            $this->_field = $this->_m[$this->_config][$this->_table]['field'];
+        }
+        else {
+            throw new f_m_exception(array(
+                'type' => f_m_exception::INVALID_ARGUMENT,
+                'msg'  => "Oczekiwany argument typu: string, array lub boolean lub brak",
+            ));
+        }
         return $this;
-	}
+    }
 
     /**
      * Dodaje pole lub pola
@@ -191,8 +196,10 @@ class f_m implements IteratorAggregate, Countable
      * @param array|string $asField Pola jako tablica lub string gdzie pola oddzielone są znakiem spacji
      * @return array|$this
      */
-	public function addField($asField)
-	{
+    public function addField($asField)
+    {
+        $this->_fieldBack = $this->_field;
+        
         foreach (is_array($asField) ? $asField : explode(' ', $asField) as $k => $v ) {
             if (is_int($k)) {
                 $this->_field[] = $v;
@@ -201,45 +208,49 @@ class f_m implements IteratorAggregate, Countable
                 $this->_field[$k] = $v;
             }
         }
-		return $this;
-	}
+        
+        return $this;
+    }
 
     /**
      * Usuwa pole lub pola
      * 
-     * @param array|string $asField Pola jako tablica lub string gdzie pola oddzielone są znakiem spacji
+     * @param array|string $asField Pola jako tablica lub string gdzie pola oddzielone sa znakiem spacji
      * @return $this
      */
-	public function removeField($asField)
-	{
-		foreach (is_array($asField) ? $asField : explode(' ', $asField) as $i) {
-			$aRemove[$i] = true;
-		}
-		foreach ($this->_field as $k => $v) {
-			if (isset ($aRemove[$v])) {
-				unset($this->_field[$k]);
-			}
-		}
-		return $this;
-	}
+    public function removeField($asField)
+    {
+        $this->_fieldBack = $this->_field;
+
+        foreach (is_array($asField) ? $asField : explode(' ', $asField) as $i) {
+            $aRemove[$i] = true;
+        }
+        foreach ($this->_field as $k => $v) {
+            if (isset ($aRemove[$v])) {
+                unset($this->_field[$k]);
+            }
+        }
+        
+        return $this;
+    }
 
 
-	/**
-	 * Ustawia lub pobiera wartosci modelu, nie zmienia wartosci klucza glownego
-	 *
-	 * @param array|null $aKeyValue Wartości jako tablica asocjacyjna
+    /**
+     * Ustawia lub pobiera wartosci modelu, nie zmienia wartosci klucza glownego
+     *
+     * @param array|null $aKeyValue Wartości jako tablica asocjacyjna
      * @param array|string $asRestrictionField Pola w ktorych maja byc ustawione wartosci
-	 * @return array|$this Wartości jako tablica asocjacyjna
-	 */
-	public function val($aKeyValue = null, $asRestrictionField = null)
-	{
-		if ($aKeyValue === null) {
-			foreach ($this->_field as $i) {
-				$a[$i] = $this->{$i};
-			}
-			return $a;
-		}
-		else if ($asRestrictionField === null) {
+     * @return array|$this Wartości jako tablica asocjacyjna
+     */
+    public function val($aKeyValue = null, $asRestrictionField = null)
+    {
+        if (func_num_args() == 0) {
+            foreach ($this->_field as $i) {
+                $a[$i] = $this->{$i};
+            }
+            return $a;
+        }
+        else if ($asRestrictionField === null) {
             foreach ($this->_field as $i) {
                 if (isset($aKeyValue[$i]) && $i != $this->_key) {
                     $this->{$i} = $aKeyValue[$i];
@@ -255,22 +266,22 @@ class f_m implements IteratorAggregate, Countable
                     $this->{$i} = $aKeyValue[$i];
                 }
             }
-		}
+        }
     	return $this;
-	}
+    }
 
-	/**
-	 * Ustala pola modelu i ustawia wartości modelu, nie zmienia wartosci klucza głównego
-	 *
-	 * @param array $aKeyValue Pola jako klucze $aKeyValue, wartosci modelu jako wartosci $aKeyValue
-	 * @return $this
-	 */
-	public function valField($aKeyValue)
-	{
-		$this->field(array_keys($aKeyValue));
-		$this->val($aKeyValue);
-		return $this;
-	}
+    /**
+     * Ustala pola modelu i ustawia wartości modelu, nie zmienia wartosci klucza glownego
+     *
+     * @param array $aKeyValue Pola jako klucze $aKeyValue, wartosci modelu jako wartosci $aKeyValue
+     * @return $this
+     */
+    public function valField($aKeyValue)
+    {
+        $this->field(array_keys($aKeyValue));
+        $this->val($aKeyValue);
+        return $this;
+    }
 
     /**
      * Czysci wartosci modelu
