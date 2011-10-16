@@ -1,6 +1,6 @@
 <?php
 
-class f_m implements IteratorAggregate, Countable
+class f_m implements IteratorAggregate
 {
 
     /**
@@ -10,11 +10,12 @@ class f_m implements IteratorAggregate, Countable
      */
     public $_;
 
-    protected static $_m = array();
-    protected static $_configStatic = array(
+    protected static $_metadata      = array();
+    protected static $_configPackage = array(
         'paging' => 'f_paging', // f_paging_interface
         'prefix' => 'm_',       // class prefix for models
     );
+    
     protected $_table;
     protected $_key;
     protected $_field;
@@ -25,7 +26,6 @@ class f_m implements IteratorAggregate, Countable
     protected $_linkage  = array();
     protected $_result;
     protected $_valid;
-    protected $_isValid;
     protected $_error;
 
     /**
@@ -46,37 +46,37 @@ class f_m implements IteratorAggregate, Countable
     {
         $this->_class = $class = get_class($this);
 
-        if (! isset(self::$_m[$class])) {
+        if (! isset(self::$_metadata[$class])) {
             
-            $part = explode('_', substr($class, strlen(self::$_configStatic['prefix'])));
+            $part = explode('_', substr($class, strlen(self::$_configPackage['prefix'])));
 
             $reflection = new ReflectionClass($this);
             foreach ($reflection->getProperties(ReflectionProperty::IS_PUBLIC) as $property) {
                 $name = $property->getName();
                 if ($name[0] != '_') {
-                    self::$_m[$class]['field'][] = $name;
+                    self::$_metadata[$class]['field'][] = $name;
                 }
             }
 
             if (count($part) == 1) {
-                self::$_m[$class]['prefix'] = 'm_';
-                self::$_m[$class]['db']     = 'db';
-                self::$_m[$class]['table']  = $part[0];
+                self::$_metadata[$class]['prefix'] = 'm_';
+                self::$_metadata[$class]['db']     = 'db';
+                self::$_metadata[$class]['table']  = $part[0];
                 $key = $part[0] . '_id';
-                self::$_m[$class]['key'] = in_array($key, self::$_m[$class]['field']) ? $key : null;
+                self::$_metadata[$class]['key'] = in_array($key, self::$_metadata[$class]['field']) ? $key : null;
             }
             else {
-                self::$_m[$class]['prefix'] = 'm_' . $part[1] . '_';
-                self::$_m[$class]['db']     = 'db_' . $part[1];
-                self::$_m[$class]['table']  = $part[1];
+                self::$_metadata[$class]['prefix'] = 'm_' . $part[1] . '_';
+                self::$_metadata[$class]['db']     = 'db_' . $part[1];
+                self::$_metadata[$class]['table']  = $part[1];
                 $key = $part[1] . '_id';
-                self::$_m[$class]['key'] = in_array($key, self::$_m[$class]['field']) ? $key : null;
+                self::$_metadata[$class]['key'] = in_array($key, self::$_metadata[$class]['field']) ? $key : null;
             }
         }
 
-        $this->_table = self::$_m[$class]['table'];
-        $this->_field = self::$_m[$class]['field'];
-        $this->_key   = self::$_m[$class]['key'];
+        $this->_table = self::$_metadata[$class]['table'];
+        $this->_field = self::$_metadata[$class]['field'];
+        $this->_key   = self::$_metadata[$class]['key'];
 
         foreach ($config as $k => $v) {
             $this->{$k}($v);
@@ -93,12 +93,12 @@ class f_m implements IteratorAggregate, Countable
         switch ($key) {
             
             case '_db':
-                $service   = self::$_m[$this->_class]['db'];
+                $service   = self::$_metadata[$this->_class]['db'];
                 $this->_db = f::$c->{$service};
                 return $this->_db;
                 
             case '_paging':
-                $paging        = self::$_configStatic['paging'];
+                $paging        = self::$_configPackage['paging'];
                 $this->_paging = new $paging();
                 return $this->_paging;
                         
@@ -120,6 +120,8 @@ class f_m implements IteratorAggregate, Countable
         return new ArrayIterator($this->_);
     }
 
+    /* setup */
+    
     /**
      * Ustala lub pobiera nazwe tabeli w zależności od parametru
      *
@@ -234,7 +236,8 @@ class f_m implements IteratorAggregate, Countable
         return $this;
     }
 
-
+    /* values */
+    
     /**
      * Ustawia lub pobiera wartosci modelu, nie zmienia wartosci klucza glownego
      *
@@ -267,7 +270,7 @@ class f_m implements IteratorAggregate, Countable
                 }
             }
         }
-    	return $this;
+        return $this;
     }
 
     /**
@@ -288,8 +291,9 @@ class f_m implements IteratorAggregate, Countable
      */
     public function removeVal()
     {
+        return;
         $this->_ = null;
-        foreach (self::$_m[$this->_class]['field'] as $field) {
+        foreach (self::$_metadata[$this->_class]['field'] as $field) {
             $this->{$field} = null;
         }
         /** @todo wyczyscic modele depend */
@@ -311,7 +315,52 @@ class f_m implements IteratorAggregate, Countable
             return $this;
         }
     }
+    
+    /* params for queries */
+    
+    public function param($asKey, $sValue = null)
+    {
+        if (is_array($asKey)) {
+            foreach ($asKey as $k => $v) {
+                if (is_int($k)) {
+                    $this->_param[] = $v;
+                }
+                else {
+                    $this->_param[$k] = $v;
+                }
+            }
+            return $this;
+        }
+        if ($sValue === null) {
+            return $this->_param[$asKey];
+        }
+        $this->_param[$asKey] = $sValue;
+        return $this;
+    }
 
+    public function isParam($sKey)
+    {
+        return isset($this->_param[$sKey]);
+    }
+
+    public function removeParam($asKey = null)
+    {
+        if ($sKey === null) {
+            $this->_param = array();
+        }
+        else {
+            if (! is_array($asKey)) {
+                $asKey = array($asKey);
+            }
+            foreach ($asKey as $i) {
+                unset ($this->_param[$i]);
+            }
+        }
+        return $this;
+    }
+
+    /* queries */
+    
     /**
      * Selekcjonuje jeden rekord z tabeli, zapisuje go do pola _, zapisuje pobrane dane do pol publicznych obiektu
      *
@@ -346,51 +395,6 @@ class f_m implements IteratorAggregate, Countable
     }
 
     /**
-     * Selekcjonuje rekordy, ktore pobierane sa metoda next()
-     *
-     * @param array|integer|string|null $aisParam Parametry
-     * @return $this
-     */
-    public function selectLoop($aisParam = null)
-    {
-        $this->_result = $this->_db->query($this->_sql($aisParam, true, true, true));
-        return $this;
-    }
-
-    /**
-     * Pobiera kolejny rekod zapytania wykonanego przez metode selectLoop()
-     *
-     * @return $this
-     */
-    public function selectNext()
-    {
-        if ($data = $this->_db->fetch($this->_result)) {
-            $this->val($data);
-            $this->_ = $data;
-            if ($this->_key !== null && isset($data[$this->_key])) {
-                $this->{$this->_key} = $data[$this->_key];
-            }
-        }
-        else {
-            $this->removeVal();
-        }
-        return $this;
-    }
-
-
-    /**
-     * Pobiera wartosc pierwszego pola z pierwszego wyselekcjonowanego rekordu, zapisuje ja do _
-     *
-     * @param array|integer|string|null $aisParam Parametry
-     * @return $this
-     */
-    public function selectVal($aisParam = null)
-    {
-        $this->_ = $this->_db->val($this->_sql($aisParam, true, true, true));
-        return $this;
-    }
-
-    /**
      * Zwraca jedno wymiarową tablice numeryczną gdzie wartościami tablicy jest pierwsze pole z wyselekcjonowanych rekordow
      *
      * @param array|integer|string|null $aisParam Parametry
@@ -415,6 +419,18 @@ class f_m implements IteratorAggregate, Countable
     }
 
     /**
+     * Pobiera wartosc pierwszego pola z pierwszego wyselekcjonowanego rekordu, zapisuje ja do _
+     *
+     * @param array|integer|string|null $aisParam Parametry
+     * @return $this
+     */
+    public function selectVal($aisParam = null)
+    {
+        $this->_ = $this->_db->val($this->_sql($aisParam, true, true, true));
+        return $this;
+    }
+
+    /**
      * Wykonuje zapytanie SELECT COUNT, wartosc zapytania zapisuje do pola _
      *
      * @param array|integer|string|null $aisParam Parametry
@@ -428,16 +444,85 @@ class f_m implements IteratorAggregate, Countable
     }
 
     /**
-     * Wykonuje zapytanie SELECT COUNT, wartosc zapytania zapisuje do pola _
+     * Selekcjonuje rekordy, ktore pobierane sa metoda next()
      *
      * @param array|integer|string|null $aisParam Parametry
-     * @param string $sExpr Domyślnie *
      * @return $this
      */
-    public function count($aisParam = null, $sExpr = '*')
+    public function selectLoop($aisParam = null)
     {
-        $this->selectCount($aisParam, $sExpr);
-        return $this->_;
+        $this->_result = $this->_db->query($this->_sql($aisParam, true, true, true));
+        return $this;
+    }
+
+    /**
+     * Pobiera kolejny rekod zapytania wykonanego przez metode selectLoop()
+     *
+     * @return $this
+     */
+    public function selectNext()
+    {
+        if (($data = $this->_db->fetch($this->_result))) {
+            $this->val($data);
+            $this->_ = $data;
+            if ($this->_key !== null && isset($data[$this->_key])) {
+                $this->{$this->_key} = $data[$this->_key];
+            }
+        }
+        else {
+            $this->removeVal();
+        }
+        return $this;
+    }
+
+    /**
+     * Pobiera do modelu ostatnio dodany rekorod do bazy
+     *
+     * @return $tthis
+     */
+    public function selectLast()
+    {
+        $row = $this->_db->row("SELECT * FROM `$this->_table` WHERE `$this->_key` = LAST_INSERT_ID()");
+        $this->val($row);
+        $this->{$this->_key} = $aRow[$this->_key];
+        return $this;
+    }
+
+    /**
+     * Dodaje rekord do tabeli
+     *
+     * Nieprawidłowe klucze w tablicy są pomijane, musi sie zgadzac kolejność i ilość
+     *
+     * @param array $aData Tablica jedno wymiarowa asocjacyjna
+     * @return f_m
+     */
+    public function insert($aData = null)
+    {
+        
+        if (func_num_args()) {
+            foreach ($aData as $k => $v) {
+                if (! is_int($k) && ! in_array($k, $this->_field)) {
+                    unset($aData[$k]);
+                }
+            }
+        }
+        else {
+            $aData = $this->val();
+        }
+
+        $aSet = array();
+        foreach ($aData as $k => $v) {
+            $aSet[$k] = "`$k` = '{$this->_db->escape($v)}'";
+        }
+        if ($this->_linkage) {
+            foreach ($this->_linkage as $k => $v) {
+                $aSet[$k] = "`$k` = '{$this->_db->escape($v)}'";
+            }
+        }
+        
+        $this->_db->query("INSERT INTO `{$this->_table}` SET " . implode(', ', $aSet));
+
+        return $this;
     }
 
     /**
@@ -493,79 +578,44 @@ class f_m implements IteratorAggregate, Countable
     }
 
     /**
-     * Dodaje rekord do tabeli
+     * Modyfikuje rekord lub rekordy
      *
-	 * Nieprawidłowe klucze w tablicy są pomijane, musi sie zgadzac kolejność i ilość
-	 *
-	 * @param array $aData Tablica jedno wymiarowa asocjacyjna
-	 * @return f_m
-	 */
-	public function insert($aData = null)
-	{
-		if ($aData) {
-            foreach ($aData as $k => $v) {
-                if (! is_int($k) && ! in_array($k, $this->_field)) {
-                    unset($aData[$k]);
-                }
+     * @param array $aData Tablica jedno wymiarowa asocjacyjna
+     * @param array|integer|string|null $aisParam Parametry
+     * @return $this
+     */
+    public function update($aData = null, $aisParam = null)
+    {
+        if ($aisParam === null) {
+            if ($this->{$this->_key} !== null) {
+                $aisParam = $this->{$this->_key};
             }
-		}
-		$aData = $this->val();
-
-        $aSet = array();
-        foreach ($aData as $k => $v) {
-            $aSet[$k] = "`$k` = '{$this->_db->escape($v)}'";
-        }
-        if ($this->_linkage) {
-            foreach ($this->_linkage as $k => $v) {
-                $aSet[$k] = "`$k` = '{$this->_db->escape($v)}'";
-            }
-        }
-        
-        $this->_db->query("INSERT INTO `{$this->_table}` SET " . implode(', ', $aSet));
-
-        return $this;
-	}
-
-
-	/**
-	 * Modyfikuje rekord lub rekordy
-	 *
-	 * @param array $aData Tablica jedno wymiarowa asocjacyjna
-	 * @param array|integer|string|null $aisParam Parametry
-	 * @return $this
-	 */
-	public function update($aData = null, $aisParam = null)
-	{
-		if ($aisParam === null) {
-			if ($this->{$this->_key} !== null) {
-				$aisParam = $this->{$this->_key};
-			}
             else {
                 throw new LogicException("Oczekiwany warunek modyfikowania rekordow.");
                 return;
             }
-		}
+        }
 
-		if ($aData) {
+        if ($aData) {
             foreach ($aData as $k => $v) {
                 if (! is_int($k) && ! in_array($k, $this->_field)) {
                     unset($aData[$k]);
                 }
             }
-		}
+        }
         else {
             $aData = $this->val();
         }
         
-		$aSet = array();
-		foreach ($aData as $k => $v) {
+        $aSet = array();
+        foreach ($aData as $k => $v) {
             if (is_int($k)) {
                 $aSet[] = $v;
             }
             else {
                 $aSet[$k] = "`$k` = '{$this->_db->escape($v)}'";
             }
-		}
+        }
         if ($this->_linkage) {
             foreach ($this->_linkage as $k => $v) {
                 $aSet[$k] = "`$k` = '{$this->_db->escape($v)}'";
@@ -576,183 +626,154 @@ class f_m implements IteratorAggregate, Countable
         return $this;
     }
 
-	/**
-	 * Modyfikuje wszystkie rekordy w tabeli
-	 *
-	 * @param array $aData Tablica jedno wymiarowa asocjacyjna
-	 * @return $this
-	 */
+    /**
+     * Modyfikuje wszystkie rekordy w tabeli
+     *
+     * @param array $aData Tablica jedno wymiarowa asocjacyjna
+     * @return $this
+     */
     public function updateAll($aData = null)
     {
         $this->update($aData, array('1'));
         return $this;
     }
 
-	/**
-	 * Usuwa rekord lub rekordy
-	 * Gdy brak jakiegokolwiek warunku zapytanie DELETE nie zostanie wykonane, aby usunąć wszystkie rekordy użyj metody deleteAll
-	 *
-	 * @param array|integer|string|null $aisParam Parametry
-	 * @return int 0 - sucess, 1 - Bład zapytania DELETE, <2,n> - Błąd w metodzie przeciązającej tą metode;
-	 */
-	public function delete($aisParam = null)
-	{
-		if ($aisParam === null) {
-			if ($this->{$this->_key} !== null) {
-				$aisParam = $this->{$this->_key};
-			}
+    /**
+     * Usuwa rekord lub rekordy
+     * Gdy brak jakiegokolwiek warunku zapytanie DELETE nie zostanie wykonane, aby usunąć wszystkie rekordy użyj metody deleteAll
+     *
+     * @param array|integer|string|null $aisParam Parametry
+     * @return int 0 - sucess, 1 - Bład zapytania DELETE, <2,n> - Błąd w metodzie przeciązającej tą metode;
+     */
+    public function delete($aisParam = null)
+    {
+        if ($aisParam === null) {
+            if ($this->{$this->_key} !== null) {
+                $aisParam = $this->{$this->_key};
+            }
             else {
                 throw new LogicException("Oczekiwany warunek kasacji rekordow");
                 return;
             }
-		}
+        }
         $this->_db->query("DELETE FROM `{$this->_table}`".$this->_sql($aisParam, false, false, true));
         return $this;
-	}
+    }
 
-	public function deleteAll()
-	{
-		$this->delete(array('1'));
+    public function deleteAll()
+    {
+        $this->delete(array('1'));
         return $this;
-	}
+    }
 
-	/**
-	 * Zapisuje rekord do bazy, wkonuje zapytanie INSERT jesli wartosc klucza podstawowego jest rowna null, lub UPDATE w przeciwnym wypadku
-	 *
-	 * @param array $aData Tablica jedno wymiarowa asocjacyjna
-	 * @param integer|null $iId Id rekordu
-	 * @return $this
-	 */
-	public function save($aData = null, $iId = null)
-	{
-		if ($aData !== null) {
-			$this->val($aData);
-		}
-		if ($iId !== null) {
-			$this->{$this->_key} = $iId;
-		}
+    /**
+     * Zapisuje rekord do bazy, wkonuje zapytanie INSERT jesli wartosc klucza podstawowego jest rowna null, lub UPDATE w przeciwnym wypadku
+     *
+     * @param array $aData Tablica jedno wymiarowa asocjacyjna
+     * @param integer|null $iId Id rekordu
+     * @return $this
+     */
+    public function save($aData = null, $iId = null)
+    {
+        if ($aData !== null) {
+            $this->val($aData);
+        }
+        if ($iId !== null) {
+            $this->{$this->_key} = $iId;
+        }
 
-		if ($this->{$this->_key} === null) {
-			$this->insert();
-		}
-		else {
-			$this->update();
-		}
+        if ($this->{$this->_key} === null) {
+            $this->insert();
+        }
+        else {
+            $this->update();
+        }
         
         return $this;
-	}
+    }
 
-	/**
-	 * Pobiera do modelu ostatnio dodany rekorod do bazy
-	 *
-	 * @return $tthis
-	 */
-	public function selectLast()
-	{
-		$row = $this->_db->row("SELECT * FROM `$this->_table` WHERE `$this->_key` = LAST_INSERT_ID()");
-		$this->val($row);
-		$this->{$this->_key} = $aRow[$this->_key];
-        return $this;
-	}
+    /**
+     * Wykonuje zapytanie SELECT COUNT, wartosc zapytania zapisuje do pola _
+     *
+     * @param array|integer|string|null $aisParam Parametry
+     * @param string $sExpr Domyślnie *
+     * @return $this
+     */
+    public function count($aisParam = null, $sExpr = '*')
+    {
+        $this->selectCount($aisParam, $sExpr);
+        return $this->_;
+    }
 
-	/**
-	 * Wykonuje JOIN dołączenie do tabeli według referencji
-	 *
-	 * @param string $asRefName Nazwa referencji
-	 * @param array|string $asField Pola jako tablica lub string gdzie pola są oddzielone znakiem spacji
-	 * @param string $asModel Nazwa modelu
-	 * @return $this
-	 */
+    /* join */
+
+    /**
+     * Wykonuje JOIN dołączenie do tabeli według referencji
+     *
+     * @param string $asRefName Nazwa referencji
+     * @param array|string $asField Pola jako tablica lub string gdzie pola są oddzielone znakiem spacji
+     * @param string $asModel Nazwa modelu
+     * @return $this
+     */
     public function join($asRefName, $asField = null, $asModel = null)
     {
         $this->_join($asRefName, $asField, $asModel, 'JOIN');
-		return $this;
+        return $this;
     }
-
-	/**
-	 * Wykonuje LEFT JOIN dołączenie do tabeli według referencji
-	 *
-	 * @param string $asRefName Nazwa referencji
-	 * @param array|string $asField Pola jako tablica lub string gdzie pola są oddzielone znakiem spacji
-	 * @param string $asModel Nazwa modelu
-	 * @return $this
-	 */
-	public function joinLeft($asRefName, $asField = null, $asModel = null)
-	{
-        $this->_join($asRefName, $asField, $asModel, 'LEFT JOIN');
-		return $this;
-	}
-
 
     /**
-     * @todo napisac opis
-     * @param <type> $isKey
-     * @param <type> $sValue 
+     * Wykonuje LEFT JOIN dołączenie do tabeli według referencji
+     *
+     * @param string $asRefName Nazwa referencji
+     * @param array|string $asField Pola jako tablica lub string gdzie pola są oddzielone znakiem spacji
+     * @param string $asModel Nazwa modelu
+     * @return $this
      */
-	public function modelLinkage($isKey, $sValue)
-	{
-		$this->_linkage[$isKey] = $sValue;
-	}
-
-    public function param($asKey, $sValue = null)
+    public function joinLeft($asRefName, $asField = null, $asModel = null)
     {
-        if (is_array($asKey)) {
-            foreach ($asKey as $k => $v) {
-                if (is_int($k)) {
-                    $this->_param[] = $v;
-                }
-                else {
-                    $this->_param[$k] = $v;
-                }
-            }
-            return $this;
-        }
-        if ($sValue === null) {
-            return $this->_param[$asKey];
-        }
-        $this->_param[$asKey] = $sValue;
+        $this->_join($asRefName, $asField, $asModel, 'LEFT JOIN');
         return $this;
     }
 
-    public function isParam($sKey)
-    {
-        return isset($this->_param[$sKey]);
-    }
-
-    public function removeParam($asKey = null)
-    {
-        if ($sKey === null) {
-            $this->_param = array();
-        }
-        else {
-            if (! is_array($asKey)) {
-                $asKey = array($asKey);
-            }
-            foreach ($asKey as $i) {
-                unset ($this->_param[$i]);
-            }
-        }
-        return $this;
-    }
-
+    /* additional */
+    
     public function paging($aConfig = array())
     {
         if (! isset($aConfig['all']) && ! isset($this->_paging->all)) {
-            $this->_paging->all = $this->count();
+            $aConfig['all'] = $this->count();
         }
 
         foreach ($aConfig as $k => $v) {
             $this->_paging->{$k} = $v;
         }
 
-		$this->_paging->paging();
+        $this->_paging->paging();
 
-        $this->param(array('paging' => $this->_paging));
-        $this->removeParam('limit');
+        $this->param(array(
+            'limit'  => $this->_paging->limit,
+            'offset' => $this->_paging->offset,
+        ));
 
         return $this;
     }
 
+
+    /* private api */
+    
+    /**
+     * @todo napisac opis
+     * @param <type> $isKey
+     * @param <type> $sValue 
+     */
+    public function modelLinkage($isKey, $sValue)
+    {
+        $this->_linkage[$isKey] = $sValue;
+    }
+
+    
+    
+    /* */
+    
     /**
      * @friend f_m
      */
@@ -762,7 +783,7 @@ class f_m implements IteratorAggregate, Countable
     }
 
     /**
-	 * Buduje zapytanie SQL
+     * Buduje zapytanie SQL
      *
      * @param array|integer|null|string $aisParam Parametry
      * @param boolean $bSelect Czy budowac fragment SELECT
@@ -770,16 +791,16 @@ class f_m implements IteratorAggregate, Countable
      * @param boolean $bLinkage Czy budowac fragment powiazania
      * @return string Zapytanie SQL lub fragment zapytania
      */
-	protected function _sql($aisParam, $bSelect, $bFrom, $bLinkage)
-	{
-		$select  = null;
-		$from    = null;
-		$where   = null;
-		$groupby = null;
-		$having  = null;
-		$orderby = null;
-		$limit   = null;
-		$offset  = null;
+    protected function _sql($aisParam, $bSelect, $bFrom, $bLinkage)
+    {
+        $select  = null;
+        $from    = null;
+        $where   = null;
+        $groupby = null;
+        $having  = null;
+        $orderby = null;
+        $limit   = null;
+        $offset  = null;
 
         $aField  = $this->_field;
 
@@ -841,32 +862,32 @@ class f_m implements IteratorAggregate, Countable
             $where = " WHERE ".implode($operator, $aWhere);
         }
 
-		if ($this->_linkage && $bLinkage) {
+        if ($this->_linkage && $bLinkage) {
             $aLinkage = array();
             foreach ($this->_linkage as $k => $v) {
                 $aLinkage[$k] = "`$k` = '{$this->_db->escape($v)}'";
             }
 
-			$where = (empty($where) ? ' WHERE ' : substr($where, 0, 7) . '(' . substr($where, 7) . ') AND ')
+            $where = (empty($where) ? ' WHERE ' : substr($where, 0, 7) . '(' . substr($where, 7) . ') AND ')
                 . implode(" AND ", $aLinkage);
-		}
+        }
 
         // select
-		if ($bSelect) {
-			$aSelect = array();
+        if ($bSelect) {
+            $aSelect = array();
             foreach ($aField as $k => $v) {
                 $aSelect[] =  "`$v`" . (is_int($k) ? '' : ' as ' . $k);
             }
-			$select = 'SELECT '.implode(', ', array_merge($aSelect, $this->_select));
-		}
+            $select = 'SELECT '.implode(', ', array_merge($aSelect, $this->_select));
+        }
 
         // from
-		if ($bFrom) {
-			$from   = " FROM `{$this->_table}`" . ($this->_join ? ' ' . implode(' ', $this->_join) : '');
-		}
+        if ($bFrom) {
+            $from   = " FROM `{$this->_table}`" . ($this->_join ? ' ' . implode(' ', $this->_join) : '');
+        }
 
-		return $select . $from . $where . $groupby . $having . $orderby . $limit . $offset;
-	}
+        return $select . $from . $where . $groupby . $having . $orderby . $limit . $offset;
+    }
 
 
     protected function _rel()
@@ -887,7 +908,7 @@ class f_m implements IteratorAggregate, Countable
             $relField = "{$sRefModel}_id";
         }
 
-        self::$_m[$this->_class]['ref'][$sRefModel] = array(
+        self::$_metadata[$this->_class]['ref'][$sRefModel] = array(
             'field'    => $field,
             'relTable' => $relTable,
             'relField' => $relField,
@@ -912,7 +933,7 @@ class f_m implements IteratorAggregate, Countable
             $relField = "{$model}_id";
         }
         
-        self::$_m[$this->_class]['ref'][$sRefModel] = array(
+        self::$_metadata[$this->_class]['ref'][$sRefModel] = array(
             'field'    => $field,
             'relTable' => $relTable,
             'relField' => $relField,
@@ -937,7 +958,7 @@ class f_m implements IteratorAggregate, Countable
             $relField = "{$model}_id_{$this->_table}_{$option}";
         }
 
-        self::$_m[$this->_class]['dep'][$sDepModel] = array(
+        self::$_metadata[$this->_class]['dep'][$sDepModel] = array(
             'field'    => $field,
             'relTable' => $relTable,
             'relField' => $relField,
@@ -946,28 +967,28 @@ class f_m implements IteratorAggregate, Countable
 
     private function _modelDependent($sDependent)
     {
-        if (!isset(self::$_m[$this->_class]['ref'])) {
+        if (!isset(self::$_metadata[$this->_class]['ref'])) {
             $this->_rel();
-            if (! isset (self::$_m[$class]['ref'])) {
-                self::$_m[$class]['ref'] = array();
+            if (! isset (self::$_metadata[$class]['ref'])) {
+                self::$_metadata[$class]['ref'] = array();
             }
-            if (! isset (self::$_m[$class]['dep'])) {
-                self::$_m[$class]['dep'] = array();
+            if (! isset (self::$_metadata[$class]['dep'])) {
+                self::$_metadata[$class]['dep'] = array();
             }
         }
 
-        if (isset(self::$_m[$this->_class]['dep'][$sDependent])) {
-            $rel = self::$_m[$this->_class]['dep'][$sDependent];
+        if (isset(self::$_metadata[$this->_class]['dep'][$sDependent])) {
+            $rel = self::$_metadata[$this->_class]['dep'][$sDependent];
         }
-        else if (isset(self::$_m[$this->_class]['ref'][$sDependent])) {
-            $rel = self::$_m[$this->_class]['dep'][$sDependent] = self::$_m[$this->_class]['ref'][$sDependent];
+        else if (isset(self::$_metadata[$this->_class]['ref'][$sDependent])) {
+            $rel = self::$_metadata[$this->_class]['dep'][$sDependent] = self::$_metadata[$this->_class]['ref'][$sDependent];
         }
         else {
             throw new Exception("Odwolanie do nieistniejacej relacji o nazwie $sDependent w modelu $this->_class");
             return;
         }
 
-        $class  = self::$_m[$this->_class]['prefix'].$rel['relTable'];
+        $class  = self::$_metadata[$this->_class]['prefix'].$rel['relTable'];
         $oModel = new $class;
         $oModel->modelLinkage($rel['relField'], $this->{$rel['field']});
         $oModel->{$rel['relField']} = $this->{$rel['field']};
@@ -975,27 +996,27 @@ class f_m implements IteratorAggregate, Countable
         return $oModel;
     }
 
-	private function _join($asRefName, $asField, $asModel, $sType)
-	{
-		if (is_array($asRefName)) {
-			$aliasJoin = key($asRefName);
-			$asRefName = current($asRefName);
-		}
+    private function _join($asRefName, $asField, $asModel, $sType)
+    {
+        if (is_array($asRefName)) {
+            $aliasJoin = key($asRefName);
+            $asRefName = current($asRefName);
+        }
         if (is_array($asModel)) {
-			$aliasModel = key($asModel);
-			$asModel    = current($asModel);
-		}
+            $aliasModel = key($asModel);
+            $asModel    = current($asModel);
+        }
 
         if ($asModel == null) {
             $class = $this->_class;
-            $model = self::$_m[$this->_class]['table'];
+            $model = self::$_metadata[$this->_class]['table'];
         }
         else {
-            $class = self::$_m[$this->_class]['prefix'] . $asModel;
+            $class = self::$_metadata[$this->_class]['prefix'] . $asModel;
             $model = $asModel;
         }
 
-        if (!isset(self::$_m[$class]['ref'])) {
+        if (!isset(self::$_metadata[$class]['ref'])) {
             if ($asModel == null) {
                 $this->_rel();
             }
@@ -1003,19 +1024,19 @@ class f_m implements IteratorAggregate, Countable
                 $o = new $class;
                 $o->modelRel();
             }
-            if (! isset (self::$_m[$class]['ref'])) {
-                self::$_m[$class]['ref'] = array();
+            if (! isset (self::$_metadata[$class]['ref'])) {
+                self::$_metadata[$class]['ref'] = array();
             }
-            if (! isset (self::$_m[$class]['dep'])) {
-                self::$_m[$class]['dep'] = array();
+            if (! isset (self::$_metadata[$class]['dep'])) {
+                self::$_metadata[$class]['dep'] = array();
             }
         }
 
-        if (isset(self::$_m[$class]['ref'][$asRefName])) {
-            $rel = self::$_m[$class]['ref'][$asRefName];
+        if (isset(self::$_metadata[$class]['ref'][$asRefName])) {
+            $rel = self::$_metadata[$class]['ref'][$asRefName];
         }
-        else if (isset(self::$_m[$class]['dep'][$asRefName])) {
-            $rel = self::$_m[$class]['ref'][$asRefName] = self::$_m[$class]['dep'][$asRefName];
+        else if (isset(self::$_metadata[$class]['dep'][$asRefName])) {
+            $rel = self::$_metadata[$class]['ref'][$asRefName] = self::$_metadata[$class]['dep'][$asRefName];
         }
         else {
             throw new Exception("Odwolanie do nieistniejacej relacji o nazwie $asRefName w modelu $this->_class");
@@ -1024,11 +1045,11 @@ class f_m implements IteratorAggregate, Countable
 
         if ($asField !== false) {
             if ($asField === null) {
-                $classJoin = self::$_m[$this->_class]['prefix'] . $rel['relTable'];
-                if (! isset (self::$_m[$classJoin])) {
+                $classJoin = self::$_metadata[$this->_class]['prefix'] . $rel['relTable'];
+                if (! isset (self::$_metadata[$classJoin])) {
                     new $classJoin();
                 }
-                $asField = self::$_m[$classJoin]['field'];
+                $asField = self::$_metadata[$classJoin]['field'];
             }
             else if (is_string($asField)){
                 $asField = explode(' ', $asField);
@@ -1041,6 +1062,6 @@ class f_m implements IteratorAggregate, Countable
             . ' ON (' . ($aliasModel === null ? '' : "`$aliasModel`.") . "`{$rel['field']}`"
             . ' = ' . ($aliasJoin === null ? '' : "`$aliasJoin`.") . "`{$rel['relField']}`" . ')';
 
-	}
+    }
     
 }

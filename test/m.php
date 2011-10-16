@@ -150,6 +150,7 @@ class test_m extends f_test
         if ($oEvent->type != 'call') {
             return;
         }
+        
         if ($oEvent->name == 'escape') {
             $oEvent->val   = addslashes($oEvent->arg[0]);
             $oEvent->break = true;
@@ -319,20 +320,21 @@ class test_m extends f_test
         unset(self::$_select["SELECT `post_id` FROM `post`"]);
     }
 
-    public function loop()
-    {
-        self::$_select["SELECT `post_id` FROM `post`"] = array(
-            array("1"), array("2"), array("3"), array("4"), array("5"));
-        $oPost = new m_post();
-        $oPost->field('post_id');
-        $oPost->selectLoop();
-        while($oPost->selectNext()->id()) {
-
-        }
-
-
-         unset(self::$_select["SELECT `post_id` FROM `post`"]);
-   }
+//    public function loop()
+//    {
+//        self::$_select["SELECT `post_id` FROM `post`"] = array(
+//            array("1"), array("2"), array("3"), array("4"), array("5"));
+//        $oPost = new m_post();
+//        $oPost->field('post_id');
+//        $oPost->selectLoop();
+//        while($oPost->selectNext()->id()) {
+//            var_dump(self::$_query);
+//            break;
+//        }
+//
+//
+//         unset(self::$_select["SELECT `post_id` FROM `post`"]);
+//   }
 
    public function reservedWords()
    {
