@@ -5,7 +5,7 @@ class f_event
 
     protected $_id;
     protected $_subject;
-    protected $_processed;
+    protected $_cancel = false;
 
     /**
      * @param array $aConfig
@@ -36,7 +36,7 @@ class f_event
     public function cancel($bCancel = null)
     {
         if (func_num_args ()) {
-            $this->_processed = $bCancel;
+            $this->_cancel = (boolean)$bCancel;
             return $this;
         }
         return $this->_cancel === false ? false : true;

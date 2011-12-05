@@ -103,7 +103,7 @@ class f_m implements IteratorAggregate
                 return $this->_paging;
                         
             default:
-                return $this->{$key} = $this->_modelLinked($key);
+                return $this->{$key} = $this->_createLinkedModel($key);
                 
         }
     }
@@ -758,7 +758,7 @@ class f_m implements IteratorAggregate
     }
 
 
-    /* private api */
+    /* friend api */
     
     /**
      * @todo napisac opis
@@ -770,10 +770,6 @@ class f_m implements IteratorAggregate
         $this->_linkage[$isKey] = $sValue;
     }
 
-    
-    
-    /* */
-    
     /**
      * @friend f_m
      */
@@ -782,6 +778,17 @@ class f_m implements IteratorAggregate
         $this->_rel();
     }
 
+    /* private api */
+    
+    /**
+     * 
+     */
+    protected function _rel()
+    {
+
+    }
+
+    
     /**
      * Buduje zapytanie SQL
      *
@@ -889,11 +896,6 @@ class f_m implements IteratorAggregate
         return $select . $from . $where . $groupby . $having . $orderby . $limit . $offset;
     }
 
-
-    protected function _rel()
-    {
-
-    }
 
     protected function _rel11($sRefModel, $sField = null, $sRelatedField = null)
     {

@@ -12,8 +12,20 @@ return array(
             'pass'    => 'fine',
             'charset' => 'utf8'
         ),
+        'error' => array(
+            'render'     => true,
+            'level'      => E_ALL ^ E_NOTICE,
+            'log'        => true,
+            'throwError' => 0
+        ),
     ),
     'prod' => array(
+        'error' => array(
+            'render'     => false,
+            'level'      => E_ALL ^ E_NOTICE,
+            'log'        => true,
+            'throwError' => 0
+        ),
         'db' => array (
             'host'    => 'localhost',
             'name'    => 'XXXXXXXXXXXXXXX',

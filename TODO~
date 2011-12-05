@@ -1,0 +1,9 @@
+- f_event - break replace to cancel()
+- f_paging_interface
+- f_debug_object(array('object' => '', 'key', ''))
+- f_c_helper_connectionClose
+- f_c_helper_uri: build, abs, resolvePairsParams moze polaczenie offsetow i pairs? hmm :)?
+- f_c_helper_notFound->ifNot();
+- f_di __isset
+- f_c_helper_notShared_interface
+-

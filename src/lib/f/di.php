@@ -6,7 +6,6 @@ class f_di
     protected static $_shared = array();
 
     protected $_useStaticShare = false;
-    protected $_param          = array();
 
     public function _()
     {
@@ -24,31 +23,6 @@ class f_di
         }
 
         return null;
-    }
-
-    public function removeParam($sName = null)
-    {
-        if ($sName !== null) {
-            $this->_param[$sName] = array();
-            return $this;
-        }
-        $this->_param = array();
-        return $this;
-    }
-
-    public function param($asName, $mValue = null)
-    {
-        if (is_array($asName)) {
-            foreach ($asName as $k => $v) {
-                $this->_param[$k] = $v;
-            }
-            return $this;
-        }
-        if ($mValue !== null) {
-            $this->_param[$asName] = $mValue;
-            return $this;
-        }
-        return $this->_param[$asName];
     }
 
 }

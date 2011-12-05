@@ -34,12 +34,12 @@ class f_config
     {
         $file = str_replace('_', '/', $this->___path . $sName) . '.php';
 
-        $this->{$sName} = @include $file;
+        $this->{$sName} = include $file;
 
-        if ($this->{$sName} == false) {
+        if ($this->{$sName} === false) {
             throw new f_config_exception(array(
                 'type' => f_config_exception::NO_CONFIG_FILE,
-                'msg'  => "No config file named $sName ($file) or config file return flase"
+                'msg'  => "No config file named $sName ($file) or config file return false"
             ));
         }
 

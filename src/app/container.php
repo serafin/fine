@@ -1,24 +1,22 @@
 <?php
 
-class app_c extends f_c_container
+class app_container extends f_c_container
 {
 
     protected function _config()
     {
-        $this->config = new f_config(array(
-            'path' => f::$pathApp . 'config/',
-        ));
-        $this->config->main = $this->config->main->{f::$env};
+        $this->config       = new f_config(array('path' =>  'app/config/'));
+        $this->config->main = $this->config->main[$this->env];
         return $this->config;
     }
 
     protected function _db()
     {
-        $db = $this->config->main->db;
+        $config   = $this->config->main['db'];
         $this->db = new f_db_mysql();
-        $this->db->connect($db->host, $db->user, $db->pass);
-        $this->db->selectDb($db->name);
-        $this->db->query("SET NAMES '{$db->charset}'");
+        $this->db->connect($config->host, $config->user, $config->pass);
+        $this->db->selectDb($config->name);
+        $this->db->query("SET NAMES '{$config->charset}'");
         return $this->db;
     }
     
@@ -33,42 +31,31 @@ class app_c extends f_c_container
     {
         $this->dispacher          = new f_c_dispacher();
         $this->dispacher->request = $this->request;
-        $this->dispacher->event   = $this->event;
         return $this->dispacher;
     }
     
     protected function _env()
     {
-        $this->env = $_SERVER['ENV'] == 'dev' ? 'dev' : 'prod';
-        return $this->env;
+        return $this->env = $_SERVER['ENV'] == 'dev' ? 'dev' : 'prod';
     }
 
     protected function _error()
     {
-        $this->error = new f_error($this->config->main->error);
-        $this->error->register();
+        
+        $this->error = new f_error($this->config->main['error']);
         return $this->error;
     }
 
     protected function _event()
     {
-        $this->event = new f_event_dispacher();
-        return $this->event;
+        return $this->event = new f_event_dispacher();
     }
 
     protected function _flash()
     {
-        $this->flash           = new f_helper_flash();
+        $this->flash           = new f_c_helper_flash();
         $this->flash->session  = $this->session->space('flash');
-        $this->flash->redirect = $this->redirect;
         return $this->flash;
-    }
-
-    protected function _m()
-    {
-        $this->m = new f_m_dispacher();
-        $this->m->prefix("m_");
-        return $this->m;
     }
 
     protected function _reg()
@@ -79,7 +66,7 @@ class app_c extends f_c_container
     protected function _request()
     {
         if ($_FILES) {
-            /* @todo */
+            $_POST += $_FILES;
         }
         return $this->request = new f_c_request();
         
@@ -92,18 +79,17 @@ class app_c extends f_c_container
 
     protected function _router()
     {
-        $this->router          = new app_c_router();
+        $this->router          = new f_c_router();
         $this->router->request = $this->request;
         return $this->router;
     }
 
     protected function _render()
     {
-        $this->render            = new f_c_helper_render();
-        $this->render->dispacher = $this->dispacher;
-        $this->render->view      = $this->v;
-        $this->render->layout    = $this->layout;
-        $this->render->response  = $this->respones;
+        $this->render             = new f_c_render();
+        $this->render->dispacher  = $this->dispacher;
+        $this->render->viewObject = $this->v;
+        $this->render->response   = $this->response;
         return $this->render;
     }
 
@@ -121,10 +107,7 @@ class app_c extends f_c_container
 
     protected function _uri()
     {
-        $this->uri = new f_helper_uri(array(
-            'request' => $this->request,
-            'router'  => $this->router,
-        ));
+        $this->uri = new f_c_helper_uri();
     }
     
     protected function _uriAbs()

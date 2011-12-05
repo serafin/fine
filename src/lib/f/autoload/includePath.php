@@ -3,9 +3,9 @@
 class f_autoload_includePath
 {
 
-    protected $_path           = array();
-    protected $_extension      = '.php';
-    protected $_separator      = '_';
+    protected $_path      = array();
+    protected $_suffis    = '.php';
+    protected $_separator = '_';
     
 
     public static function _()
@@ -35,14 +35,14 @@ class f_autoload_includePath
         }
     }
 
-    public function extension($sFileExtension = null)
+    public function suffix($sFileSuffix= null)
     {
         if (func_num_args()) {
-            $this->_extension = $sFileExtension;
+            $this->_suffis = $sFileSuffix;
             return $this;
         }
         else {
-            return $this->_extension;
+            return $this->_suffis;
         }
     }
 
@@ -72,7 +72,7 @@ class f_autoload_includePath
 
     public function load($sClassName)
     {
-        @include str_replace($this->_separator, DIRECTORY_SEPARATOR, $sClassName . $this->_extension);
+        include str_replace($this->_separator, DIRECTORY_SEPARATOR, $sClassName . $this->_suffis);
     }
 
 }

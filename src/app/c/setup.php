@@ -5,7 +5,7 @@ class c_setup
 
     public function indexAction()
     {
-        $this->{f::$env}();
+        $this->{$this->env}();
     }
 
     public function dev()

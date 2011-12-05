@@ -4,7 +4,7 @@ class f_error
 {
     
     const ERROR_NOT_FOUND = 'NOT_FOUND';
-    const ERROR_NO_ACCESS = 'FORBIDDEN';
+    const ERROR_NO_ACCESS = 'NO_ACCESS';
     const ERROR_INTERNAL  = 'INTERNAL';
 
     const RENDER_FORMAT_HTML = 'RENDER_FORAMT_HTML';
