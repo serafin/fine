@@ -9,7 +9,7 @@ class f_db_mysql
 
     public function connect($sHostname, $sUsername, $sPassword)
     {
-        if ($this->_connect = mysql_connect($sHostname, $sUsername, $sPassword, true)) {
+        if (($this->_connect = mysql_connect($sHostname, $sUsername, $sPassword, true))) {
             return $this;
         }
         throw new f_db_exception(array(
@@ -64,7 +64,7 @@ class f_db_mysql
     public function query($sQuery)
     {
         $this->_query = $sQuery;
-        if ($this->_result = mysql_query($sQuery, $this->_connect)) {
+        if (($this->_result = mysql_query($sQuery, $this->_connect))) {
             return $this->_result;
         }
         throw new f_db_exception(array(
@@ -84,7 +84,7 @@ class f_db_mysql
     public function row($sQuery)
     {
         $this->_query = $sQuery;
-        if ($this->_result = mysql_query($sQuery, $this->_connect)) {
+        if (($this->_result = mysql_query($sQuery, $this->_connect))) {
             return mysql_fetch_assoc($this->_result);
         }
         throw new f_db_exception(array(
@@ -104,7 +104,7 @@ class f_db_mysql
     public function rows($sQuery)
     {
         $this->_query = $sQuery;
-        if ($this->_result = mysql_query($sQuery, $this->_connect)) {
+        if (($this->_result = mysql_query($sQuery, $this->_connect))) {
             $a = array();
             while ($i = mysql_fetch_assoc($this->_result)) {
                 $a[] = $i;
@@ -130,7 +130,7 @@ class f_db_mysql
     public function col($sQuery)
     {
         $this->_query = $sQuery;
-        if ($this->_result = mysql_query($sQuery, $this->_connect)) {
+        if (($this->_result = mysql_query($sQuery, $this->_connect))) {
             $a = array();
             while ($i = mysql_fetch_row($this->_result)) {
                 $a[] = $i[0];
@@ -154,7 +154,7 @@ class f_db_mysql
     public function cols($sQuery)
     {
         $this->_query = $sQuery;
-        if ($this->_result = mysql_query($sQuery, $this->_connect)) {
+        if (($this->_result = mysql_query($sQuery, $this->_connect))) {
             $a = array();
             while ($i = mysql_fetch_row($this->_result)) {
                 $a[$i[0]] = $i[1];
@@ -177,8 +177,8 @@ class f_db_mysql
     public function val($sQuery)
     {
         $this->_query = $sQuery;
-        if ($this->_result = mysql_query($sQuery, $this->_connect)) {
-            if ($a = mysql_fetch_row($this->_result)) {
+        if (($this->_result = mysql_query($sQuery, $this->_connect))) {
+            if (($a = mysql_fetch_row($this->_result))) {
                 return $a[0];
             }
             return null;
@@ -200,7 +200,7 @@ class f_db_mysql
     public function rowNum($sQuery)
     {
         $this->_query = $sQuery;
-        if ($this->_result = mysql_query($sQuery, $this->_connect)) {
+        if (($this->_result = mysql_query($sQuery, $this->_connect))) {
             return mysql_fetch_row($this->_result);
         }
         throw new f_db_exception(array(
@@ -220,7 +220,7 @@ class f_db_mysql
     public function rowsNum($sQuery)
     {
         $this->_query = $sQuery;
-        if ($this->_result = mysql_query($sQuery, $this->_connect)) {
+        if (($this->_result = mysql_query($sQuery, $this->_connect))) {
             $a = array();
             while ($i = mysql_fetch_row($this->_result)) {
                 $a[] = $i;
@@ -369,10 +369,10 @@ class f_db_mysql
             }
             else {
                 throw new f_db_exception(array(
+                    'type'  => f_db_exception::INVALID_ARGUMENT,
                     'msg'   => "Too not enough \"?\" chars(".substr_count($sQuery, "?").") in query"
                               ." and too many vars(".count($asVar).") passed in second argument",
                     'code'  => 0,
-                    'query' => $sQuery
                 ));
             }
         }

@@ -1,27 +1,8 @@
 <?php
 
-class f_c_helper_render
+class f_c_render extends f_c
 {
 
-    /** 
-     * view object
-     * @var f_v 
-     */
-    public $viewObject;
-    
-    /** 
-     * response object
-     * @var f_c_response 
-     */
-    public $reponse;
-    
-    /** 
-     * dispacher object
-     * used only to auto resolve view script if not set
-     * @var f_c_dispacher 
-     */
-    public $dispacher;
-    
     /** 
      * render result kept for next view level
      * @var string
@@ -114,9 +95,9 @@ class f_c_helper_render
 
     public function render($sViewScript = null)
     {
-        // event main_prender_pre
-        if (f::$c->event->is('main_render_pre')) {
-            f::$c->event->run($event = new f_event(array('id' => 'main_render_pre', 'subject' => $this)));
+        // event prender_pre
+        if ($this->event->is('render_pre')) {
+            $this->event->run($event = new f_event(array('id' => 'render_pre', 'subject' => $this)));
             if ($event->cancel()) {
                 return;
             }
@@ -139,28 +120,28 @@ class f_c_helper_render
         
         // render view
         ob_start();
-        $this->viewObject->renderPath("$this->viewPath/$this->view.php");
+        $this->v->renderPath("$this->viewPath/$this->view.php");
         $this->content = ob_get_clean();
         
         // render layout
         if ($this->layout !== null) {
             ob_start();
-            $this->viewObject->renderPath("$this->layoutPath/$this->layout.php");
+            $this->v->renderPath("$this->layoutPath/$this->layout.php");
             $this->content = ob_get_clean();
         }
         
         // render head
         if ($this->layout !== null) {
             ob_start();
-            $this->viewObject->renderPath("$this->headPath/$this->head.php");
+            $this->v->renderPath("$this->headPath/$this->head.php");
             $this->content = ob_get_clean();
         }
         
         $this->response->body = $this->content;
         
-        // event main_render_post
-        if (f::$c->event->is('main_render_pre')) {
-            f::$c->event->run(new f_event(array('id' => 'main_render_post', 'subject' => $this)));
+        // event render_post
+        if ($this->event->is('render_pre')) {
+            $this->event->run(new f_event(array('id' => 'render_post', 'subject' => $this)));
         }
 
     }

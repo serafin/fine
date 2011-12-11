@@ -1,6 +1,6 @@
 <?php
 
-class f_c_helper_redirect
+class f_c_helper_redirect extends f_c
 {
 
     protected $_code = 302;
@@ -14,17 +14,14 @@ class f_c_helper_redirect
         }
             
         if (is_array($asUri)) {
-            $asUri = f::$c->uri->abs($asUri);
+            $asUri = $this->uri->abs($asUri);
         }
             
-        f::$c->response
+        $this->response
                 ->redirect($asUri, $this->_code)
                 ->sendHeader();
                 
         if ($this->_exit) {
-            if (f::$c->event->is('main_end')) {
-                f::$c->event->run(new f_event(array('id' => 'main_end', 'subject' => $this)));
-            }
             exit;
         }
         

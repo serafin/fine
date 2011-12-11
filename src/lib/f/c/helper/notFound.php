@@ -2,17 +2,21 @@
 
 /** @todo */
 
-class f_c_helper_notFound
+class f_c_helper_notFound extends f_c
 {
 
-   	public static function helper()
+   	public function helper()
 	{
-            if(is_file(f_load::$pathApp . 'c/404.php')){
-                    $oController = new c_404;
-                    $oController->indexAction();
-            }
-            exit;
+            $this->error(f_error::ERROR_NOT_FOUND);
 	}
+        
+        public function ifNot($bExpression) 
+        {
+            if ($bExpression) {
+                return;
+            }
+            $this->error(f_error::ERROR_NOT_FOUND);
+        }
 
 }
 

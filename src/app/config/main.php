@@ -16,7 +16,7 @@ return array(
             'render'     => true,
             'level'      => E_ALL ^ E_NOTICE,
             'log'        => true,
-            'throwError' => 0
+            'throwError' => E_ALL ^ E_NOTICE,
         ),
     ),
     'prod' => array(
@@ -24,7 +24,7 @@ return array(
             'render'     => false,
             'level'      => E_ALL ^ E_NOTICE,
             'log'        => true,
-            'throwError' => 0
+            'throwError' => 0,
         ),
         'db' => array (
             'host'    => 'localhost',

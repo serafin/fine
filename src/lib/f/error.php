@@ -44,7 +44,7 @@ class f_error
     public function helper($sErrorType)
     {
         $this->type       = $sErrorType;
-        $oErrorController = new app_c_error();
+        $oErrorController = new c_error();
         $oErrorController->error();
         exit;
     }
@@ -188,7 +188,7 @@ class f_error
                 $this->_renderException();
             }
             else {
-                $this->helper(self::INTERNAL);
+                $this->helper(self::ERROR_INTERNAL);
             }
         }
         catch (Exception $e) {
@@ -220,7 +220,7 @@ class f_error
             $trace =& $this->{$type}->trace;
             foreach ((array)$trace as $t_k => $t_v) {
                 foreach ((array)$t_v['args'] as $k => $v) {
-                    $trace[$t_k]['args'][$k] = "";
+                    $trace[$t_k]['args'][$k] = "*";
                 }
             }
         }
@@ -265,7 +265,7 @@ class f_error
         foreach ($this->exception->trace as $k => $v) {
             $view .= "<tr><th>[$k]</th><td><div class=\"trace\">"
                    . "" . $v['class'] . $v['type'] . $v['function']
-                   . "(" . implode(', ', $v['args']) .")"
+                   . "(" . implode(', ', is_array($v['args']) ? $v['args'] : array()) .")"
                    . " " . $v['file'] . ":" . $v['line']
                    . "</div>"
                    . f_debug::source($v['file'], $v['line'])

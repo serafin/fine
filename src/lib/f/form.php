@@ -1,33 +1,37 @@
 <?php
 
-class f_form extends f_form_elementAttr implements ArrayAccess, IteratorAggregate
+class f_form implements ArrayAccess, IteratorAggregate, Countable
 {
-	
-	public $element = array();
+
+    /**
+     * @var array Elementy formularza
+     * dla udostepnienia pelnej przestrzeni nazw nie nazywa sie 'element'
+     * glownie sluzy do zmiany kolejnosci elementow
+     */
+    public $_ = array(); 
 
     protected $_attr     = array('method' => 'post');
     protected $_decor    = array('helper' => 'f_form_decor_helper');
-	protected $_error    = array();
-	protected $_isValid;
-	protected $_submit;
+    protected $_viewHelper = 'form';
 
-	/**
-	 * Tworzy i konfiguruje obiekt formularza
-	 *
-	 * @param array $aConfig Tablica gdzie kluczem jest nazwa funkcji tej klasy a wartością pierwszy argument
-	 */
-	public function __construct($aConfig = array())
-	{
-        foreach ($aConfig as $k => $v) {
+
+    /**
+     * Tworzy i konfiguruje obiekt formularza
+     *
+     * @param array $aConfig Tablica gdzie kluczem jest nazwa funkcji tej klasy a wartością pierwszy argument
+     */
+    public function __construct(array $config = array())
+    {
+        foreach ($config as $k => $v) {
             $this->{$k}($v);
         }
-	}
+    }
 
 	/**
 	 * Zwraca obiekt podanego elementu tego formularza
 	 *
 	 * @param string $sName nazwa elementu
-	 * @return object 
+	 * @return object
 	 */
     public function  __get($sName)
     {
@@ -52,6 +56,8 @@ class f_form extends f_form_elementAttr implements ArrayAccess, IteratorAggregat
         return $this->render();
     }
 
+    }
+
 	/**
 	 * Ustala/pobiera akcje formularza - adres gdzie formularz ma zostać wysłany (wartość atrybutu action elementu form)
 	 *
@@ -60,9 +66,9 @@ class f_form extends f_form_elementAttr implements ArrayAccess, IteratorAggregat
 	 */
 	public function action($asAction = null, $sRouteName = null)
 	{
-		if ($asAction === null) {
-			return $this->_attr['action'];
-		}
+            if ($asAction === null) {
+                return $this->_attr['action'];
+            }
         else if (is_string($asAction)) {
             $this->_attr['action'] = $asAction;
         }
@@ -108,7 +114,7 @@ class f_form extends f_form_elementAttr implements ArrayAccess, IteratorAggregat
 		}
 		return $this->_error;
 	}
-	
+
 	/**
 	 * Sprawdza czy formularz sie waliduje lub czy podany element sie waliduje
 	 *
@@ -183,7 +189,7 @@ class f_form extends f_form_elementAttr implements ArrayAccess, IteratorAggregat
         }
 		return parent::renderAttr();
 	}
-	
+
 	/**
 	 * Ustala nazwe elementu submit formularza
 	 * Wykorzystywane przy wyświetlaniu wielu formularzy na jednej stronie
@@ -196,7 +202,7 @@ class f_form extends f_form_elementAttr implements ArrayAccess, IteratorAggregat
 		$this->_submit = $sName;
 		return $this;
 	}
-	
+
 	/**
 	 * Ustala/pobiera wartości formularza
 	 *

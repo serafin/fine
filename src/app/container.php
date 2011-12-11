@@ -1,6 +1,6 @@
 <?php
 
-class app_container extends f_c_container
+class container extends f_c_container
 {
 
     protected function _config()
@@ -29,21 +29,21 @@ class app_container extends f_c_container
 
     protected function _dispacher()
     {
-        $this->dispacher          = new f_c_dispacher();
-        $this->dispacher->request = $this->request;
+        $this->dispacher             = new f_c_dispacher();
+        $this->dispacher->controller = $this->request->get(0);
+        $this->dispacher->action     = $this->request->get(1);
         return $this->dispacher;
     }
     
     protected function _env()
     {
+        return $this->env = 'dev';
         return $this->env = $_SERVER['ENV'] == 'dev' ? 'dev' : 'prod';
     }
 
     protected function _error()
     {
-        
-        $this->error = new f_error($this->config->main['error']);
-        return $this->error;
+        return $this->error = new f_error($this->config->main['error']);
     }
 
     protected function _event()

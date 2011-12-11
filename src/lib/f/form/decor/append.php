@@ -3,21 +3,23 @@
 class f_form_decor_append extends f_form_decor_abstract
 {
 
-    public function  __construct($mConfig = null)
+    protected $_placement = self::APPEND;
+    protected $_content;
+
+    public function content($sContent = null)
     {
-        if ($mConfig !== null) {
-            if (is_string($mConfig)) {
-                $this->_option['html'] = $mConfig;
-            }
-            else {
-                parent::__construct($mConfig);
-            }
+        if ($sContent === null) {
+            return $this->_content;
         }
+        $this->_content = $sContent;
+        return $this;
     }
 
-    public function render($sRender = '')
+
+    public function render()
     {
-        return $this->_option['html'] . $this->_option['separator'] . $sRender;
+        $this->decoration = $this->_content;
+        return $this->_render();
     }
 
 }

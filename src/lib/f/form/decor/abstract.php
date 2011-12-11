@@ -3,41 +3,70 @@
 abstract class f_form_decor_abstract
 {
 
-    protected $_element;
-    protected $_option = array('place' => 'append', 'separator' => '');
+    const PREPEND = 'PREPEND';
+    const APPEND  = 'APPEND';
+    const EMBRACE = 'EMBRACE';
 
-    public function __construct($aConfig = array())
+    public $content;
+    public $element;
+    public $decoration;
+    public $decoration2;
+    
+
+    protected $_placement = self::APPEND;
+    protected $_event;
+
+    public function __construct(array $config = array())
     {
-        foreach ($aConfig as $k => $v) {
+        foreach ($config as $k => $v) {
             $this->{$k}($v);
         }
     }
 
-    public function element($oElement)
+    public function placement($tPlacement = null)
     {
-        $this->_element = $oElement;
-    }
-
-    public function option($asKey, $mVal = null)
-    {
-        if ($mVal === null) {
-            return $this->_option[$sKey];
+        if ($tPlacement === null) {
+            return $this->_placement;
         }
-        $this->_option[$sKey] = $mVal;
+        $this->_placement = $tPlacement;
         return $this;
     }
 
-    public function clearOption($sKey)
+    public function event($sEventId = null)
     {
-        unset($this->_option[$sKey]);
+        if ($sEventId === null) {
+            return $this->_event;
+        }
+        $this->_event = $sEventId;
+        return $this;
     }
 
-    protected function _render($sRender, $sDecor)
+    protected function _render()
     {
-        return
-            $this->_option['place'] == 'prepend'
-                ? $sDecor  . $this->_option['separator'] . $sRender
-                : $sRender . $this->_option['separator'] . $sDecor;
+
+        if ($this->_event !== null) {
+            $event = new f_event(array('id' => $this->_event, 'subject' => $this));
+            f::$c->event->run($event);
+            return $event->val;
+        }        
+
+        switch ($this->_placement) {
+            case self::PREPEND:
+                return $this->content . $this->decoration . $this->decoration2;
+
+            case self::APPEND:
+                return $this->decoration . $this->decoration2 . $this->content;
+
+            case self::EMBRACE:
+                return $this->decoration . $this->content. $this->decoration2;
+
+            default:
+                throw new f_form_decor_exception(array(
+                    'type' => f_form_decor_exception::UNEXPECTED_VALUE,
+                    'msg'  => 'Wrong value for placement property',
+                ));
+        }
+
     }
 
 }

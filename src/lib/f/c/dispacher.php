@@ -2,50 +2,121 @@
 
 class f_c_dispacher extends f_c
 {
-    
-    public 
 
+    /**
+     * @var string Nazwa kontrolera
+     */
     public $controller;
+
+    /**
+     * @var string Nazwa akcji
+     */
     public $action;
 
-	public function run()
+    /**
+     * @var string Wzorzez klasy kontrolera, dostepna zmienna "{controller}"
+     */
+    public $class = 'c_{controller}';
+
+    /**
+     * @var string Nazwa wymaganego iterfejsu dla klasy kontrolera
+     */
+    public $interface = 'f_c_action_interface';
+
+    /**
+     * @var string Wzorzez metody akcji, dostepna zmienna "{action}"
+     */
+    public $method = '{action}Action';
+
+    /**
+     * @var string Sciezka do klas kontrollerow
+     */
+    public $dir = './app/';
+
+    /**
+     * @var object Ostatni kontroller
+     */
+     public $object;
+
+    /**
+     * @var array Wszystkie wywolania
+     */
+    public $stack;
+
+    /**
+     * Uruchamia akcje kontrolera
+     */
+    public function run()
     {
-        $oRequest    = $this->_c->request;
-        $sController = isset($oRequest->controller[0]) ? $oRequest->controller : 'index';
-        $sAction     = isset($oRequest->action[0])     ? $oRequest->action     : 'index';
+        
+        if (!isset($this->controller[0])) {
+            $this->controller = 'index';
+        }
+        if (!isset($this->action[0])) {
+            $this->action = 'index';
+        }
+        $class  = str_replace('{controller}', $this->controller, $this->class);
+        $method = str_replace('{action}', $this->action, $this->method);
+        $file   = $this->dir . str_replace('_', '/', $class) . '.php';
 
-		$sFile = f::$pathApp.'c/' . str_replace('_', '/', $sController) . '.php';
-
+        // check file
     	if (! is_file($file)) {
-			$this->_c->notFound->helper();
-		}
-
-		$sClass      = "c_{$sController}";
-		$oController = new $sClass;
-        $sMethod     = "{$sAction}Action";
-
-        if (! $oController instanceof f_c_action_interface) {
-			$this->_c->notFound->helper();
+            exit('1');
+            $this->error(f_error::ERROR_NOT_FOUND);
         }
-        
-        if (! method_exists($oController, $sMethod)) {
-            if ($sMethod !== 'indexAction' && ! method_exists($oController, 'indexAction')) {
-                $this->_c->notFound->helper();
+
+        include $file;
+
+        // check class name
+        if (!class_exists($class, false)) {
+            exit('2');
+            $this->error(f_error::ERROR_NOT_FOUND);
+        }
+
+        $this->object = new $class;
+
+        // check interface
+        if (isset($this->interface[0]) && ! ($this->object instanceof $this->interface)) {
+            exit('3');
+            $this->error(f_error::ERROR_NOT_FOUND);
+        }
+
+        // index method
+        if (! method_exists($this->object, $method)) {
+            $index = str_replace('{action}', 'index', $this->method);
+            if ($method !== $index && ! method_exists($this->object, $index)) {
+            $this->error(f_error::ERROR_NOT_FOUND);
             }
-            $sMethod = 'indexAction';
-            $sAction = 'index';
+            $method       = $index;
+            $this->action = 'index';
         }
-        
-        $this->controller = $sController;
-        $this->action     = $sAction;
 
-        if ($this->_c->event->is('f.dispacher')) {
-            if ($this->_c->event->notify(new f_event($this, 'f.dispacher'))->break) {
+        // event dispacher
+        if ($this->event->is('dispacher_pre')) {
+            $this->event->run($oEvent = new f_event(array('id' => 'dispacher_pre', 'subject' => $this)));
+            if ($oEvent->cancel()) {
                 return;
             }
         }
 
-        $oController->{$sMethod}();
+        // call
+        $this->object->{$method}();
+
+        // log stack
+        $this->stack[] = array(
+            'controller' => $this->controller,
+            'action'     => $this->action,
+            'class'      => $this->class,
+            'interface'  => $this->interface,
+            'method'     => $this->method,
+            'dir'        => $this->dir,
+        );
+
+        // event dispacher_end
+        if ($this->event->is('dispacher_end')) {
+            $this->event->run(new f_event(array('id' => 'dispacher_post', 'subject' => $this)));
+        }
+
     }
 
 }

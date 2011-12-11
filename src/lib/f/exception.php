@@ -90,6 +90,11 @@ class f_exception extends Exception
         return $this->_properties;
     }
 
+    public function getType()
+    {
+        return $this->_properties['type'];
+    }
+
     /**
      * Returns previous Exception
      *

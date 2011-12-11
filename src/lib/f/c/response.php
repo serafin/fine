@@ -1,6 +1,6 @@
 <?php
 
-class f_c_response
+class f_c_response extends f_c
 {
 
     public $body;
@@ -116,6 +116,15 @@ class f_c_response
         return $this;
     }
 
+    public function body($sContent = null) 
+    {
+        if (func_num_args() == 0) {
+            return $this->body;
+        }
+        $this->body = $sContent;
+        return $this;
+    }
+    
     public function append($sContent)
     {
         $this->body .= $sContent;
@@ -165,15 +174,22 @@ class f_c_response
 
     public function sendBody()
     {
-        echo $this->_body;
+        echo $this->body;
         return $this;
+    }
+    
+    public function sendOnce()
+    {
+        if ($this->_sendOnce) {
+            return;
+        }
+        $this->send();
     }
 
     public function send()
     {
-        
-        if (f::$c->event->is('main_response_pre')) {
-            f::$c->event->run($event = new f_event(array('id' => 'main_response_pre', 'subject' => $this))); 
+        if ($this->event->is('response_pre')) {
+            $this->event->run($event = new f_event(array('id' => 'response_pre', 'subject' => $this))); 
             if ($event->cancel()) {
                 return $this;
             }
@@ -183,8 +199,8 @@ class f_c_response
         $this->sendHeader();
         $this->sendBody();
         
-        if (f::$c->event->is('main_response_post')) {
-            f::$c->event->run($event = new f_event(array('id' => 'main_response_post', 'subject' => $this))); 
+        if ($this->event->is('response_post')) {
+            $this->event->run(new f_event(array('id' => 'response_post', 'subject' => $this))); 
         }
         
         return $this;
