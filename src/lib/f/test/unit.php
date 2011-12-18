@@ -17,22 +17,21 @@ class f_test_unit
             $this->{$method}();
         }
 
-        $stat = array('ok' => 0, 'error' => 0, 'all' => 0, 'group' => 0);
+        $stat = array('ok' => 0, 'error' => 0, 'all' => 0);
         foreach ((array)$this->_test as $sMethod => $aTest) {
             foreach ($aTest as $test) {
                 $stat[$test['test']?'ok':'error']++;
                 $stat['all']++;
             }
-            $stat['group']++;
         }
 
         $name = get_class($this);
         
         if ($stat['error'] == 0) {
-            echo "\033[0;37m\033[42m#$name# all: {$stat['all']}, group: {$stat['group']}, ok: {$stat['ok']}, error: {$stat['error']}\033[0m\n";
+            echo "\033[1;37m\033[42m$name all: {$stat['all']}, ok: {$stat['ok']}, error: {$stat['error']}\033[0m\n";
         }
         else {
-            echo "\033[0;37m\033[41m#$name# all: {$stat['all']}, group: {$stat['group']}, ok: {$stat['ok']}, error: {$stat['error']}\033[0m\n";
+            echo "\033[1;37m\033[41m$name all: {$stat['all']}, ok: {$stat['ok']}, error: {$stat['error']}\033[0m\n\n";
         }
 
         if ($stat['error']) {
@@ -42,12 +41,18 @@ class f_test_unit
                         continue;
                     }
 
-                    if ($test['escape']) {
-                        $test['error'] = htmlspecialchars($test['error']);
+                    echo "\033[0;37m\033[41m#\033[0m$sMethod";
+                    
+                    
+                    if ($k != 0) {
+                        echo "#$k";
                     }
-
-                    $offset = $k + 1;
-                    echo "\033[0;37m\033[40m#$name#$sMethod#$offset#{$test['info']}\033[0m\n\033[0;37m\033[40m{$test['error']}\033[0m\n";
+                    if (strlen($test['info'])) {
+                        echo "#{$test['info']}";
+                    }
+                    
+                    echo "\n{$test['error']}\n\n";
+                    
                     
                 }
             }

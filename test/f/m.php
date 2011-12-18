@@ -12,11 +12,6 @@ f_autoload_includePath::_()
     ->path(array('./', '../src/lib/'))
     ->register();
 
-f_error::_()
-    ->level(E_ALL ^ E_NOTICE)
-    ->render(true)
-    ->renderFormat(f_error::RENDER_FORMAT_TEXT)
-    ->register();
 
 /* f::$c - main contianer*/
 
