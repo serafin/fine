@@ -33,5 +33,32 @@ class f_debug
         fclose($sFile);
         return '<pre class="debug_source"><code>'.$source.'</code></pre>';
     }
+    
+    public static function dump($mVar, $sLabel = null, $bEcho = true)
+    {
+        $label = ($sLabel === null) ? '' : '<strong style="color:red">'.trim($sLabel) . '</strong> ';
+        
+        $sOutput = '<pre style="background:black;color:#0f0;padding:5px;text-align:left;">' 
+                  . $label 
+                  . htmlspecialchars(self::varDumpPretty($mVar), ENT_QUOTES)
+                  . '</pre>';
+        
+        if ($bEcho) {
+            echo($sOutput);
+            return;
+        }
+        
+        return $sOutput;
+    }
+
+    public static function varDumpPretty($mVar)
+    {
+        ob_start();
+        var_dump($mVar);
+        return preg_replace("/\]\=\>\n(\s+)/m", "] => ", ob_get_clean());
+    }
+	
+
+    
 
 }

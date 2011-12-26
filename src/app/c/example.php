@@ -34,5 +34,17 @@ class c_example extends f_c_action
     }
     
     
+    public function formAction()
+    {
+        $o = new f_form_text();
+        $o->name('test[]');
+        $o->desc('This is description');
+        $o->val('<b>a</b>');
+        $o->label('This is label');
+        echo $o->render();
+        
+        
+    }
+    
     
 }

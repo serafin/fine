@@ -6,3 +6,8 @@
 - f_c_helper_flash->$storage
 - f_error::register();
 - f_v_helper_head
+- csrf do inkubatora
+- f_form
+- m_ relacje
+- f_debug::source klasy css wedlugo standardu box
+- f_form_decor_label - opcja dla przyklejenia tekstu labela prepend, append

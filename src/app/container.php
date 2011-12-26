@@ -102,7 +102,7 @@ class container extends f_c_container
 
     protected function _vc()
     {
-        return $this->vc = new app_v_c();
+        return $this->vc = new v_container();
     }
 
     protected function _uri()

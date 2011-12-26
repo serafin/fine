@@ -3,55 +3,42 @@
 class f_form_element
 {
 
-    public $valid      = array();
-    public $filter     = array();
-    public $decor      = true;
-
-    protected static $_configStatic = array(
-        'default_decor' => array(
-            'viewHelper' => 'f_form_decor_viewHelper',
-            'label'      => 'f_form_decor_label',
-            'error'      => 'f_form_decor_error',
-            'desc'       => 'f_form_decor_desc',
-            'tag'        => array('f_form_decor_tag', 'attr' => 'class="form_element"'),
-        ),
-        'checkboxOne_decor' => array(
-            'viewHelper' => 'f_form_decor_viewHelper',
-            'label'      => array('f_form_decor_label', 'placement' => 'EMBRACE'),
-            'error'      => 'f_form_decor_error',
-            'desc'       => 'f_form_decor_desc',
-            'tag'        => array('f_form_decor_tag', 'attr' => 'class="form_element"'),
-        ),
-        'hidden_decor' => array(
-            'viewHelper' => 'f_form_decor_viewHelper',
-        ),
-        'submit_decor' => array(
-            'viewHelper' => 'f_form_decor_viewHelper',
-            'tag'        => array('f_form_decor_tag', 'attr' => 'class="form_element"'),
-        ),
-    );
-
+    public $_valid      = array();
+    public $_filter     = array();
+    public $_decor      = true;
+    
+    /* contenxt alone */
     protected $_type          = 'text';
     protected $_name;
     protected $_val;
     protected $_attr          = array();
     protected $_option        = array();
     protected $_separator     = array();
-    protected $_ignoreVal     = false;
-    protected $_ignoreRender  = false;
     protected $_isArray       = false;
     protected $_required      = false;
     protected $_requiredClass = 'f_valid_notEmpty';
     protected $_breakOnFail   = true;
     protected $_error         = array();
     protected $_viewHelper    = 'formText';
+    
+    /* context form */
+    protected $_form;
+    protected $_ignoreVal     = false;
+    protected $_ignoreRender  = false;
     protected $_label;
     protected $_desc;
+    protected $_decorElement  = array(
+        'viewHelper' => 'f_form_decor_viewHelper',
+        
+    );
+    protected $_decorForm     = array(
+        'viewHelper' => 'f_form_decor_viewHelper',
+        'label'      => 'f_form_decor_label',
+        'error'      => 'f_form_decor_error',
+        'desc'       => 'f_form_decor_desc',
+        'tag'        => array('f_form_decor_tag', 'attr' => 'class="form_element"'),
+    );
 
-    public static function configStatic(array $config)
-    {
-        self::$_configStatic = $config + self::$_configStatic;
-    }
 
     /**
      * Element formularza
@@ -77,9 +64,9 @@ class f_form_element
     public function toArray()
     {
         return array(
-            'valid'         => $this->valid,
-            'filter'        => $this->filter,
-            'decor'         => $this->decor,
+            'valid'         => $this->_valid,
+            'filter'        => $this->_filter,
+            'decor'         => $this->_decor,
             'type'          => $this->_type,
             'name'          => $this->_name,
             'val'           => $this->_val,
@@ -106,6 +93,7 @@ class f_form_element
      */
     public function form($oForm)
     {
+        $this->_form = $oForm;
     }
 
 
@@ -147,8 +135,31 @@ class f_form_element
     	if (func_num_args() === 0) {
             return $this->_val;
     	}
-        /** @todo filtry */
+        
+        if ($this->_filter) {
+            
+            foreach ($this->_filter as $k => $filter) {
+                
+                if (!is_object($filter)) {
+                    if (is_string($filter)) {
+                        $this->_filter[$k] = new $filter;
+                    }
+                    else if (is_array($filter)) {
+                        $class = array_shift($filter);
+                        $this->_filter[$k] = new $class($filter);
+                    }
+                    $decor = $this->_filter[$k];
+                }
+                
+                /* @var $filter f_filter_interface */
+                $mValue = $filter->filter($mValue);
+                
+            }
+            
+        }
+        
         $this->_val = $mValue;
+        
         return $this;
     }
 
@@ -210,11 +221,17 @@ class f_form_element
 
     public function id($sId = null)
     {
+        // getter
         if (func_num_args() === 0) {
             return $this->_attr['id'];
         }
-        else if ($sId === null) {
+        
+        // setter
+        if ($sId === null) {
             unset($this->_attr['id']);
+        }
+        else if ($sId === true) {
+            $this->_attr['id'] = $this->_attr['name'];
         }
         else {
             $this->_attr['id'] = $sId;
@@ -258,7 +275,7 @@ class f_form_element
     public function css($asName, $sValue = null)
     {
 
-        $style = f_helper_arrayAssocExplode::helper($this->_attr['style'], ';', ':');
+        $style = f_c_helper_arrayExplode::helper($this->_attr['style'], ';', ':');
 
         switch (func_num_args ()) {
 
@@ -290,7 +307,7 @@ class f_form_element
                 ));
         }
 
-        $this->_attr['style'] = f_helper_arrayAssocImplode::helper($style, ';', ':');
+        $this->_attr['style'] = f_c_helper_arrayImplode::helper($style, ';', ':');
         
     	return $this;
     }
@@ -373,6 +390,7 @@ class f_form_element
     {
 
         // getter
+        
         if (func_num_args() === 0) {
             return $this->_required;
         }
@@ -444,10 +462,10 @@ class f_form_element
     	if (is_array($aoValid)) {
             foreach ($aoValid as $k => $v) {
                 if (is_integer($k)) {
-                    $this->valid[] = $v;
+                    $this->_valid[] = $v;
                 }
                 else {
-                    $this->valid[$k] = $v;
+                    $this->_valid[$k] = $v;
                 }
             }
             return $this;
@@ -477,7 +495,7 @@ class f_form_element
 
         $bValid = true;
 
-        foreach ($this->valid as $k => $valid) {
+        foreach ($this->_valid as $k => $valid) {
 
             // lazy load validotor
             if (is_array($valid)) {
@@ -532,58 +550,64 @@ class f_form_element
     	if (is_array($aoFilter)) {
             foreach ($aoFilter as $k => $v) {
                 if (is_integer($k)) {
-                    $this->filter[] = $v;
+                    $this->_filter[] = $v;
                 }
                 else {
-                    $this->filter[$k] = $v;
+                    $this->_filter[$k] = $v;
                 }
             }
             return $this;
     	}
-        $this->filter[] = $aoFilter;
+        $this->_filter[] = $aoFilter;
         return $this;
     }
-
 
     public function decor($abnosDecor)
     {
         if ($abnosDecor === null || $abnosDecor === true) {
-            $this->decor = $abnosDecor;
+            $this->_decor = $abnosDecor;
             return $this;
         }
     	if (is_array($abnosDecor)) {
+            if ($this->_decor === true) {
+                $this->decorDefault();
+            }
             foreach ($abnosDecor as $k => $v) {
                 if (is_integer($k)) {
-                    $this->decor[] = $v;
+                    $this->_decor[] = $v;
                 }
                 else {
-                    $this->decor[$k] = $v;
+                    $this->_decor[$k] = $v;
                 }
             }
             return $this;
     	}
         if (is_string($abnosDecor)) {
-            if ($this->decor === true) {
-                $this->decorDefaultInit();
+            if ($this->_decor === true) {
+                $this->decorDefault();
             }
-            if (!is_object($this->decor[$abnosDecor])) {
-                if (is_string($this->decor[$abnosDecor])) {
-                    $this->decor[$abnosDecor] = new $this->decor[$abnosDecor];
+            if (!is_object($this->_decor[$abnosDecor])) {
+                if (is_string($this->_decor[$abnosDecor])) {
+                    $this->_decor[$abnosDecor] = new $this->_decor[$abnosDecor];
                 }
-                else if (is_array($this->decor[$abnosDecor])) {
-                    $class = array_shift($this->decor[$abnosDecor]);
-                    $this->decor[$abnosDecor] = new $class($this->decor[$abnosDecor]);
+                else if (is_array($this->_decor[$abnosDecor])) {
+                    $class = array_shift($this->_decor[$abnosDecor]);
+                    $this->_decor[$abnosDecor] = new $class($this->_decor[$abnosDecor]);
                 }
             }
-            return $this->decor[$abnosDecor];
+            return $this->_decor[$abnosDecor];
         }
-        $this->decor[] = $abnosDecor;
+        
+        if ($this->_decor === true) {
+            $this->decorDefault();
+        }
+        $this->_decor[] = $abnosDecor;
         return $this;
     }
 
-    public function decorDefaultInit()
+    public function decorDefault()
     {
-        $this->decor = isset(self::$_configStatic[$this->_type . "_decor"])
+        $this->_decor = isset(self::$_configStatic[$this->_type . "_decor"])
                      ? self::$_configStatic[$this->_type . "_decor"]
                      : self::$_configStatic["default_decor"];
 
@@ -591,30 +615,29 @@ class f_form_element
 
     public function render()
     {
-        // default decorators form configStatic
-        if ($this->decor === true) {
-            $this->decorDefaultInit();
+        // default decorators form
+        if ($this->_decor === true) {
+            $this->decorDefault();
         }
 
         $render = "";
 
-        foreach ((array)$this->decor as $k => $decor) {
-
+        foreach ((array)$this->_decor as $k => $decor) {
+            
             // lazy load decorator
             if (!is_object($decor)) {
                 if (is_string($decor)) {
-                    $this->decor[$k] = new $decor;
+                    $this->_decor[$k] = new $decor;
                 }
                 else if (is_array($decor)) {
                     $class = array_shift($decor);
-                    $this->decor[$k] = new $class($decor);
+                    $this->_decor[$k] = new $class($decor);
                 }
-                $decor = $this->decor[$k];
+                $decor = $this->_decor[$k];
             }
 
             $decor->element    = $this;
             $decor->content    = $render;
-            $decor->decoration = "";
             $render            = $decor->render();
             
         }
@@ -626,7 +649,7 @@ class f_form_element
     	if ($sViewHelperName === null) {
             return $this->_viewHelper;
     	}
-        $this->_view = $sViewHelperName;
+        $this->_viewHelper = $sViewHelperName;
         return $this;
     }
 

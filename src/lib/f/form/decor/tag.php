@@ -57,7 +57,7 @@ class f_form_decor_tag extends f_form_decor_abstract
             $this->decoration2 = "</{$this->_name}>";
         }
 
-        $this->_render();
+        return $this->_render();
     }
 
 }

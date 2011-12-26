@@ -25,6 +25,9 @@ class index extends f_c
         // session
         //session_start();
         
+        // pretty uris
+        $this->uri->resolveRequestUri();
+        
         // run controller action by request
         $this->dispacher->run();
 
@@ -32,7 +35,7 @@ class index extends f_c
         //$this->render->renderOnce();
 
         // send response to client if not send before
-        $this->response->sendOnce();
+        //$this->response->sendOnce();
         
     }
 

@@ -4,7 +4,7 @@ class f_autoload_includePath
 {
 
     protected $_path      = array();
-    protected $_suffis    = '.php';
+    protected $_suffix    = '.php';
     protected $_separator = '_';
     
 
@@ -38,11 +38,11 @@ class f_autoload_includePath
     public function suffix($sFileSuffix= null)
     {
         if (func_num_args()) {
-            $this->_suffis = $sFileSuffix;
+            $this->_suffix = $sFileSuffix;
             return $this;
         }
         else {
-            return $this->_suffis;
+            return $this->_suffix;
         }
     }
 
@@ -72,7 +72,7 @@ class f_autoload_includePath
 
     public function load($sClassName)
     {
-        include str_replace($this->_separator, DIRECTORY_SEPARATOR, $sClassName . $this->_suffis);
+        include str_replace($this->_separator, DIRECTORY_SEPARATOR, $sClassName . $this->_suffix);
     }
 
 }

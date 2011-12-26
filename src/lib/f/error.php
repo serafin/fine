@@ -265,7 +265,7 @@ class f_error
         foreach ($this->exception->trace as $k => $v) {
             $view .= "<tr><th>[$k]</th><td><div class=\"trace\">"
                    . "" . $v['class'] . $v['type'] . $v['function']
-                   . "(" . implode(', ', is_array($v['args']) ? $v['args'] : array()) .")"
+                   . "(" . $this->_traceArgs($v['args']) .")"
                    . " " . $v['file'] . ":" . $v['line']
                    . "</div>"
                    . f_debug::source($v['file'], $v['line'])
@@ -308,7 +308,7 @@ class f_error
         foreach ($trace as $k => $v) {
 
             $return .= " [$k] " . $v['class'] . $v['type'] . $v['function']
-                     . "(" . implode(', ', (array)$v['args']) .")"
+                     . "(" . $this->_traceArgs($v['args']) .")"
                      . " " .$v['file'] . ":" . $v['line'];
 
             ;
@@ -323,9 +323,9 @@ class f_error
         if (! is_array($aArgs)) {
             return array();
         }
-        foreach ($aArgs as &$i) {
-            if (is_object($i)) {
-                $i = get_class($i);
+        foreach ($aArgs as $argKey => $argValue) {
+            if (is_object($argValue)) {
+                $aArgs[$argKey] = get_class($argValue);
             }
         }
         return $aArgs;

@@ -61,7 +61,6 @@ class f_c_dispacher extends f_c
 
         // check file
     	if (! is_file($file)) {
-            exit('1');
             $this->error(f_error::ERROR_NOT_FOUND);
         }
 
@@ -69,7 +68,6 @@ class f_c_dispacher extends f_c
 
         // check class name
         if (!class_exists($class, false)) {
-            exit('2');
             $this->error(f_error::ERROR_NOT_FOUND);
         }
 
@@ -77,7 +75,6 @@ class f_c_dispacher extends f_c
 
         // check interface
         if (isset($this->interface[0]) && ! ($this->object instanceof $this->interface)) {
-            exit('3');
             $this->error(f_error::ERROR_NOT_FOUND);
         }
 

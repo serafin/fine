@@ -45,17 +45,16 @@ abstract class f_form_decor_abstract
     {
 
         if ($this->_event !== null) {
-            $event = new f_event(array('id' => $this->_event, 'subject' => $this));
-            f::$c->event->run($event);
+            f::$c->event->run($event = new f_event(array('id' => $this->_event, 'subject' => $this)));
             return $event->val;
         }        
 
         switch ($this->_placement) {
             case self::PREPEND:
-                return $this->content . $this->decoration . $this->decoration2;
+                return $this->decoration . $this->decoration2 . $this->content;
 
             case self::APPEND:
-                return $this->decoration . $this->decoration2 . $this->content;
+                return $this->content . $this->decoration . $this->decoration2;
 
             case self::EMBRACE:
                 return $this->decoration . $this->content. $this->decoration2;

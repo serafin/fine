@@ -13,7 +13,7 @@ class f_v
 
     public function  __call($sName, $aArg)
     {
-        return call_user_func_array(array($this->_c->{$sName}, '__invoke'), $aArg);
+        return call_user_func_array(array($this->_c->{$sName}, 'helper'), $aArg);
     }
 
     public function viewDir($sDir = null)
