@@ -27,7 +27,6 @@ class f_valid_equal extends f_valid_abstract
         return $this;
     }
 
-
     public function isValid($mValue)
     {
         $sValue = (string) $mValue;

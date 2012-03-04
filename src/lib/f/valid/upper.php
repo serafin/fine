@@ -2,20 +2,19 @@
 
 class f_valid_upper extends f_valid_abstract
 {
+    
+    const STRING_EMPTY = 'STRING_EMPTY';
+    const NOT_UPPER    = 'NOT_UPPER';
 
-	const STRING_EMPTY = 'stringEmpty';
-	const NOT_UPPER    = 'notUpper';
-
-    /** @todo */
     protected $_msg = array(
-        self::STRING_EMPTY => "Dieses Feld darf nicht leer sein",
-        self::NOT_UPPER    => "Dieses Feld darf nur Großbuchstaben enthalten (A-Z)",
+        self::STRING_EMPTY => 'Wymagana wartość',
+        self::NOT_UPPER    => 'Wymagane duże znaki alfabetyczne (A-Z, np. ABNM)',
     );
 
-	public static function _()
-	{
-		return new self;
-	}
+    public static function _(array $config = array())
+    {
+        return new self($config);
+    }
 
     public function isValid($mValue)
     {
@@ -34,5 +33,5 @@ class f_valid_upper extends f_valid_abstract
 
         return true;
     }
-    
+
 }

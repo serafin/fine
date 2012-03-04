@@ -2,20 +2,19 @@
 
 class f_valid_xdigit extends f_valid_abstract
 {
+    
+    const STRING_EMPTY = 'STRING_EMPTY';
+    const NOT_XDIGIT   = 'NOT_XDIGIT';
 
-	const STRING_EMPTY = 'stringEmpty';
-	const NOT_XDIGIT   = 'notXdigit';
-
-    /** @todo tresci w jedzyku pl */
     protected $_msg = array(
-        f_valid_xdigit::STRING_EMPTY => "Dieses Feld darf nicht leer sein?",
-        f_valid_xdigit::NOT_XDIGIT   => "Dieses Feld darf nur Hexadezimale zahlen enthalten (0-9, a-f, A-F)",
+        slef::STRING_EMPTY => 'Wymagana wartość',
+        self::NOT_XDIGIT   => 'Wymagana wartość heksadecymalna (0-9, a-f, A-F np. 00ff00)',
     );
-	
-	public static function _()
-	{
-		return new self;
-	}
+
+    public static function _(array $config = array())
+    {
+        return new self($config);
+    }
 
     public function isValid($mValue)
     {
@@ -31,8 +30,8 @@ class f_valid_xdigit extends f_valid_abstract
             $this->_error(self::NOT_XDIGIT);
             return false;
         }
-		
+
         return true;
     }
-    
+
 }

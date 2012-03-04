@@ -3,25 +3,24 @@
 class f_valid_regExp extends f_valid_abstract
 {
 	
-    const NOT_MATCH = 'NotMatch';
+    const NOT_MATCH = 'NOT_MATCH';
 
-    /** @todo */
     protected $_msg =  array(
-        self::NOT_MATCH => "Ihre Eingabe ('{value}') muss die Zeichenkette '{pattern}' enthalten",
+        self::NOT_MATCH => "Wartość '{val}' musi pasowac do wzorca '{pattern}' ",
     );
     protected $_var = array(
-        'pattern' => '_pattern'
+        '{pattern}' => '_pattern'
     );
     protected $_pattern;
     
-	public static function _()
-	{
-		return new self;
-	}
+    public static function _(array $config = array())
+    {
+        return new self($config);
+    }
 
     public function pattern($sPattern = null)
     {
-        if ($sPattern === null) {
+        if (func_num_args() == 0) {
             return $this->_pattern;
         }
         $this->_pattern = $sPattern;
