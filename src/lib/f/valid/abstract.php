@@ -3,51 +3,35 @@
 abstract class f_valid_abstract
 {
 
-    protected static $_config = array(
-        'translator' => null,
-    );
-
-    protected $_var       = array();
-    protected $_msg       = array();
-    protected $_error     = array();
+    protected $_var    = array();
+    protected $_varVal = '{val}';
+    protected $_msg    = array();
+    protected $_error  = array();
     protected $_val;
     protected $_translator;
-
-    /**
-     * Konfiguracja komponentu f_valid
-     *
-     * @param array $config
-     *      "translator"  => obiekt tlumacz z metoda string t(string)
-     */
-    public static function config(array $config)
-    {
-        foreach($config as $k => $v) {
-            self::$_config[$k] = $v;
-        }
-    }
 
     /**
      * Konstruktor statyczny
      *
      * @return object
      */
-	public static function _()
-	{
-		$sClass = get_called_class();
-		return new $sClass;
-	}
+    public static function _(array $config = array())
+    {
+        $sClass = get_called_class();
+        return new $sClass($config);
+    }
 
     /**
      * Konstruktor
      *
      * @return object
      */
-	public function __construct(array $config = array())
-	{
-        foreach($config as $k => $v) {
+    public function __construct(array $config = array())
+    {
+        foreach ($config as $k => $v) {
             $this->{$k}($v);
         }
-	}
+    }
 
     /**
      * Pobiera/ustawia obiekt tlumacza
@@ -67,6 +51,21 @@ abstract class f_valid_abstract
     }
 
     /**
+     * Pobiera/ustawia zmienna walidowanej wartosci w tresciach bledow
+     *
+     * @param null|string Zmienna, standardowo `{val}`
+     * @return null|object
+     */
+    public function varVal($lsVarVal = null)
+    {
+        if (func_num_args() == 0) {
+            return $this->_varVal;
+        }
+        $this->_varVal = $lsVarVal;
+        return $this;
+    }
+    
+    /**
      * Pobiera/ustawia tresci bledow
      *
      * Pobieranie
@@ -84,20 +83,20 @@ abstract class f_valid_abstract
      */
     public function msg($asKey = null, $sMsg = null)
     {
-    	if (is_array($asKey)) {
-	        foreach ($asKey as $k => $v) {
-	             $this->_msg[$k] = $v;
-	        }
-	        return $this;
-    	}
-    	if ($asKey === null) {
-    		return $this->_msg;
-    	}
-    	if ($sMsg === null) {
-    		return $this->_msg[$asKey];
-    	}
-    	$this->_msg[$asKey] = $sMsg;
-		return $this;
+        if (is_array($asKey)) {
+            foreach ($asKey as $k => $v) {
+                $this->_msg[$k] = $v;
+            }
+            return $this;
+        }
+        if ($asKey === null) {
+            return $this->_msg;
+        }
+        if ($sMsg === null) {
+            return $this->_msg[$asKey];
+        }
+        $this->_msg[$asKey] = $sMsg;
+        return $this;
     }
 
     /**
@@ -141,27 +140,34 @@ abstract class f_valid_abstract
      *
      * klucz to nazwa bledu, wartosc to wygenerowana tresc bledu
      * do generowania tresci bledow wykorzystywany jest tlumacz jesli jest zdefiniowany przez
-     * $this->translator($oTranslator) lub f_valid::config(array('translator' => $oTranslator))
+     * $this->translator($oTranslator) lub w f::$c->_t
      *
      * @return array Bledy
      */
     public function error()
     {
-        if (! $this->_translator) {
-            if (self::$_config['translator']) {
-                $this->_translator = self::$_config['translator'];
+        if (!$this->_translator) {
+            if (isset(f::$c->_t)) {
+                $this->_translator = f::$c->_t;
             }
         }
 
         foreach ($this->_error as $key => $msg) {
+            
             if ($msg === true) {
+                
                 $msg = $this->_msg[$key];
+                
                 if ($this->_translator) {
                     $msg = $this->_translator->t($msg);
                 }
-                $msg = str_replace('{val}', (string) $this->_val, $msg);
+                
+                if ($this->_varVal !== null) {
+                    $msg = str_replace($this->_varVal, (string) $this->_val, $msg);
+                }
+                
                 foreach ($this->_var as $var => $property) {
-                    $msg = str_replace("{{$var}}", $this->$property, $msg);
+                    $msg = str_replace($var, $this->{$property}, $msg);
                 }
                 $this->_error[$key] = $msg;
             }
@@ -177,7 +183,7 @@ abstract class f_valid_abstract
      * @param string $sKey Nazwa (klucz) bledu
      */
     protected function _error($sKey)
-	{
+    {
         $this->_error[$sKey] = true;
     }
 
@@ -189,8 +195,8 @@ abstract class f_valid_abstract
      */
     protected function _val($mValue)
     {
-        $this->_val      = $mValue;
-        $this->_error    = array();
+        $this->_val   = $mValue;
+        $this->_error = array();
     }
 
 }

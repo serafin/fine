@@ -20,25 +20,25 @@ class f_debug
             }
             if ($line >= $begin) {
                 $row = htmlspecialchars($row, ENT_NOQUOTES, 'utf-8');
-                $row = '<span class="number">'.sprintf($format, $line).'</span> '.$row;
+                $row = '<span class="f_debug-number">'.sprintf($format, $line).'</span> '.$row;
                 if ($line === $iLine) {
-                    $row = '<span class="line highlight">'.$row.'</span>';
+                    $row = '<span class="f_debug-line f_debug-highlight">'.$row.'</span>';
                 }
                 else {
-                    $row = '<span class="line">'.$row.'</span>';
+                    $row = '<span class="f_debug-line">'.$row.'</span>';
                 }
                 $source .= $row;
             }
         }
         fclose($sFile);
-        return '<pre class="debug_source"><code>'.$source.'</code></pre>';
+        return '<pre class="box-f_debug">'.$source.'</pre>';
     }
     
     public static function dump($mVar, $sLabel = null, $bEcho = true)
     {
-        $label = ($sLabel === null) ? '' : '<strong style="color:red">'.trim($sLabel) . '</strong> ';
+        $label = ($sLabel === null) ? '' : '<span style="color:#666; font-family:monospace;">'.trim($sLabel) . '</span> ';
         
-        $sOutput = '<pre style="background:black;color:#0f0;padding:5px;text-align:left;">' 
+        $sOutput = '<pre style="background:black;margin:10px 10px 0 10px;color:#0f0;padding:10px;text-align:left;border-radius:5px;">' 
                   . $label 
                   . htmlspecialchars(self::varDumpPretty($mVar), ENT_QUOTES)
                   . '</pre>';

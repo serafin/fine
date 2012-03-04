@@ -106,7 +106,7 @@ class f_c_render extends f_c
         // setting flag that view was rendered
         $this->_renderOnce = true;
         
-        // handling passed argument
+        // handle passed argument
         if ($sViewScript !== null) {
             $this->view = $sViewScript;
         }
@@ -140,7 +140,7 @@ class f_c_render extends f_c
         $this->response->body = $this->content;
         
         // event render_post
-        if ($this->event->is('render_pre')) {
+        if ($this->event->is('render_post')) {
             $this->event->run(new f_event(array('id' => 'render_post', 'subject' => $this)));
         }
 

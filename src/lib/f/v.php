@@ -4,7 +4,7 @@ class f_v
 {
 
     public $_c;
-    public $_viewDir = 'v/script/';
+    public $_defaultPath = 'app/v/script/';
 
     public function  __get($sName)
     {
@@ -19,16 +19,16 @@ class f_v
     public function viewDir($sDir = null)
     {
         if ($sDir === null) {
-            return $this->_viewDir;
+            return $this->_defaultPath;
         }
-        $this->_viewDir = $sDir;
+        $this->_defaultPath = $sDir;
         return $this;
     }
 
     public function render($sFile)
     {
         ob_start();
-        require $this->_viewDir . $sFile . '.php';
+        require $this->_defaultPath . $sFile . '.php';
         return ob_get_clean();
     }
 

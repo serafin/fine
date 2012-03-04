@@ -2,37 +2,39 @@
 
 class f_valid_min extends f_valid_abstract
 {
+    
+    const NOT_MIN = 'NOT_MIN';
 
-	const NOT_MIN = 'notMin';
-	
-    public $min;
+    protected $_var = array(
+        '{min}' => '_min',
+    );
+    protected $_min;
 
-    protected $_var = array('min');
-
-	public function __construct($iMin, $sMsgNotMin = null)
+    public static function _(array $config = array())
     {
-        $this->min = $iMin;
-        if ($sMsgNotMin !== null) {
-        	$this->msg(self::NOT_MIN, $sMsgNotMin);
-        }
+        return new self($config);
     }
     
-	public function _()
-	{
-		return new self;
-	}
+    public function min($fiMin = null)
+    {
+        if (func_num_args() == 0) {
+            return $this->_min;
+        }
+        $this->_min = $fiMin;
+        return $this;
+    }
 
     public function isValid($mValue)
     {
-    	$iValue = (int) $mValue;
+        $iValue = (int) $mValue;
         $this->_val($iValue);
-		
-        if (!($iValue >= $this->min)) {
+
+        if (!($iValue >= $this->_min)) {
             $this->_error(self::NOT_MIN);
             return false;
         }
-		
+
         return true;
     }
-    
+
 }

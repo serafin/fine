@@ -2,7 +2,7 @@
 
 class f_m implements IteratorAggregate
 {
-
+    
     /**
      * Wynik zapytania (rokordy, rekord, krotki danych, wartosc pola lub falsz)
      *
@@ -10,11 +10,11 @@ class f_m implements IteratorAggregate
      */
     public $_;
 
-    protected static $_metadata      = array();
-    protected static $_configPackage = array(
-        'paging' => 'f_paging', // f_paging_interface
-        'prefix' => 'm_',       // class prefix for models
-    );
+    /** 
+     * private api
+     */
+    public static $_metadata    = array();
+    public static $_classPrefix = 'm_';
     
     protected $_table;
     protected $_key;
@@ -48,7 +48,7 @@ class f_m implements IteratorAggregate
 
         if (! isset(self::$_metadata[$class])) {
             
-            $part = explode('_', substr($class, strlen(self::$_configPackage['prefix'])));
+            $part = explode('_', substr($class, strlen($this->_classPrefix)));
 
             $reflection = new ReflectionClass($this);
             foreach ($reflection->getProperties(ReflectionProperty::IS_PUBLIC) as $property) {
@@ -98,9 +98,7 @@ class f_m implements IteratorAggregate
                 return $this->_db;
                 
             case '_paging':
-                $paging        = self::$_configPackage['paging'];
-                $this->_paging = new $paging();
-                return $this->_paging;
+                return $this->_paging = f::$c->paging;
                         
             default:
                 return $this->{$key} = $this->_createLinkedModel($key);
@@ -967,7 +965,7 @@ class f_m implements IteratorAggregate
         );
     }
 
-    private function _modelDependent($sDependent)
+    protected function _modelDependent($sDependent)
     {
         if (!isset(self::$_metadata[$this->_class]['ref'])) {
             $this->_rel();

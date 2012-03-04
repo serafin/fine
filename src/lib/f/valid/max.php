@@ -2,35 +2,39 @@
 
 class f_valid_max extends f_valid_abstract
 {
-	
-	const NOT_MAX = 'notMax';
-	
-    public $max;
+    
+    const NOT_MAX = 'NOT_MAX';
 
-    protected $_var = array('max');
+    protected $_var = array(
+        '{max}' => '_max'
+    );
+    protected $_max;
 
-	public function __construct($iMax, $aMsg = null)
+    public static function _(array $config = array())
     {
-        $this->max = $iMax;
-		parent::__construct($aMsg);
+        return new self($config);
     }
-
-	public function _()
-	{
-		return new self;
-	}
-
+    
+    public function max($fiMax = null)
+    {
+        if (func_num_args() == 0) {
+            return $this->_max;
+        }
+        $this->_max = $fiMax;
+        return $this;
+    }
+    
     public function isValid($mValue)
     {
-    	$iValue = (int) $mValue;
+        $iValue = (int) $mValue;
         $this->_val($iValue);
-		
-        if (!($iValue <= $this->max)) {
+
+        if (!($iValue <= $this->_max)) {
             $this->_error(self::NOT_MAX);
             return false;
         }
-		
+
         return true;
     }
-    
+
 }

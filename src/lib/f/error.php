@@ -236,22 +236,24 @@ class f_error
         if (! headers_sent()) {
             header('Content-Type: text/html; charset=utf-8', TRUE, 500);
         }
-
-        $view = "<style type=\"text/css\">"
-              . "body {background:#2C001E;margin:0; patding:0; font:14px courier new, monospace; color:#000;} "
-              . ".head { color:#f00; padding:10px 20px 10px 20px;}"
-              . ".head td, .head th { color:#fff;vertical-align:top; font-size:16px; font-weight:normal;vertical-align:top; line-height:100%;}"
-              . ".head th { color:#9C6A8E; padding-right:5px; line-height:100%; text-align:right;border-right:solid 2px #190011; }"
-              . "code .highlight { background:#190011; }"
-              . "code .number { color:#9C6A8E; }"
-              . "code .line { display:block; line-height:140%; padding:0;}"
-              . "code { color:#aaa; font-size:13px; margin:0; line-height:140%; font-family:courier new; }"
-              . "pre  { margin:0;}"
-              . ".trace {  color:#fff;padding:0 0 5px 0;  font-size:16px; border-bottom:solid 2px #190011; margin-bottom:5px;}"
+ $view = "<style type=\"text/css\">"
+              . "body {background:#222;margin:0; padding:0; font:14px courier new, monospace; color:#000;} "
+              . ".box-f_error { color:#f00;padding:50px; }"
+              . ".box-f_error .f_error-head { color:#f00; font-family:arial,helvetica,tahoma;font-size:100px; padding:0 20px 20px 20px;}"
+              . ".box-f_error table { width:100%;border-collapse:collapse; }"
+              . ".box-f_error th { padding: 10px 15px 10px 15px;color:#888;vertical-align:top; font-size:18px;font-weight:normal;vertical-align:top;text-align:right; line-height:100%;}"
+              . ".box-f_error td { padding: 10px 15px 10px 15px;color:#eee;vertical-align:top; font-size:18px; font-weight:normal;vertical-align:top; line-height:100%;}"
+              . ".box-f_error td th { padding: 5px 10px 20px 0px;font-size:14px;}"
+              . ".box-f_error td td { padding: 5px 10px 20px 0px;font-size:14px;color:#888;}"
+              . ".box-f_error .f_error-trace { background:#111; padding:10px; font-size:16px;margin:30px 0 10px 0; border-radius:10px;}"
+              . ".box-f_debug { padding:0 5px 0; color:#eee; font-size:14px; line-height:100%; margin:0; font-family:courier new; }"
+              . ".box-f_debug .f_debug-highlight { background:#2f2f2f; border-radius:5px;}"
+              . ".box-f_debug .f_debug-number { color:#666; }"
+              . ".box-f_debug .f_debug-line { display:block; line-height:100%; color:#eee; padding:3px 0;}"
               . "</style>"
         ;
-        $view .= "<div style=\"background:#190011;color:#fff;padding:5px 10px;text-align:right;color:#aaa;font-size:13px;\">Fine ".f::VERSION."</div>";
-        $view .= "<div class=\"head\"><table cellspacing=10>";
+        $view .= "<div class=\"box-f_error\"><div class=\"f_error-head\">:(</div><table>";
+        
         foreach ((array)$this->exception as $k => $v) {
             if ($k == 'trace') {
                 continue;
@@ -261,17 +263,18 @@ class f_error
         $view .= "<tr><th>Source</th><td>"
                . f_debug::source($this->exception->file, $this->exception->line) . "</td></tr>";
 
-        $view .= "<tr><th>Trace</th><td><table cellspacing=10>";
+        $view .= "<tr><td colspan=\"2\">";
         foreach ($this->exception->trace as $k => $v) {
-            $view .= "<tr><th>[$k]</th><td><div class=\"trace\">"
+            $view .= "<div class=\"f_error-trace\">[$k] "
                    . "" . $v['class'] . $v['type'] . $v['function']
                    . "(" . $this->_traceArgs($v['args']) .")"
                    . " " . $v['file'] . ":" . $v['line']
                    . "</div>"
                    . f_debug::source($v['file'], $v['line'])
-                   . "</td></tr>";
+                   . "";
         }
-        $view .= "<tr><th>[".(++$k)."]</th><td><div class=\"trace\"> {main}</div></td></tr>";
+        $view .= "<div class=\"f_error-trace\">[".(++$k)."]</div> {main}</td></tr>";
+        $view .= "<tr><td colspan=\"2\" style=\"color:#2f2f2f;text-align:right;font:26px cursive;\">Fine ".f::VERSION."</td></tr>";
         $view .= "</table>";
         $view .= "</td></tr></table></div>";
 

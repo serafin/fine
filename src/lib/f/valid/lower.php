@@ -2,14 +2,19 @@
 
 class f_valid_lower extends f_valid_abstract
 {
-	
-	const STRING_EMPTY = 'stringEmpty';
-	const NOT_LOWER    = 'notLower';
-	
-	public function _()
-	{
-		return new self;
-	}
+    
+    const STRING_EMPTY = 'STRING_EMPTY';
+    const NOT_LOWER    = 'NOT_LOWER';
+
+    protected $_msg = array(
+        self::STRING_EMPTY => 'Wymagana wartość',
+        self::NOT_LOWER    => 'Wymagane male znaki alfabetyczne (a-z, np. abnm)',
+    );
+    
+    public static function _(array $config = array())
+    {
+        return new self($config);
+    }
 
     public function isValid($mValue)
     {
@@ -28,5 +33,5 @@ class f_valid_lower extends f_valid_abstract
 
         return true;
     }
-    
+
 }

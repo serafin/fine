@@ -1,45 +1,70 @@
 <?php
 /**
+ * @todo
  * join z 4 parametrami (dochodzi jeden parametr)
  * nie definiujemy ref  i dep, szukam tak:
  * inicjacla _rel(), ref, dep, nie ma, to robie 1:1
  * _rel(name, polewlasne, model obcy, pole obce, where, )
  */
+require "./../src/lib/f/autoload/includePath.php";
 
-
-require "../src/lib/f/autoload/includePath.php";
 f_autoload_includePath::_()
-    ->path(array('./', '../src/lib/'))
+    ->path(array('./', './../src/lib/'))
     ->register();
 
-
-/* f::$c - main contianer*/
+/* container with db service used by models*/
+class db
+{
+    
+    public function escape($s)
+    {
+        return addslashes($s);
+    }
+    
+    public function query($s)
+    {
+        test_f_m::$query = $s;
+    }
+    
+    public function rows($s)
+    {
+        test_f_m::$query = $s;
+        return test_f_m::$select[$s];
+    }
+    
+    public function row($s)
+    {
+        test_f_m::$query = $s;
+        return test_f_m::$select[$s];
+    }
+    
+    public function col($s)
+    {
+        test_f_m::$query = $s;
+        return test_f_m::$select[$s];
+    }
+    
+    public function cols($s)
+    {
+        test_f_m::$query = $s;
+        return test_f_m::$select[$s];
+    }
+    
+    public function val($s)
+    {
+        test_f_m::$query = $s;
+        return test_f_m::$select[$s];
+    }
+    
+}
 
 class c
 {
-    public function __get($name)
-    {
-        return $this->{"_$name"}();
-    }
-
-    protected function _db()
-    {
-        return $this->db = new f_agent(array('subject' => new stdClass(), 'event' => 'agent'));
-    }
-
-    protected function _event()
-    {
-        return $this->event = new f_event_dispacher();
-    }
-
-    protected function _m()
-    {
-        return $this->m = new f_m_dispacher(array('prefix' => 'm_'));
-    }
-
+    
 }
 
 f::$c = new c();
+f::$c->db = new db();
 
 /* models */
 
@@ -133,46 +158,18 @@ class m_user extends f_m
 
 }
 
-class test_m extends f_test
+class test_f_m extends f_test
 {
 
-    protected static $_query;
-    protected static $_method;
-    protected static $_select;
-
-    public static function _event($oEvent)
-    {
-        if ($oEvent->type != 'call') {
-            return;
-        }
-        
-        if ($oEvent->name == 'escape') {
-            $oEvent->val   = addslashes($oEvent->arg[0]);
-            $oEvent->break = true;
-            return;
-        }
-
-        if (isset(self::$_select[(string)$oEvent->arg[0]])) {
-            $oEvent->val   = self::$_select[$oEvent->arg[0]];
-        }
-
-        self::$_query  = $oEvent->arg[0];
-        self::$_method = $oEvent->name;
-        $oEvent->break = true;
-    }
-
-    public function __construct()
-    {
-        f::$c->event->on('agent', array('test_m', '_event'));
-        parent::__construct();
-    }
+    public static $query;
+    public static $select;
 
     protected function _q($sQuery, $sInfo = null)
     {
         if ($sInfo === null) {
             $sInfo = 'Zapytanie SQL';
         }
-        $this->_testEqual(self::$_query, $sQuery, $sInfo);
+        $this->_testEqual(self::$query, $sQuery, $sInfo);
     }
 
     public function test()
@@ -342,5 +339,5 @@ class test_m extends f_test
 
 }
 
-new test_m();
+new test_f_m();
 

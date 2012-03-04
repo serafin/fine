@@ -11,4 +11,5 @@
 - m_ relacje
 - f_debug::source klasy css wedlugo standardu box
 - f_form_decor_label - opcja dla przyklejenia tekstu labela prepend, append
-
+- f_exception style nazwewnictwa metod z fine wprowadzic
+- f_valid_db*

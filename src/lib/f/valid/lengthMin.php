@@ -2,42 +2,49 @@
 
 class f_valid_lengthMin extends f_valid_abstract
 {
-	
-	const NOT_MIN = 'notMin';
-	
-    public $min;
+    
+    const NOT_MIN = 'NOT_MIN';
 
-    protected $_var = array('min');
+    protected $_msg = array(
+        self::NOT_MIN => "Minimalna długość/ilość : {mian}",
+    );
+    protected $_var = array(
+        '{min}' => '_min'
+    );
+    protected $_min;
 
-    public function __construct($iMin, $aMsg = null)
+    public static function _(array $config = array())
     {
-        $this->min = $iMin;
-		parent::__construct($aMsg);
+        return new self($config);
     }
     
-	public function _()
-	{
-		return new self;
-	}
+    public function min($iMin = null)
+    {
+        if (func_num_args() == 0) {
+            return $this->_min;
+        }
+        $this->_min = $iMin;
+        return $this;
+    }
 
     public function isValid($mValue)
     {
-    	if (is_array($mValue)) {
-			$iValueLength = count($mValue);
-	        $this->_val($iValueLength);
-    	}
-    	else {
-			$mValue = (string) $mValue;
-	        $iValueLength = strlen($mValue);
-	        $this->_val($mValue);
-    	}
-		
-        if ($iValueLength < $this->min) {
+        if (is_array($mValue)) {
+            $iValueLength = count($mValue);
+            $this->_val($iValueLength);
+        }
+        else {
+            $mValue = (string) $mValue;
+            $iValueLength = strlen($mValue);
+            $this->_val($mValue);
+        }
+
+        if ($iValueLength < $this->_min) {
             $this->_error(self::NOT_MIN);
             return false;
         }
-		
+
         return true;
     }
-    
+
 }
