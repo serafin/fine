@@ -1,3 +1,4 @@
+[v2.0]
 - f_paging_interface
 - f_debug_object(array('object' => '', 'key', ''))
 - f_c_helper_uri: build, abs, resolvePairsParams moze polaczenie offsetow i pairs? hmm :)?
@@ -13,3 +14,7 @@
 - f_form_decor_label - opcja dla przyklejenia tekstu labela prepend, append
 - f_exception style nazwewnictwa metod z fine wprowadzic
 - f_valid_db*
+
+[v2.1]
+- f_valid_file*
+- f_valid_abstract::msgVar - to co msg tylko ze dla $this->_var;

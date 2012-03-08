@@ -3,24 +3,57 @@
 class f_valid_dbEqual extends f_valid_abstract
 {
 	
-	const NOT_EQUAL = 'notEqual';
+    const NOT_EQUAL = 'NOT_EQUAL';
 	
-    public $valueEqual;
-    public $sqlCode;
-    public $var;
+    protected $_msg = array(
+        self::NOT_EQUAL   => 'Błędna wartość',
+    );
+    protected $_equal;
+    protected $_sql;
+    protected $_db;
+    protected $_defaultDb = 'db';
     
-    public function __construct($sValue, $sSqlCode, $asVar = null, $aMsg = null)
+    
+    public static function _(array $config = array())
     {
-        $this->valueEqual = $sValue;
-        $this->sqlCode    = $sSqlCode;
-        $this->var        = $asVar;
-		parent::__construct($aMsg);
+        return new self($config);
     }
     
-	public function _()
-	{
-		return new self;
-	}
+    public function equal($mEqualValue = null)
+    {
+        if (func_num_args() == 0) {
+            return $this->_equal;
+        }
+        $this->_equal = $mEqualValue;
+        return $this;
+    }
+
+    public function sql($sSQLQuery = null)
+    {
+        if (func_num_args() == 0) {
+            return $this->_sql;
+        }
+        $this->_sql = $sSQLQuery;
+        return $this;
+    }
+
+    public function db($oDBService = null)
+    {
+        if (func_num_args() == 0) {
+            return $this->_db;
+        }
+        $this->_db = $oDBService;
+        return $this;
+    }
+
+    public function defaultDb($sDefaultDBServiceName = null)
+    {
+        if (func_num_args() == 0) {
+            return $this->_defaultDb;
+        }
+        $this->_defaultDb = $sDefaultDBServiceName;
+        return $this;
+    }
 
     public function isValid($mValue)
     {
