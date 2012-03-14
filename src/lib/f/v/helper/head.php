@@ -17,6 +17,22 @@ class f_v_helper_head
             'separator' => " | ",
             'append'    => "</title>\n",
         ),
+        'keywords' => array(
+            'mode'      => 'list',
+            'template'  => "{words}",
+            'var'       => 'words',
+            'prepend'   => "\t<meta name=\"keywords\" content=\"",
+            'separator' => ', ',
+            'append'    => "\" />\n",
+        ),
+        'description' => array(
+            'mode'      => 'list',
+            'template'  => "{description}",
+            'var'       => 'description',
+            'prepend'   => "\t<meta name=\"description\" content=\"",
+            'separator' => '. ',
+            'append'    => "\" />\n",
+        ),
         'favicon' => array(
             'mode'      => 'item',
             'template'  => "\t<link href=\"/{href}\" rel=\"shortcut icon\">\n",
@@ -74,11 +90,6 @@ class f_v_helper_head
             'var'       => 'content',
             'val'       => array('attr' => ''),
         ),
-        /** 
-         * @todo
-         *  - description
-         *  - keywords
-         */
     );
     protected $_data = array();
     

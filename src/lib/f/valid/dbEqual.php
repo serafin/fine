@@ -8,11 +8,11 @@ class f_valid_dbEqual extends f_valid_abstract
     protected $_msg = array(
         self::NOT_EQUAL   => 'Błędna wartość',
     );
-    protected $_equal;
+    protected $_equal = 1;
     protected $_sql;
+    protected $_sqlVarVal = '{val}'; 
     protected $_db;
     protected $_defaultDb = 'db';
-    
     
     public static function _(array $config = array())
     {
@@ -37,6 +37,15 @@ class f_valid_dbEqual extends f_valid_abstract
         return $this;
     }
 
+    public function sqlVarVal($sSQLVarVal = null)
+    {
+        if (func_num_args() == 0) {
+            return $this->_sqlVarVal;
+        }
+        $this->_sqlVarVal = $sSQLVarVal;
+        return $this;
+    }
+
     public function db($oDBService = null)
     {
         if (func_num_args() == 0) {
@@ -57,14 +66,19 @@ class f_valid_dbEqual extends f_valid_abstract
 
     public function isValid($mValue)
     {
-    	$asVars = $this->var;
-    	$sQuery = $this->sqlCode;
     	$sValue = (string) $mValue;
         $this->_val($sValue);
     	
-		$sQuery = str_replace('{value}', db::escape($sValue), $sQuery);
+        $db  = $this->_db !== null ? $this->_db : f::$c->{$this->_defaultDb};
+        $sql = $this->_sql;
         
-        if ($this->valueEqual !== db::one($sQuery, $asVars)) {
+        if (strlen($this->_sqlVarVal) > 0) {
+            $sql = str_replace($this->_sqlVarVal, $db->escape($sValue), $sql);
+        }
+        
+        $result = $db->val($sql);
+        
+        if ($this->_equal !== $result) {
             $this->_error(self::NOT_EQUAL);
             return false;
         }

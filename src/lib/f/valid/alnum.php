@@ -11,7 +11,7 @@ class f_valid_alnum extends f_valid_abstract
         self::NOT_ALNUM    => "Wymagane znaki alfabetyczne lub numeryczne (a-z, A-Z, 0-9, np. qweRTY123)",
     );
 
-    public function _(array $config = array())
+    public static function _(array $config = array())
     {
         return new self($config);
     }

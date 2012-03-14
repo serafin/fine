@@ -8,7 +8,7 @@ class f_test_unit
 
     public function  __construct()
     {
-
+        error_reporting(E_ALL^E_NOTICE);
         foreach (get_class_methods($this) as $method) {
             if ($method[0] == '_') {
                 continue;

@@ -7,7 +7,7 @@ class f_form_element
     public $_filter     = array();
     public $_decor      = true;
     
-    /* contenxt alone */
+    /* context alone */
     protected $_type          = 'text';
     protected $_name;
     protected $_val;
@@ -607,10 +607,7 @@ class f_form_element
 
     public function decorDefault()
     {
-        $this->_decor = isset(self::$_configStatic[$this->_type . "_decor"])
-                     ? self::$_configStatic[$this->_type . "_decor"]
-                     : self::$_configStatic["default_decor"];
-
+        $this->_decor = isset($this->_form) ? $this->_decorForm : $this->_decorElement;
     }
 
     public function render()

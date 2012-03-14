@@ -1,20 +1,19 @@
 [v2.0]
-- f_paging_interface
-- f_debug_object(array('object' => '', 'key', ''))
 - f_c_helper_uri: build, abs, resolvePairsParams moze polaczenie offsetow i pairs? hmm :)?
 - f_di __isset
-- f_c_helper_notShared_interface
 - f_c_helper_flash->$storage
-- f_error::register();
-- f_v_helper_head
-- csrf do inkubatora
 - f_form
 - m_ relacje
-- f_debug::source klasy css wedlugo standardu box
 - f_form_decor_label - opcja dla przyklejenia tekstu labela prepend, append
 - f_exception style nazwewnictwa metod z fine wprowadzic
 - f_valid_db*
 
 [v2.1]
+- csrf do inkubatora
+- f_debug::source klasy css wedlugo standardu box
 - f_valid_file*
 - f_valid_abstract::msgVar - to co msg tylko ze dla $this->_var;
+- f_valid - agregator validatorow, obslugiwany tak jakby byl jednym walidatorem, pomyslec co z kluczami bledow, 
+    co z breakOnFail, czy jest to mozliwe?
+- f_debug_object(array('object' => '', 'key', ''))
+

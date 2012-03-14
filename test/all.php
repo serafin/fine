@@ -13,5 +13,5 @@
  
 foreach (glob_recursive('*.test.php') as $testfile) {
     
-    echo shell_exec("php $testfile 2> /dev/null");
+    echo shell_exec("php $testfile");
 }
