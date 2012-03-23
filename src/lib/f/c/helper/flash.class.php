@@ -1,6 +1,6 @@
 <?php
 
-/** @todo jeden helper dla kontrollera i widoku */
+/** @todo jeden helper dla kontrollera i widoku, storage wlasnosc */
 
 class f_c_helper_flash
 {

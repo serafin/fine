@@ -1,22 +1,25 @@
 <?php
 
-class c_setup
+class c_setup extends f_c_action
 {
 
-    public function indexAction()
+    public function checkAction()
     {
-        $this->{$this->env}();
-    }
-
-    public function dev()
-    {
-        /** @todo auto tworzenie nie istniejacych modeli
+     
+        /** 
+         * @todo sprawdzic prawa zapisu do ./data, ./tmp, ./cache - jezeli instieja
          * 
          */
+        
     }
-
-    public function prod()
+    
+    public function modelAction()
     {
+        if ($this->env != 'dev') {
+            return;
+        }
+        
+        /** @todo */
     }
 
 }

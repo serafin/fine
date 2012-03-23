@@ -14,14 +14,17 @@ class container extends f_c_container
     {
         $config   = $this->config->main['db'];
         $this->db = new f_db_mysql();
-        $this->db->connect($config->host, $config->user, $config->pass);
-        $this->db->selectDb($config->name);
-        $this->db->query("SET NAMES '{$config->charset}'");
+        $this->db->connect($config['host'], $config['user'], $config['pass']);
+        $this->db->selectDb($config['name']);
+        $this->db->query("SET NAMES '{$config['charset']}'");
         return $this->db;
     }
     
     protected function _debug()
     {
+        /** Will be done in v2.1 */
+        return null; 
+        
         $this->debug = new f_debug();
         $this->db    = new f_debug_component_db(array('component' => $this->db));
         return $this->debug;
@@ -53,8 +56,8 @@ class container extends f_c_container
 
     protected function _flash()
     {
-        $this->flash           = new f_c_helper_flash();
-        $this->flash->session  = $this->session->space('flash');
+        $this->flash          = new f_c_helper_flash();
+        $this->flash->storage =& $_SESSION['flash'];
         return $this->flash;
     }
 
@@ -65,23 +68,12 @@ class container extends f_c_container
 
     protected function _request()
     {
-        if ($_FILES) {
-            $_POST += $_FILES;
-        }
         return $this->request = new f_c_request();
-        
     }
 
     protected function _response()
     {
         return $this->response = new f_c_response();
-    }
-
-    protected function _router()
-    {
-        $this->router          = new f_c_router();
-        $this->router->request = $this->request;
-        return $this->router;
     }
 
     protected function _render()
