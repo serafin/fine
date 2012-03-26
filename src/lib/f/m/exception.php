@@ -1,5 +1,5 @@
 <?php
 
-class f_m_exception extends f_exception
+interface f_m_exception
 {
 }
