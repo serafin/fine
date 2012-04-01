@@ -60,10 +60,7 @@ abstract class f_form_decor_abstract
                 return $this->decoration . $this->content. $this->decoration2;
 
             default:
-                throw new f_form_decor_exception(array(
-                    'type' => f_form_decor_exception::UNEXPECTED_VALUE,
-                    'msg'  => 'Wrong value for placement property',
-                ));
+                /** @todo throw new f_form_exception_logice 'Wrong value for placement property' */
         }
 
     }

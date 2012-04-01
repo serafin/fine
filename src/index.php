@@ -3,7 +3,7 @@
 require "lib/f/autoload/includePath.php";
 
 f_autoload_includePath::_()
-    ->path(array('.', 'app/m/', 'app/', 'lib/'))
+    ->path(array('.', 'app/', 'lib/'))
     ->register();
 
 

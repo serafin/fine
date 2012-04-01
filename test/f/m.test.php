@@ -91,6 +91,7 @@ class m_img extends f_m
 
     public $img_id;
     public $img_id_user;
+    public $img_id_post;
     public $img_insert;
     public $img_token;
 
@@ -121,7 +122,10 @@ class m_post extends f_m
 {
 
     public $post_id;
+    public $post_id_post;
     public $post_id_user;
+    public $post_id_user_edit;
+    public $post_id_img;
     public $post_insert;
     public $post_title;
 
@@ -340,3 +344,16 @@ class test_f_m extends f_test_unit
 
 new test_f_m();
 
+function test()
+{
+    
+    $oPost = new m_post();
+    $oPost->join('img');
+    // SELECT * FROM post JOIN (post_id_img = img_id) 
+    
+    $oPost = new m_post();
+    $oPost->img;
+    // SELECT * FROM img WHERE (img_id)
+    
+    
+}

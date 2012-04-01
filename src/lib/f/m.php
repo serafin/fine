@@ -48,7 +48,7 @@ class f_m implements IteratorAggregate
 
         if (! isset(self::$_metadata[$class])) {
             
-            $part = explode('_', substr($class, strlen($this->_classPrefix)));
+            $part = explode('_', substr($class, strlen(self::$_classPrefix)));
 
             $reflection = new ReflectionClass($this);
             foreach ($reflection->getProperties(ReflectionProperty::IS_PUBLIC) as $property) {
@@ -90,8 +90,7 @@ class f_m implements IteratorAggregate
      */
     public function __get($key)
     {
-        switch ($key) {
-            
+        switch ($key) { 
             case '_db':
                 $service   = self::$_metadata[$this->_class]['db'];
                 $this->_db = f::$c->{$service};
@@ -289,7 +288,6 @@ class f_m implements IteratorAggregate
      */
     public function removeVal()
     {
-        return;
         $this->_ = null;
         foreach (self::$_metadata[$this->_class]['field'] as $field) {
             $this->{$field} = null;
@@ -305,7 +303,7 @@ class f_m implements IteratorAggregate
      */
     public function id($sValue = null)
     {
-        if (func_num_args()) {
+        if (func_num_args() == 0) {
             return $this->{$this->_key};
         }
         else {
@@ -460,7 +458,7 @@ class f_m implements IteratorAggregate
      */
     public function selectNext()
     {
-        if (($data = $this->_db->fetch($this->_result))) {
+        if (($data = $this->_db->fetchUsingResult($this->_result))) {
             $this->val($data);
             $this->_ = $data;
             if ($this->_key !== null && isset($data[$this->_key])) {
@@ -894,7 +892,6 @@ class f_m implements IteratorAggregate
         return $select . $from . $where . $groupby . $having . $orderby . $limit . $offset;
     }
 
-
     protected function _rel11($sRefModel, $sField = null, $sRelatedField = null)
     {
         $field = $sField !== null ? $sField : "{$this->_table}_id";
@@ -998,10 +995,13 @@ class f_m implements IteratorAggregate
 
     private function _join($asRefName, $asField, $asModel, $sType)
     {
+        //  table, table alias
         if (is_array($asRefName)) {
             $aliasJoin = key($asRefName);
             $asRefName = current($asRefName);
         }
+        
+        // model, model alias
         if (is_array($asModel)) {
             $aliasModel = key($asModel);
             $asModel    = current($asModel);
@@ -1024,10 +1024,10 @@ class f_m implements IteratorAggregate
                 $o = new $class;
                 $o->modelRel();
             }
-            if (! isset (self::$_metadata[$class]['ref'])) {
+            if (!isset(self::$_metadata[$class]['ref'])) {
                 self::$_metadata[$class]['ref'] = array();
             }
-            if (! isset (self::$_metadata[$class]['dep'])) {
+            if (!isset(self::$_metadata[$class]['dep'])) {
                 self::$_metadata[$class]['dep'] = array();
             }
         }
@@ -1039,8 +1039,63 @@ class f_m implements IteratorAggregate
             $rel = self::$_metadata[$class]['ref'][$asRefName] = self::$_metadata[$class]['dep'][$asRefName];
         }
         else {
-            throw new Exception("Odwolanie do nieistniejacej relacji o nazwie $asRefName w modelu $this->_class");
-            return;
+            
+            /**
+             * post
+             * post_id_img
+             */
+            
+            if (property_exists($this, "{$this->_table}_id_{$asRefName}")) { // is ref
+                if (strstr($asRefName, '_')) {
+                    $relTable = current(explode('_', $asRefName));
+                }
+                else {
+                    $relTable = $asRefName;
+                }
+                
+                $rel = array(
+                    'field'    => "{$this->_table}_id_{$asRefName}",
+                    'relTable' => $relTable,
+                    'relField' => "{$relTable}_id",
+                );
+                
+                // cache dynamic created relation to metadata
+                self::$_metadata[$class]['ref'][$asRefName] = $rel;
+            }
+            else {
+                
+                /**
+                 * post
+                 * img_id_post
+                 */
+                if (strstr($asRefName, '_')) {
+                    $relTable = current(explode('_', $asRefName));
+                    $relField = "{$relTable}_id_{$this->_table}_" . end(explode('_', $asRefName));
+                }
+                else {
+                    $relTable = $asRefName;
+                    $relField = "{$relTable}_id_{$this->_table}";
+                }
+                
+                $relClass = self::$_metadata[$this->_class]['prefix'] . $relTable;
+                
+                if (property_exists($relClass, $relField)) { // is dep
+                    
+                }
+                else { // ref 1 to 1 
+                    
+                }
+                
+                
+                
+                
+            }
+            
+            
+            
+            
+//            throw new Exception("Odwolanie do nieistniejacej relacji o nazwie $asRefName w modelu $this->_class");
+//            return;
         }
 
         if ($asField !== false) {
@@ -1055,7 +1110,11 @@ class f_m implements IteratorAggregate
                 $asField = explode(' ', $asField);
             }
             foreach ($asField as $k => $v) {
-                $this->_select[] = ($aliasJoin === null ? '' : "`$aliasJoin`" . '.') . (is_int($k) ?   ($aliasJoin === null ? "`$v`" : "`{$v}` as `{$aliasJoin}_{$v}`") : "`$v` as $k");
+                $this->_select[] = ($aliasJoin === null ? '' : "`$aliasJoin`" . '.')
+                                 . (is_int($k) 
+                                        ?   ($aliasJoin === null ? "`$v`" : "`{$v}` as `{$aliasJoin}_{$v}`") 
+                                        : "`$v` as $k"
+                                  );
             }
         }
         $this->_join[] =  $sType. ' `' . $rel['relTable'] . '`' . ($aliasJoin === null ? '' : " as `$aliasJoin`")

@@ -20,10 +20,7 @@ class f_c_helper_byte2size
                 case 'B':
                     return $iSize;
                 default:
-                    throw new f_c_helper_exception(array(
-                        'type' => f_c_helper_exception::INVALID_ARGUMENT,
-                        'msg'  => "Nieobsługiwana jednostka '$sUnit'. Obsługiwane: MB, kB, B",
-                    ));
+                    /** @todo throw new f_c_exception_logic 'Nieobsługiwana jednostka '$sUnit'. Obsługiwane: GB, MB, kB, B' */
             }
         }
         else {

@@ -92,6 +92,11 @@ class f_c_render extends f_c
         }
         $this->render();
     }
+    
+    public function off()
+    {
+        $this->_renderOnce = true;
+    }
 
     public function render($sViewScript = null)
     {

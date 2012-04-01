@@ -37,10 +37,7 @@ class f_config
         $this->{$sName} = include $file;
 
         if ($this->{$sName} === false) {
-            throw new f_config_exception(array(
-                'type' => f_config_exception::NO_CONFIG_FILE,
-                'msg'  => "No config file named $sName ($file) or config file return false"
-            ));
+            /** @todo throw new f_config_exception_logic "No config file named $sName ($file) or config file return false" */
         }
 
         return $this->{$sName};

@@ -11,6 +11,24 @@ class f_c_response extends f_c
     protected $_redirect  = false;
     protected $_sendOnce  = false;
 
+    /**
+     *
+     * @param array $config
+     * @return f_c_response
+     */
+    public static function _(array $config = array()) 
+    {
+        return new self();
+    }
+    
+    public function __construct(array $config = array())
+    {
+        foreach ($config as $k => $v) {
+            $this->{$k}($v);
+        }
+    }
+    
+    
     public function __toString()
     {
         ob_start();
@@ -185,7 +203,12 @@ class f_c_response extends f_c
         }
         $this->send();
     }
-
+    
+    public function off()
+    {
+        $this->_sendOnce = true;
+    }
+    
     public function send()
     {
         if ($this->event->is('response_pre')) {
