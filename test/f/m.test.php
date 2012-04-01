@@ -12,7 +12,7 @@ f_autoload_includePath::_()
     ->path(array('./', './../src/lib/'))
     ->register();
 
-/* container with db service used by models*/
+/* container with db service used by models */
 class db
 {
     
@@ -26,13 +26,13 @@ class db
         test_f_m::$query = $s;
     }
     
-    public function rows($s)
+    public function row($s)
     {
         test_f_m::$query = $s;
         return test_f_m::$select[$s];
     }
     
-    public function row($s)
+    public function rows($s)
     {
         test_f_m::$query = $s;
         return test_f_m::$select[$s];
@@ -56,14 +56,17 @@ class db
         return test_f_m::$select[$s];
     }
     
-}
-
-class c
-{
+    public function fetchUsingResult($rRresult)
+    {
+        $key = key(test_f_m::$select);
+        $val = current(test_f_m::$select[$key]);
+        next(test_f_m::$select[$key]);
+        return $val;
+    }
     
 }
 
-f::$c = new c();
+f::$c = new stdClass();
 f::$c->db = new db();
 
 /* models */
@@ -172,36 +175,36 @@ class test_f_m extends f_test_unit
         $this->_testEqual(self::$query, $sQuery, $sInfo);
     }
 
-//    public function where()
-//    {
-//        $o = new m_post();
-//
-//        $o->select(1);
-//        $this->_q("SELECT `post_id`, `post_id_user`, `post_insert`, `post_title` FROM `post` WHERE `post_id` = '1'");
-//
-//        $o->select(array('user_id' => array('12', '13')));
-//        $this->_q("SELECT `post_id`, `post_id_user`, `post_insert`, `post_title` FROM `post` WHERE `user_id` IN ('12','13')");
-//
-//        $o->select(array('user_id|NOT BETWEEN' => array('12', '13')));
-//        $this->_q("SELECT `post_id`, `post_id_user`, `post_insert`, `post_title` FROM `post` WHERE `user_id` NOT BETWEEN '12' AND '13'");
-//
-//        $o->select(array('user_id|LIKE' => '%1'));
-//        $this->_q("SELECT `post_id`, `post_id_user`, `post_insert`, `post_title` FROM `post` WHERE `user_id` LIKE '%1'");
-//
-//    }
-//
-//    public function field()
-//    {
-//        $o = new m_post();
-//
-//        $o->field('post_id post_title');
-//        $o->select(1234);
-//        $this->_q("SELECT `post_id`, `post_title` FROM `post` WHERE `post_id` = '1234'");
-//
-//        $o->addField('post_insert');
-//        $o->select(1234);
-//        $this->_q("SELECT `post_id`, `post_title`, `post_insert` FROM `post` WHERE `post_id` = '1234'");
-//    }
+    public function where()
+    {
+        $o = new m_post();
+
+        $o->select(1);
+        $this->_q("SELECT `post_id`, `post_id_user`, `post_insert`, `post_title` FROM `post` WHERE `post_id` = '1'");
+
+        $o->select(array('user_id' => array('12', '13')));
+        $this->_q("SELECT `post_id`, `post_id_user`, `post_insert`, `post_title` FROM `post` WHERE `user_id` IN ('12','13')");
+
+        $o->select(array('user_id|NOT BETWEEN' => array('12', '13')));
+        $this->_q("SELECT `post_id`, `post_id_user`, `post_insert`, `post_title` FROM `post` WHERE `user_id` NOT BETWEEN '12' AND '13'");
+
+        $o->select(array('user_id|LIKE' => '%1'));
+        $this->_q("SELECT `post_id`, `post_id_user`, `post_insert`, `post_title` FROM `post` WHERE `user_id` LIKE '%1'");
+
+    }
+
+    public function field()
+    {
+        $o = new m_post();
+
+        $o->field('post_id post_title');
+        $o->select(1234);
+        $this->_q("SELECT `post_id`, `post_title` FROM `post` WHERE `post_id` = '1234'");
+
+        $o->addField('post_insert');
+        $o->select(1234);
+        $this->_q("SELECT `post_id`, `post_title`, `post_insert` FROM `post` WHERE `post_id` = '1234'");
+    }
 
 //    public function join()
 //    {
@@ -230,17 +233,17 @@ class test_f_m extends f_test_unit
 //
 //    }
 //
-//    public function insert()
-//    {
-//        $o = new m_post();
-//        $o->post_id_user = '1';
-//        $o->post_insert  = time() - rand (0, 30 * 24 * 60 * 60);
-//        $o->post_title   = "'".md5(uniqid(rand(), true));
-//        $o->save();
-//
-//        $this->_q("INSERT INTO `post` SET `post_id` = '', `post_id_user` = '1', `post_insert` = '$o->post_insert', `post_title` = '" . f::$c->db->escape($o->post_title) . "'");
-//    }
-//
+    public function insert()
+    {
+        $o = new m_post();
+        $o->post_id_user = '1';
+        $o->post_insert  = time() - rand (0, 30 * 24 * 60 * 60);
+        $o->post_title   = "'".md5(uniqid(rand(), true));
+        $o->save();
+
+        $this->_q("INSERT INTO `post` SET `post_id` = '', `post_id_user` = '1', `post_insert` = '$o->post_insert', `post_title` = '" . f::$c->db->escape($o->post_title) . "'");
+    }
+
 //    public function joinByDependentModel_newFeature()
 //    {
 //        $oComment = new m_comment();
@@ -248,7 +251,7 @@ class test_f_m extends f_test_unit
 //        $oComment->select(1234);
 //        $this->_q("SELECT `comment_id`, `comment_id_post`, `comment_insert`, `comment_content`, `post_id`, `post_id_user`, `post_insert`, `post_title` FROM `comment` JOIN `post` ON (`comment_id_post` = `post_id`) WHERE `comment_id` = '1234'");
 //    }
-//
+
 //    public function dependentModelObject()
 //    {
 //
@@ -287,46 +290,49 @@ class test_f_m extends f_test_unit
 //
 //    }
 
-//    public function iterator()
-//    {
-//        self::$_select["SELECT `post_id` FROM `post`"] = array(
-//            array("1"), array("2"), array("3"), array("4"), array("5"));
-//
-//        $oPost = new m_post();
-//        $oPost->field('post_id');
-//
-//        $i = 0;
-//        foreach (m_post::_()->field('post_id')->selectCol() as $post) {
-//            $i++;
-//        }
-//        $this->_q("SELECT `post_id` FROM `post`");
-//        $this->_testEqual($i, 5, "iteracja powinna sie odbyc 5 razy");
-//
-//        unset(self::$_select["SELECT `post_id` FROM `post`"]);
-//    }
+    public function iterator()
+    {
+        self::$select["SELECT `post_id` FROM `post`"] = array(
+            array("1"), array("2"), array("3"), array("4"), array("5"));
 
-//    public function loop()
-//    {
-//        self::$_select["SELECT `post_id` FROM `post`"] = array(
-//            array("1"), array("2"), array("3"), array("4"), array("5"));
-//        $oPost = new m_post();
-//        $oPost->field('post_id');
-//        $oPost->selectLoop();
-//        while($oPost->selectNext()->id()) {
-//            var_dump(self::$_query);
-//            break;
-//        }
-//
-//
-//         unset(self::$_select["SELECT `post_id` FROM `post`"]);
-//   }
+        $oPost = new m_post();
+        $oPost->field('post_id');
 
-//   public function reservedWords()
-//   {
-//       $o = new m_select();
-//       $o->select(1);
-//       $this->_q("SELECT `select_id`, `select_data` FROM `select` WHERE `select_id` = '1'");
-//   }
+        $i = 0;
+        foreach (m_post::_()->field('post_id')->selectCol() as $post) {
+            $i++;
+        }
+        $this->_q("SELECT `post_id` FROM `post`");
+        $this->_testEqual($i, 5, "iteracja powinna sie odbyc 5 razy");
+
+        unset(self::$select["SELECT `post_id` FROM `post`"]);
+    }
+
+    public function loop()
+    {
+        self::$select["SELECT `post_id` FROM `post`"] = array(
+            array("post_id" => "1"), array("post_id" => "2"), array("post_id" => "3"), 
+            array("post_id" => "4"), array("post_id" => "5"),
+        );
+        $oPost = new m_post();
+        $oPost->field('post_id');
+        $oPost->selectLoop();
+        $i = 0;
+        while($a = $oPost->selectNext()->id()) {
+            $i++;
+        }
+        
+        $this->_testEqual($i, 5);
+
+         unset(self::$select["SELECT `post_id` FROM `post`"]);
+    }
+
+    public function reservedWords()
+    {
+       $o = new m_select();
+       $o->select(1);
+       $this->_q("SELECT `select_id`, `select_data` FROM `select` WHERE `select_id` = '1'");
+    }
 
 
 
