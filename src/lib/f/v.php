@@ -28,14 +28,14 @@ class f_v
     public function render($sFile)
     {
         ob_start();
-        require $this->_defaultPath . $sFile . '.php';
+        include $this->_defaultPath . $sFile . '.php';
         return ob_get_clean();
     }
 
     public function renderPath($sFile)
     {
         ob_start();
-        require $sFile . '.php';
+        include $sFile . '.php';
         return ob_get_clean();
     }
 

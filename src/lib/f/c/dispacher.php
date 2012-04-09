@@ -143,28 +143,28 @@ class f_c_dispacher extends f_c
 
         // check file
     	if (! is_file($file)) {
-            $this->error(f_error::ERROR_NOT_FOUND);
+            throw new f_c_exception_notFound();
         }
 
         include $file;
 
         // check class name
         if (!class_exists($class, false)) {
-            $this->error(f_error::ERROR_NOT_FOUND);
+            throw new f_c_exception_notFound();
         }
 
         $this->_object = new $class;
 
         // check interface
-        if (isset($this->_interface[0]) && ! ($this->_object instanceof $this->interface)) {
-            $this->error(f_error::ERROR_NOT_FOUND);
+        if (isset($this->_interface[0]) && ! ($this->_object instanceof $this->_interface)) {
+            throw new f_c_exception_notFound();
         }
 
         // index method
         if (! method_exists($this->_object, $method)) {
             $index = str_replace('{action}', 'index', $this->_method);
             if ($method !== $index && ! method_exists($this->_object, $index)) {
-                $this->error(f_error::ERROR_NOT_FOUND);
+                throw new f_c_exception_notFound();
             }
             $method        = $index;
             $this->_action = 'index';

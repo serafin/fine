@@ -24,5 +24,10 @@ class f_di
 
         return null;
     }
+    
+    public function __isset($name)
+    {
+        return isset($this->{$name}) || method_exists($this, "_{$name}");
+    }
 
 }

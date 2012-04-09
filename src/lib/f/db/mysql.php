@@ -51,6 +51,11 @@ class f_db_mysql
         return mysql_real_escape_string($sString, $this->_connect);
     }
 
+    public function result()
+    {
+        return $this->_result;
+    }
+    
     /**
      * Wykonuje zapytanie
      *
@@ -307,19 +312,8 @@ class f_db_mysql
      */
     public function countAffected()
     {
-        return mysql_affected_rows($this->_result);
+        return mysql_affected_rows($this->_connect);
     }
-
-    /**
-     * Zwraca liczbe zmodyfikowanych wierszy
-     *
-     * @return int
-     */
-    public function countAffectedUsingResult($rQueryResult)
-    {
-        return mysql_affected_rows($rQueryResult);
-    }
-	
 
     /**
      * Zamyka połączenie z serwerem MySQL

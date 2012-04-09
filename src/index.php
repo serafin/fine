@@ -41,7 +41,7 @@ class index extends f_c
 
     public function dev()
     {
-
+        
     }
 
     public function prod()

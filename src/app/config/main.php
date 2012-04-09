@@ -1,9 +1,6 @@
 <?php
 
 return array(
-    'default' => array(
-        
-    ),
     'dev' => array(
         'db' => array (
             'host'    => 'localhost',
