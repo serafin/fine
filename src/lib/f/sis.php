@@ -12,7 +12,7 @@
  *
  * Sis begins:
  *      - when `begin` method returns true,
- *      - when method `begin` does not throws f_sis_exception_running.
+ *      - when method `begin` does not throws f_sis_exception_running (if `throwException` is on).
  * Sis ends:
  *      - when php script ends,
  *      - on object `__destruct` mehtod is called (eg. unset($sis));
