@@ -112,7 +112,7 @@ class f_sis
             }
             $pid = trim(file_get_contents($this->_id));
             if (posix_kill($pid, 0)) {
-                if ($this->_isPIDAlive($pid)) {
+                if ($this->_isProcessAlive($pid)) {
                     if ($this->_throwException) {
                         throw new f_sis_exception_running("Sis `{$this->_id}` already running");
                     }
@@ -142,7 +142,7 @@ class f_sis
         }
     }
 
-    public function _isPIDAlive($iPID)
+    public function _isProcessAlive($iPID)
     {
         $state = array();
         exec('ps ' . $iPID, $state);
