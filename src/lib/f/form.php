@@ -23,8 +23,11 @@ class f_form /* implements ArrayAccess, IteratorAggregate, Countable */
      */
     public $_ = array();
     
-    protected $_attr = array('method' => self::METHOD_POST);
-    protected $_decor = array('viewHelper' => 'f_form_decor_viewHelperForm');
+    protected $_attr  = array('method' => self::METHOD_POST);
+    protected $_decor = array(
+        'formElements' => 'f_form_decor_formElements',
+        'form'         => 'f_form_decor_form',
+    );
     protected $_viewHelper = 'form';
     
     protected $_error;
@@ -201,8 +204,8 @@ class f_form /* implements ArrayAccess, IteratorAggregate, Countable */
                 $decor = $this->_decor[$k];
             }
 
-            $decor->element = $this;
-            $decor->content = $render;
+            $decor->object = $this;
+            $decor->buffer = $render;
             $render = $decor->render();
         }
         return $render;

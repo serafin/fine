@@ -3,7 +3,6 @@
 class f_form_decor_append extends f_form_decor_abstract
 {
 
-    protected $_placement = self::APPEND;
     protected $_content;
 
     public function content($sContent = null)
@@ -15,10 +14,9 @@ class f_form_decor_append extends f_form_decor_abstract
         return $this;
     }
 
-
     public function render()
     {
-        $this->decoration = $this->_content;
+        $this->_decoration = $this->_content;
         return $this->_render();
     }
 

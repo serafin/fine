@@ -26,7 +26,7 @@ class f_form_decor_viewScript extends f_form_decor_abstract
 
     public function render()
     {
-        $this->decoration = $this->_path !== null
+        $this->_decoration = $this->_path !== null
                           ? f::$c->v->renderPath($this->_path)
                           : f::$c->v->render($this->_view);
 

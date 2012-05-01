@@ -36,9 +36,8 @@ class f_form_element
         'label'      => 'f_form_decor_label',
         'error'      => 'f_form_decor_error',
         'desc'       => 'f_form_decor_desc',
-        'tag'        => array('f_form_decor_tag', 'attr' => 'class="form_element"'),
+        'tag'        => array('f_form_decor_tag', 'attr' => array('class' => 'form-element')),
     );
-
 
     /**
      * Element formularza
@@ -633,9 +632,9 @@ class f_form_element
                 $decor = $this->_decor[$k];
             }
 
-            $decor->element    = $this;
-            $decor->content    = $render;
-            $render            = $decor->render();
+            $decor->object = $this;
+            $decor->buffer = $render;
+            $render        = $decor->render();
             
         }
         return $render;

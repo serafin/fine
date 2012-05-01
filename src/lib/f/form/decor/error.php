@@ -1,8 +1,12 @@
 <?php
 
-class f_form_decor_error extends f_form_decor_abstract
+class f_form_decor_error extends f_form_decor_tag
 {
-
+    
+    protected $_tag           = 'ul';
+    protected $_itemPrepend   = '<li>';
+    protected $_itemAppend    = '</li>';
+    protected $_itemSeparator = '';
     /**
      * Additional elements - to show errors from other elements
      * @var array
@@ -36,23 +40,65 @@ class f_form_decor_error extends f_form_decor_abstract
         return $this;
     }
 
+    public function itemPrepend($sItemPrepend = null)
+    {
+        if (func_num_args() == 0) {
+            return $this->_itemPrepend;
+        }
+        $this->_itemPrepend = $sItemPrepend;
+        return $this;
+    }
+
+    public function itmeAppend($sItemAppend = null)
+    {
+        if (func_num_args() == 0) {
+            return $this->_itemAppend;
+        }
+        $this->_itemAppend = $sItemAppend;
+        return $this;
+    }
+
+    public function itemSeparator($sItemSeparator = null)
+    {
+        if (func_num_args() == 0) {
+            return $this->_itemSeparator;
+        }
+        $this->_itemSeparator = $sItemSeparator;
+        return $this;
+    }
 
     public function render()
     {
+        /** @todo sprawdzic czy czasem error nie zwraca tablicy z kluczami walidatorow (typami bledow) */
+        // errors
         $errors = array();
         if ($this->_ignoreOwner === false) {
-            $errors = $this->element->error();
+            $errors = $this->object->error();
         }
         foreach ((array)$this->_element as $i) {
             $errors += $i->error();
         }
 
-        if ($errors) {
-            $this->decoration .= '<div class="form_decor_error"><ul>';
-            foreach ($errors as $error) {
-                $this->decoration .= '<li>' . htmlspecialchars($error) . '</li>';
-            }
-            $this->decoration .= '</ul></div>';
+        // no errors = no decoration
+        if (!$errors) {
+            return $this->buffor;
+        }
+
+        // list
+        $list = array();
+        foreach ($errors as $error) {
+            $list[] = $this->_itemPrepend . htmlspecialchars($error) . $this->_itemAppend;
+        }
+        $list = implode($this->_itemSeparator, $list);
+
+        // decoration
+        if ($this->_tag !== null) {
+            $this->_prepateTag();
+            $this->_decoration .= $list;
+        }
+        else {
+            $this->_decoration  = $this->_prepend . $list;
+            $this->_decoration2 = $this->_append;
         }
 
         return $this->_render();

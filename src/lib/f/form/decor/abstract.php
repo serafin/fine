@@ -3,17 +3,16 @@
 abstract class f_form_decor_abstract
 {
 
-    const PREPEND = 'PREPEND';
-    const APPEND  = 'APPEND';
-    const EMBRACE = 'EMBRACE';
+    const PLACEMENT_PREPEND = 'PLACEMENT_PREPEND';
+    const PLACEMENT_APPEND  = 'PLACEMENT_APPEND';
+    const PLACEMENT_EMBRACE = 'PLACEMENT_EMBRACE';
 
-    public $content;
-    public $element;
-    public $decoration;
-    public $decoration2;
-    
+    public $buffor;
+    public $object;
 
-    protected $_placement = self::APPEND;
+    protected $_decoration;
+    protected $_decoration2;
+    protected $_placement = self::PLACEMENT_APPEND;
     protected $_event;
 
     public function __construct(array $config = array())
@@ -50,17 +49,17 @@ abstract class f_form_decor_abstract
         }        
 
         switch ($this->_placement) {
-            case self::PREPEND:
-                return $this->decoration . $this->decoration2 . $this->content;
+            case self::PLACEMENT_PREPEND:
+                return $this->_decoration . $this->_decoration2 . $this->buffor;
 
-            case self::APPEND:
-                return $this->content . $this->decoration . $this->decoration2;
+            case self::PLACEMENT_APPEND:
+                return $this->buffor . $this->_decoration . $this->_decoration2;
 
-            case self::EMBRACE:
-                return $this->decoration . $this->content. $this->decoration2;
+            case self::PLACEMENT_EMBRACE:
+                return $this->_decoration . $this->buffor. $this->_decoration2;
 
             default:
-                /** @todo throw new f_form_exception_logice 'Wrong value for placement property' */
+                throw new f_form_decor_exception_domain('Wrong value for placement property');
         }
 
     }

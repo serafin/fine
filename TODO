@@ -10,6 +10,12 @@
 - poszukac tabulatorow w kodzie i zamienic na spacje
 - dodac wszedzie 	_() i __construct
 - f_image
+- f_form* class ustawic w standardowych dekoratorach dla przestrzeni `box-form`
+- f_form to samo co powinien miec co f_form_element tzn. attr, css ... moze `f_form extends f_form_element`?
+- f_form_chackbox::val() obczaic to zeby dzialalo tak jak w fine-v1
+- f_from required prztestowac i czy tak to moze byc?
+
+
 
 
 [later]
