@@ -15,12 +15,12 @@
  *      - when method `begin` does not throws f_sis_exception_running (if `throwException` is on).
  * Sis ends:
  *      - when php script ends,
- *      - on object `__destruct` mehtod is called (eg. unset($sis));
+ *      - if sis object `__destruct` mehtod is called (eg. unset($sis));
  *      - on demand using method `end`
  *
  * How it works
  * `PID` (process ID) of current script is stored in file `id` (id method).
- * In next call sis checks if proccess with id equal to `PID` alreadt works.
+ * In next call sis checks if proccess with id equal to `PID` already works.
  *
  * Inspiration: http://blog.crazytje.be/single-instance-php-script/
  */
