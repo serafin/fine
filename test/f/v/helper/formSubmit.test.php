@@ -1,7 +1,7 @@
 <?php
 
 require "../src/lib/f/autoload/includePath.php";
-f_autoload_includePath::_()->path(array('./', '../src/lib/')) ->register();
+f_autoload_includePath::_()->path(array('./', '../src/lib/'))->register();
 
 class test_f_v_helper_formSubmit extends f_test_unit
 {

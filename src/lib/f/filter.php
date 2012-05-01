@@ -5,7 +5,8 @@ class f_filter
 
     protected $_filter = array();
 
-    public function  __construct($aoFilter = null)
+    /** @todo */
+    public function __construct($aoFilter = null)
     {
         if ($aoFilter) {
             $this->add($aoFilter);
