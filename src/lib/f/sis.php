@@ -15,8 +15,8 @@
  *      - when method `begin` does not throws f_sis_exception_running (if `throwException` is on).
  * Sis ends:
  *      - when php script ends,
- *      - if sis object `__destruct` mehtod is called (eg. unset($sis));
- *      - on demand using method `end`
+ *      - if sis object `__destruct` mehtod is called (eg. unset($sis)),
+ *      - on demand using method `end`.
  *
  * How it works
  * `PID` (process ID) of current script is stored in file `id` (id method).
