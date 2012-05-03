@@ -1,25 +1,13 @@
 <?php
 
-class f_form_decor_error extends f_form_decor_tag
+class f_form_decor_formError extends f_form_decor_tag
 {
-    
+
     protected $_tag           = 'ul';
     protected $_itemPrepend   = '<li>';
     protected $_itemAppend    = '</li>';
     protected $_itemSeparator = '';
     
-    /**
-     * Additional elements - to show errors from other elements
-     * @var array
-     */
-    protected $_element = array();
-    
-    /**
-     * Ignore owner element?
-     * @var boolean
-     */
-    protected $_ignoreOwner = false;
-
     public function element($aoAdditionalElement = null)
     {
         if (func_num_args() === 0) {
@@ -73,10 +61,11 @@ class f_form_decor_error extends f_form_decor_tag
         /** @todo sprawdzic czy czasem error nie zwraca tablicy z kluczami walidatorow (typami bledow) */
         // errors
         $errors = array();
-        if ($this->_ignoreOwner === false) {
-            $errors = $this->object->error();
-        }
-        foreach ((array)$this->_element as $i) {
+        foreach ((array)$this->object->_ as $i) {
+            /* @var $i f_form_element */
+            if ($i->ignoreRender()) {
+                continue;
+            }
             $errors += $i->error();
         }
 

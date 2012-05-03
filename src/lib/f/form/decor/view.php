@@ -1,6 +1,6 @@
 <?php
 
-class f_form_decor_viewScript extends f_form_decor_abstract
+class f_form_decor_view extends f_form_decor_abstract
 {
 
     protected $_view;

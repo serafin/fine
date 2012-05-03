@@ -7,7 +7,14 @@ abstract class f_form_decor_abstract
     const PLACEMENT_APPEND  = 'PLACEMENT_APPEND';
     const PLACEMENT_EMBRACE = 'PLACEMENT_EMBRACE';
 
-    public $buffor;
+    /**
+     * @var string
+     */
+    public $buffer;
+
+    /**
+     * @var f_form|f_form_element
+     */
     public $object;
 
     protected $_decoration;
@@ -50,13 +57,13 @@ abstract class f_form_decor_abstract
 
         switch ($this->_placement) {
             case self::PLACEMENT_PREPEND:
-                return $this->_decoration . $this->_decoration2 . $this->buffor;
+                return $this->_decoration . $this->_decoration2 . $this->buffer;
 
             case self::PLACEMENT_APPEND:
-                return $this->buffor . $this->_decoration . $this->_decoration2;
+                return $this->buffer . $this->_decoration . $this->_decoration2;
 
             case self::PLACEMENT_EMBRACE:
-                return $this->_decoration . $this->buffor. $this->_decoration2;
+                return $this->_decoration . $this->buffer. $this->_decoration2;
 
             default:
                 throw new f_form_decor_exception_domain('Wrong value for placement property');

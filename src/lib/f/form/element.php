@@ -19,24 +19,26 @@ class f_form_element
     protected $_requiredClass = 'f_valid_notEmpty';
     protected $_breakOnFail   = true;
     protected $_error         = array();
-    protected $_viewHelper    = 'formText';
+    protected $_helper        = 'formText';
     
     /* context form */
     protected $_form;
-    protected $_ignoreVal     = false;
-    protected $_ignoreRender  = false;
+    protected $_ignoreError   = false; // for f_form, f_form_decor_form*
+    protected $_ignoreRender  = false; // for f_form, f_form_decor_form*
+    protected $_ignoreVal     = false; // for f_form
+    protected $_ignoreValid   = false; // for f_form
     protected $_label;
     protected $_desc;
     protected $_decorElement  = array(
-        'viewHelper' => 'f_form_decor_viewHelper',
+        'helper' => 'f_form_decor_helper',
         
     );
     protected $_decorForm     = array(
-        'viewHelper' => 'f_form_decor_viewHelper',
-        'label'      => 'f_form_decor_label',
-        'error'      => 'f_form_decor_error',
-        'desc'       => 'f_form_decor_desc',
-        'tag'        => array('f_form_decor_tag', 'attr' => array('class' => 'form-element')),
+        'helper' => 'f_form_decor_helper',
+        'label'  => 'f_form_decor_label',
+        'error'  => 'f_form_decor_error',
+        'desc'   => 'f_form_decor_desc',
+        'tag'    => array('f_form_decor_tag', 'attr' => array('class' => 'form-element')),
     );
 
     /**
@@ -72,14 +74,16 @@ class f_form_element
             'attr'          => $this->_attr,
             'option'        => $this->_option,
             'separator'     => $this->_separator,
-            'ignoreVal'     => $this->_ignoreVal,
+            'ignoreError'   => $this->_ignoreError,
             'ignoreRender'  => $this->_ignoreRender,
+            'ignoreVal'     => $this->_ignoreVal,
+            'ignoreValid'   => $this->_ignoreValid,
             'isArray'       => $this->_isArray,
             'required'      => $this->_required,
             'requiredClass' => $this->_requiredClass,
             'breakOnFail'   => $this->_breakOnFail,
             'error'         => $this->_error,
-            'viewHelper'    => $this->_viewHelper,
+            'helper'        => $this->_helper,
             'label'         => $this->_label,
             'desc'          => $this->_desc,
         );
@@ -147,7 +151,7 @@ class f_form_element
                         $class = array_shift($filter);
                         $this->_filter[$k] = new $class($filter);
                     }
-                    $decor = $this->_filter[$k];
+                    $filter = $this->_filter[$k];
                 }
                 
                 /* @var $filter f_filter_interface */
@@ -211,6 +215,7 @@ class f_form_element
                 return $this;
 
             default:
+                /** @todo */
                 throw new f_form_exception(array(
                     'type' => f_form_exception::BAD_METHOD_CALL,
                     'msg'  => 'Too many arguments',
@@ -348,12 +353,12 @@ class f_form_element
         return $this;
     }
 
-    public function ignoreVal($bIgnore = null)
+    public function ignoreError($bIgnore = null)
     {
     	if ($bIgnore === null) {
-            return $this->_ignoreVal;
+            return $this->_ignoreError;
     	}
-        $this->_ignoreVal = $bIgnore;
+        $this->_ignoreError = $bIgnore;
         return $this;
     }
 
@@ -363,6 +368,24 @@ class f_form_element
             return $this->_ignoreRender;
     	}
         $this->_ignoreRender = $bIgnore;
+        return $this;
+    }
+
+    public function ignoreVal($bIgnore = null)
+    {
+    	if ($bIgnore === null) {
+            return $this->_ignoreVal;
+    	}
+        $this->_ignoreVal = $bIgnore;
+        return $this;
+    }
+
+    public function ignoreValid($bIgnore = null)
+    {
+    	if ($bIgnore === null) {
+            return $this->_ignoreValid;
+    	}
+        $this->_ignoreValid = $bIgnore;
         return $this;
     }
 
@@ -563,6 +586,7 @@ class f_form_element
 
     public function decor($abnosDecor)
     {
+        /** @todo refactor nazwa zmiennej, dodac metode do usuwania decorow, usuwanie to przypisanei tablicy*/
         if ($abnosDecor === null || $abnosDecor === true) {
             $this->_decor = $abnosDecor;
             return $this;
@@ -640,12 +664,12 @@ class f_form_element
         return $render;
     }
 
-    public function viewHelper($sViewHelperName = null)
+    public function helper($sViewHelperName = null)
     {
     	if ($sViewHelperName === null) {
-            return $this->_viewHelper;
+            return $this->_helper;
     	}
-        $this->_viewHelper = $sViewHelperName;
+        $this->_helper = $sViewHelperName;
         return $this;
     }
 

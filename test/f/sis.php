@@ -10,11 +10,6 @@ $sis = new f_sis();
 $sis->id('./test.sis');
 
 if ($sis->begin()) {
-    echo "BEGIN ";
-    sleep(10);
-    echo "END \n";
+    exec('echo "' . date('Hi ') .'" >> test.txt');
+    sleep(30);
 }
-else {
-    echo "NO \n";
-}
-

@@ -3,15 +3,14 @@
 class f_form_decor_tag extends f_form_decor_abstract
 {
 
-
-    protected $_placement = self::PLACEMENT_EMBRACE;
-    protected $_name      = 'div';
-    protected $_attr;
-    protected $_short     = false;
-    protected $_prepend   = '';
-    protected $_append    = '';
-    protected $_innerPrepend   = '';
-    protected $_innerAppend    = '';
+    protected $_placement    = self::PLACEMENT_EMBRACE;
+    protected $_name         = 'div';
+    protected $_attr         = array();
+    protected $_short        = false;
+    protected $_prepend      = '';
+    protected $_append       = '';
+    protected $_innerPrepend = '';
+    protected $_innerAppend  = '';
 
 
     public function name($sName = null)

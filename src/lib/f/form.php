@@ -1,5 +1,6 @@
 <?php
 
+/** @todo implements zrobic */
 class f_form /* implements ArrayAccess, IteratorAggregate, Countable */
 {
     /**
@@ -25,10 +26,10 @@ class f_form /* implements ArrayAccess, IteratorAggregate, Countable */
     
     protected $_attr  = array('method' => self::METHOD_POST);
     protected $_decor = array(
-        'formElements' => 'f_form_decor_formElements',
-        'form'         => 'f_form_decor_form',
+        'formBody' => 'f_form_decor_formBody',
+        'form'     => 'f_form_decor_form',
     );
-    protected $_viewHelper = 'form';
+    protected $_helper = 'form';
     
     protected $_error;
     
@@ -113,6 +114,156 @@ class f_form /* implements ArrayAccess, IteratorAggregate, Countable */
     }
 
     /**
+     * Ustawianie lub pobieranie lub usuwanie atrybutow
+     *
+     * @param array|string $asName
+     * @param string $sValue
+     * @return f_form_element
+     */
+    public function attr($asName = null, $sValue = null)
+    {
+        switch (func_num_args()) {
+            case 0:
+
+                return $this->_attr;
+
+            case 1:
+
+                if ($asName === null) {
+                    $this->_attr = array();
+                }
+                else if (is_array($asName)) {
+                    foreach ($asName as $k => $v) {
+                        $this->_attr[$k] = $v;
+                    }
+                }
+                else {
+                    return $this->_attr[$asName];
+                }
+                return $this;
+
+            case 2:
+
+                if ($sValue === null) {
+                    if (is_array($asName)) {
+                        foreach ($asName as $k => $v) {
+                            unset($this->_attr[$k]);
+                        }
+                    }
+                    else {
+                        unset($this->_attr[$asName]);
+                    }
+                }
+                else {
+                    $this->_attr[$asName] = $sValue;
+                }
+                return $this;
+
+            default:
+                /** @todo */
+                throw new f_form_exception(array(
+                    'type' => f_form_exception::BAD_METHOD_CALL,
+                    'msg'  => 'Too many arguments',
+                ));
+        }
+    }
+
+    public function id($sId = null)
+    {
+        // getter
+        if (func_num_args() === 0) {
+            return $this->_attr['id'];
+        }
+
+        // setter
+        if ($sId === null) {
+            unset($this->_attr['id']);
+        }
+        else if ($sId === true) {
+            $this->_attr['id'] = $this->_attr['name'];
+        }
+        else {
+            $this->_attr['id'] = $sId;
+        }
+        return $this;
+    }
+
+    public function addClass($asName)
+    {
+        if (! is_array($asName)) {
+            $asName = array($asName);
+        }
+
+        foreach ($asName as $k => $v) {
+            if ($k != 0 || strlen($this->_attr['class']) > 0) {
+                $this->_attr['class'] .= ' ';
+            }
+            $this->_attr['class'] .= $v;
+        }
+
+        return $this;
+    }
+
+    public function removeClass($sName = null)
+    {
+    	if ($sName === null) {
+            $this->_attr['class'] = array();
+    	}
+
+        $class = explode(' ', $this->_attr['class']);
+        foreach ($class as $k => $v) {
+            if ($v == $sName) {
+                unset ($class[$v]);
+            }
+        }
+        $this->_attr['class'] = implode(' ', $class);
+
+        return $this;
+    }
+
+    public function css($asName, $sValue = null)
+    {
+
+        $style = f_c_helper_arrayExplode::helper($this->_attr['style'], ';', ':');
+
+        switch (func_num_args ()) {
+
+            case 1:
+
+                if (is_array($asName)) {
+                    foreach ($asName as $k => $v) {
+                        $style[$k] = $v;
+                    }
+                    return $this;
+                }
+                return $style[$asName];
+
+            case 2:
+
+                if ($sValue === null) {
+                    unset($style[$sName]);
+                }
+                else {
+                    $style[$asName] = $sValue;
+                }
+                break;
+
+            default:
+
+                throw new f_form_exception(array(
+                    'type' => f_form_exception::BAD_METHOD_CALL,
+                    'msg'  => 'Too many arguments',
+                ));
+        }
+
+        $this->_attr['style'] = f_c_helper_arrayImplode::helper($style, ';', ':');
+
+    	return $this;
+    }
+
+
+
+    /**
      * Pobiera błędy napotkane przy walidacji
      *
      * @return unknown
@@ -124,7 +275,7 @@ class f_form /* implements ArrayAccess, IteratorAggregate, Countable */
         foreach ($this->_ as $element) {
             
             /* @var $element f_form_element */
-            if ($element->ignoreVal()) {
+            if ($element->ignoreError()) {
                 continue;
             }
             
@@ -148,7 +299,7 @@ class f_form /* implements ArrayAccess, IteratorAggregate, Countable */
         foreach ($this->_ as $element) {
             
             /* @var $element f_form_element */
-            if ($element->ignoreVal()) {
+            if ($element->ignoreValid()) {
                 continue;
             }
             
@@ -169,7 +320,7 @@ class f_form /* implements ArrayAccess, IteratorAggregate, Countable */
     public function removeElement($sName = null)
     {
         if ($sName === null) {
-            foreach ($this->element as $sName => $oElement) {
+            foreach ($this->_ as $sName => $oElement) {
                 $this->_removeElement($sName);
             }
         }
@@ -178,6 +329,42 @@ class f_form /* implements ArrayAccess, IteratorAggregate, Countable */
         }
         return $this;
     }
+
+    public function decor($aosuDecor)
+    {
+        print_r($aosuDecor);
+        if ($aosuDecor === null) {
+            $this->_decor = array();
+            return $this;
+        }
+    	if (is_array($aosuDecor)) {
+            foreach ($aosuDecor as $k => $v) {
+                if (is_integer($k)) {
+                    $this->_decor[] = $v;
+                }
+                else {
+                    $this->_decor[$k] = $v;
+                }
+            }
+            return $this;
+    	}
+        if (is_string($aosuDecor)) {
+            if (!is_object($this->_decor[$aosuDecor])) {
+                if (is_string($this->_decor[$aosuDecor])) {
+                    $this->_decor[$aosuDecor] = new $this->_decor[$abnosDecor];
+                }
+                else if (is_array($this->_decor[$aosuDecor])) {
+                    $class = array_shift($this->_decor[$aosuDecor]);
+                    $this->_decor[$aosuDecor] = new $class($this->_decor[$aosuDecor]);
+                }
+            }
+            return $this->_decor[$aosuDecor];
+        }
+
+        $this->_decor[] = $aosuDecor;
+        return $this;
+    }
+
 
     /**
      * Renderuje formularz
