@@ -1,10 +1,10 @@
 <?php
 
-class f_form_decor_tag extends f_form_decor_abstract
+class f_form_decor_tag extends f_form_decor_default
 {
 
     protected $_placement    = self::PLACEMENT_EMBRACE;
-    protected $_name         = 'div';
+    protected $_tag          = 'div';
     protected $_attr         = array();
     protected $_short        = false;
     protected $_prepend      = '';
@@ -12,19 +12,26 @@ class f_form_decor_tag extends f_form_decor_abstract
     protected $_innerPrepend = '';
     protected $_innerAppend  = '';
 
+    /**
+     * @return f_form_decor_tag
+     */
+    public static function _(array $config = array())
+    {
+        return new self($config);
+    }
 
-    public function name($sName = null)
+    public function tag($sTagName = null)
     {
         if (func_num_args() == 0) {
-            return $this->_name;
+            return $this->_tag;
         }
-        $this->_name = $sName;
+        $this->_tag = $sTagName;
         return $this;
     }
 
     public function attr($aAttr = null)
     {
-        if (func_get_args() == 0) {
+        if (func_num_args() == 0) {
             return $this->_attr;
         }
         $this->_attr = $aAttr;
@@ -78,11 +85,11 @@ class f_form_decor_tag extends f_form_decor_abstract
 
     public function render()
     {
-        $this->_prepateTag();
+        $this->_prepare();
         return $this->_render();
     }
 
-    protected function _prepateTag()
+    protected function _prepare()
     {
         $attr = "";
         if ($this->_attr) {
@@ -92,12 +99,12 @@ class f_form_decor_tag extends f_form_decor_abstract
         }
 
         if ($this->_short === true) {
-            $this->_decoration  = "$this->_prepend<{$this->_name}{$attr} />$this->_append";
+            $this->_decoration  = "$this->_prepend<{$this->_tag}{$attr} />$this->_append";
             $this->_decoration2 = "";
         }
         else {
-            $this->_decoration  = "$this->_prepend<{$this->_name}{$attr}>$this->_innerPrepend";
-            $this->_decoration2 = "$this->_innerAppend</{$this->_name}>$this->_append";
+            $this->_decoration  = "$this->_prepend<{$this->_tag}{$attr}>$this->_innerPrepend";
+            $this->_decoration2 = "$this->_innerAppend</{$this->_tag}>$this->_append";
         }
 
     }

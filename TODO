@@ -15,9 +15,25 @@
 - f_from required prztestowac i czy tak to moze byc?
 - decorDefault na defaultDecor
 - f_from::$helper - obecnie niepotrzebne, co z tym zrobic? moze jednak takie rozwiazanie jak w elementach?
-- moze f_form_decor_abstract -> f_form_decor_default z wlasnoscia decoration, decoration2
-  nastepnie, append, prepend z niego korzysta, i reszta tez - TAK! to jest to! tylko trzeba _render na
-  render zamienic
+- f_form
+        + f_form_decor_view::$variable
+        + f_form_decor_default::{buffer|object}()
+	+ ignoreRender
+        - defaul decor box model
+        - val
+	- ignoreVal
+        - filtry
+        - validatory
+	- ignoreError
+        - f_valid_file*
+        - dokumentacja f_form_decor wpis zrobic
+		- kazdy element z ososbna , checkbox multi
+		- decoratory rozne przyklady na jednym elemencie
+		- przyklad z decor_formError
+
+
+	
+
 
 
 

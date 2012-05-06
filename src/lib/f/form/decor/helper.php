@@ -1,7 +1,12 @@
 <?php
 
-class f_form_decor_helper extends f_form_decor_abstract
+class f_form_decor_helper extends f_form_decor_default
 {
+
+    public static function _(array $config = array())
+    {
+        return new self($config);
+    }
 
     public function render()
     {

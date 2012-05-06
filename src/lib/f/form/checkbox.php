@@ -17,7 +17,7 @@ class f_form_checkbox extends f_form_element
     public function decorDefault()
     {
         if ($this->_form !== null && !$this->_isArray) {
-            $this->decor = $this->_decorForm;
+            $this->_decor = $this->_decorForm;
         }
         else {
             parent::decorDefault();

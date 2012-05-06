@@ -9,8 +9,8 @@ class f_form_file extends f_form_element
     
     public function form($oForm)
     {
-        $oForm->attr('enctype', f_form::ENCTYPE_MULTIPART);
         parent::form($oForm);
+        $oForm->attr('enctype', f_form::ENCTYPE_MULTIPART);
     }
 
 }

@@ -1,6 +1,6 @@
 <?php
 
-abstract class f_form_decor_abstract
+class f_form_decor_default
 {
 
     const PLACEMENT_PREPEND = 'PLACEMENT_PREPEND';
@@ -20,13 +20,56 @@ abstract class f_form_decor_abstract
     protected $_decoration;
     protected $_decoration2;
     protected $_placement = self::PLACEMENT_APPEND;
-    protected $_event;
+
+    /**
+     * @return f_form_decor_default
+     */
+    public static function _(array $config = array())
+    {
+        return new self($config);
+    }
 
     public function __construct(array $config = array())
     {
         foreach ($config as $k => $v) {
             $this->{$k}($v);
         }
+    }
+
+    public function buffer($sBuffer = null)
+    {
+        if (func_num_args() === 0) {
+            return $this->buffer;
+        }
+        $this->buffer = $sBuffer;
+        return $this;
+    }
+
+    public function object($oObject = null)
+    {
+        if ($oObject === null) {
+            return $this->object;
+        }
+        $this->object = $oObject;
+        return $this;
+    }
+
+    public function decoration($sDecoration = null)
+    {
+        if ($sDecoration === null) {
+            return $this->_decoration;
+        }
+        $this->_decoration = $sDecoration;
+        return $this;
+    }
+
+    public function decoration2($sDecoration = null)
+    {
+        if ($sDecoration === null) {
+            return $this->_decoration2;
+        }
+        $this->_decoration2 = $sDecoration;
+        return $this;
     }
 
     public function placement($tPlacement = null)
@@ -38,23 +81,13 @@ abstract class f_form_decor_abstract
         return $this;
     }
 
-    public function event($sEventId = null)
+    public function render()
     {
-        if ($sEventId === null) {
-            return $this->_event;
-        }
-        $this->_event = $sEventId;
-        return $this;
+        return $this->_render();
     }
 
     protected function _render()
     {
-
-        if ($this->_event !== null) {
-            f::$c->event->run($event = new f_event(array('id' => $this->_event, 'subject' => $this)));
-            return $event->val;
-        }        
-
         switch ($this->_placement) {
             case self::PLACEMENT_PREPEND:
                 return $this->_decoration . $this->_decoration2 . $this->buffer;
@@ -68,7 +101,6 @@ abstract class f_form_decor_abstract
             default:
                 throw new f_form_decor_exception_domain('Wrong value for placement property');
         }
-
     }
 
 }

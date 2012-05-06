@@ -96,7 +96,7 @@ class f_form_element
      */
     public function form($oForm)
     {
-        $this->_form = $oForm;
+        $this->_form = true;
     }
 
 
@@ -108,8 +108,8 @@ class f_form_element
      */
     public function name($sName = null)
     {
-    	if (func_get_args() === 0) {
-	    return $this->_name;
+    	if (func_num_args() === 0) {
+            return $this->_name;
     	}
     	if (substr($sName, -2) == '[]') {
             $this->_name    = substr($sName, 0, -2);
@@ -625,6 +625,17 @@ class f_form_element
             $this->decorDefault();
         }
         $this->_decor[] = $abnosDecor;
+        return $this;
+    }
+    
+    public function removeDecor($sName = null)
+    {
+        if (func_num_args() == 0) {
+            $this->_decor = array();
+        }
+        else {
+            unset($this->_decor[$sName]);
+        }
         return $this;
     }
 

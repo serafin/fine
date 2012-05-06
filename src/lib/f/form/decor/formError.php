@@ -8,6 +8,19 @@ class f_form_decor_formError extends f_form_decor_tag
     protected $_itemAppend    = '</li>';
     protected $_itemSeparator = '';
     
+    /**
+     * @return f_form_decor_formError
+     */
+    public static function _(array $config = array())
+    {
+        return new self($config);
+    }
+
+    public function short($bShort = null)
+    {
+        throw new f_form_decor_badMethodCall('Tag contains form errors can not be shrot');
+    }
+
     public function element($aoAdditionalElement = null)
     {
         if (func_num_args() === 0) {
@@ -83,7 +96,7 @@ class f_form_decor_formError extends f_form_decor_tag
 
         // decoration
         if ($this->_tag !== null) {
-            $this->_prepateTag();
+            $this->_prepare();
             $this->_decoration .= $list;
         }
         else {

@@ -332,8 +332,7 @@ class f_form /* implements ArrayAccess, IteratorAggregate, Countable */
 
     public function decor($aosuDecor)
     {
-        print_r($aosuDecor);
-        if ($aosuDecor === null) {
+        if (func_num_args() == 0) {
             $this->_decor = array();
             return $this;
         }
@@ -365,6 +364,16 @@ class f_form /* implements ArrayAccess, IteratorAggregate, Countable */
         return $this;
     }
 
+    public function removeDecor($sName = null)
+    {
+        if (func_num_args() == 0) {
+            $this->_decor = array();
+        }
+        else {
+            unset($this->_decor[$sName]);
+        }
+        return $this;
+    }
 
     /**
      * Renderuje formularz

@@ -101,7 +101,12 @@ class f_v_helper_head
 
     public function __call($name, $arguments) 
     {
-        $this->head($arguments, $arguments[0]);
+        $this->head($name, $arguments[0]);
+    }
+
+    public function __toString()
+    {
+        return $this->render();
     }
 
     public function helper()

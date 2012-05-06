@@ -3,6 +3,14 @@
 class f_form_decor_error extends f_form_decor_tag
 {
     
+    /**
+     * @return f_form_decor_error
+     */
+    public static function _(array $config = array())
+    {
+        return new self($config);
+    }
+
     protected $_tag           = 'ul';
     protected $_itemPrepend   = '<li>';
     protected $_itemAppend    = '</li>';
@@ -94,7 +102,7 @@ class f_form_decor_error extends f_form_decor_tag
 
         // decoration
         if ($this->_tag !== null) {
-            $this->_prepateTag();
+            $this->_prepare();
             $this->_decoration .= $list;
         }
         else {

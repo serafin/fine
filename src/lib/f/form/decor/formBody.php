@@ -1,9 +1,17 @@
 <?php
 
-class f_form_decor_formBody extends f_form_decor_abstract
+class f_form_decor_formBody extends f_form_decor_default
 {
 
     protected $_separator;
+
+    /**
+     * @return f_form_decor_formBody
+     */
+    public static function _(array $config = array())
+    {
+        return new self($config);
+    }
 
     public function separator($sSeparator = null)
     {

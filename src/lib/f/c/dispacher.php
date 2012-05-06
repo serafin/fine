@@ -62,7 +62,7 @@ class f_c_dispacher extends f_c
     
     public function controller($sController = null)
     {
-        if (func_get_args() == 0) {
+        if (func_num_args() == 0) {
             return $this->_controller;
         }
         $this->_controller = $sController;
@@ -71,7 +71,7 @@ class f_c_dispacher extends f_c
     
     public function action($sAction = null)
     {
-        if (func_get_args() == 0) {
+        if (func_num_args() == 0) {
             return $this->_action;
         }
         $this->_action = $sAction;
@@ -80,7 +80,7 @@ class f_c_dispacher extends f_c
     
     public function className($sClass = null)
     {
-        if (func_get_args() == 0) {
+        if (func_num_args() == 0) {
             return $this->_class;
         }
         $this->_class = $sClass;
@@ -89,7 +89,7 @@ class f_c_dispacher extends f_c
     
     public function interfaceName($sInterface = null)
     {
-        if (func_get_args() == 0) {
+        if (func_num_args() == 0) {
             return $this->_interface;
         }
         $this->_interface = $sInterface;
@@ -98,7 +98,7 @@ class f_c_dispacher extends f_c
     
     public function method($sMethod = null)
     {
-        if (func_get_args() == 0) {
+        if (func_num_args() == 0) {
             return $this->_method;
         }
         $this->_method = $sMethod;
@@ -107,7 +107,7 @@ class f_c_dispacher extends f_c
     
     public function dir($sDir = null)
     {
-        if (func_get_args() == 0) {
+        if (func_num_args() == 0) {
             return $this->_dir;
         }
         $this->_dir = $sDir;
