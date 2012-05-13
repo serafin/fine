@@ -53,7 +53,7 @@ Metoda boksowa - czyli css z przestrzeniami nazw (prefiksami)
 </div>
 ```
 
-```
+```html
 <style type="text/css">
 .box-news .news-title { }
 .box-news .news-text { }
