@@ -4,7 +4,7 @@ Cache to połączenie dwóch obiektów: "frontend cache" i "backend cache".
 "Frontend cache" udostepnia programiscie interfejs obsługi (sprawdzenie czy jest cache, odczyt,
 zapis, usuniecie). "Backend cache" odpowiedzialny jest za sposb przechowywania danych (pliki na dysku, baza danych).
 
-~~~
+~~~php
 <?php
 
 $oCache = new f_cache(array(
@@ -23,7 +23,7 @@ print_r($aData);
 
 ## Cache buforu wyjscia
 
-~~~
+~~~php
 <?php
 
 $oCache = new f_cache_output(array(
@@ -49,7 +49,7 @@ $oCache = new f_cache_output(array(
 
 
 # Zarys API
-~~~
+~~~php
 <?php
 
 class f_cache

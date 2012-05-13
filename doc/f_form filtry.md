@@ -4,7 +4,7 @@ Filtry sa definiowane dla elementow metoda `filter` (metoda elementu lub formula
 Podczas ustawiania wartosci elementu metoda `val` (lub wartosci forumarza), 
 warosc jest filtorowana zdefiniowanymi wczesniej filtrami. Kolejnosc filtrow ma znaczenie. 
 
-```
+```php
 <?php
 
 $oText = new f_form_text();

@@ -11,7 +11,7 @@ Helpery widoku elementow formularza przyjmuja parametry:
 
 ## f_v_helper_formText
 
-```
+```php
 <?php
 $oText = new f_v_helper_formText();
 echo $oText->helper();
@@ -20,7 +20,7 @@ echo $oText->helper();
 <input type="text" name="text" value="" />
 ```
 
-```
+```php
 <?php
 $oText = new f_v_helper_formText();
 echo $oText->helper('foo');
@@ -28,7 +28,7 @@ echo $oText->helper('foo');
 <input type="text" name="foo" value="" />
 ```
 
-```
+```php
 <?php
 $oText = new f_v_helper_formText();
 echo $oText->helper('foo', 'bar');
@@ -36,7 +36,7 @@ echo $oText->helper('foo', 'bar');
 <input type="text" name="foo" value="bar" />
 ```
 
-```
+```php
 <?php
 $oText = new f_v_helper_formText();
 echo $oText->helper('foo', 'bar', array('class' => 'text', 'style' => 'color:red'));
@@ -44,7 +44,7 @@ echo $oText->helper('foo', 'bar', array('class' => 'text', 'style' => 'color:red
 <input type="text" name="foo" value="bar" class="text" style="color:red" />
 ```
 
-```
+```php
 <?php
 $oText = new f_v_helper_formText();
 echo $oText->helper('foo', '<>');
@@ -55,7 +55,7 @@ echo $oText->helper('foo', '<>');
 
 ## f_v_helper_formPassword
 
-```
+```php
 <?php
 $oPassword = new f_v_helper_formPassword();
 echo $oPassword->helper();
@@ -66,7 +66,7 @@ echo $oPassword->helper();
 
 ## f_v_helper_formTextarea
 
-```
+```php
 <?php
 $oTextarea = new f_v_helper_formTextarea();
 echo $oTextarea->helper('foo', 'bar');
@@ -77,7 +77,7 @@ echo $oTextarea->helper('foo', 'bar');
 
 ## f_v_helper_formSelect
 
-```
+```php
 <?php
 $oSelect = new f_v_helper_formSelect();
 echo $oSelect->helper('foo', null, array(), array('bar' => 'Bar', 'baz' => 'Baz'));
@@ -85,7 +85,7 @@ echo $oSelect->helper('foo', null, array(), array('bar' => 'Bar', 'baz' => 'Baz'
 <select name="foo"><option value="bar">Bar</option><option value="baz">Baz</option></select>
 ```
 
-```
+```php
 <?php
 $oSelect = new f_v_helper_formSelect();
 echo $oSelect->helper('foo', 'baz', array(), array('bar' => 'Bar', 'baz' => 'Baz'));
@@ -93,7 +93,7 @@ echo $oSelect->helper('foo', 'baz', array(), array('bar' => 'Bar', 'baz' => 'Baz
 <select name="foo"><option value="bar">Bar</option><option value="baz" selected="selected">Baz</option></select>
 ```
 
-```
+```php
 <?php
 $oSelect = new f_v_helper_formSelect();
 echo $oSelect->helper('foo[]', array('baz'), array(), array('bar' => 'Bar', 'baz' => 'Baz');
@@ -101,7 +101,7 @@ echo $oSelect->helper('foo[]', array('baz'), array(), array('bar' => 'Bar', 'baz
 <select name="foo[]" multiple="multiple"><option value="bar">Bar</option><option value="baz" selected="selected">Baz</option></select>
 ```
 
-```
+```php
 <?php
 $oSelect = new f_v_helper_formSelect();
 echo $oSelect->helper(
@@ -134,7 +134,7 @@ echo $oSelect->helper(
 
 ## f_v_helper_formRadio
 
-```
+```php
 <?php
 $oRadio = new f_v_helper_formRadio();
 echo $oRadio->helper('foo', null, array(), array('bar' => 'Bar', 'baz' => 'Baz');
@@ -143,7 +143,7 @@ echo $oRadio->helper('foo', null, array(), array('bar' => 'Bar', 'baz' => 'Baz')
 <label><input type="radio" name="foo" value="baz" />Baz</label>
 ```
 
-```
+```php
 <?php
 $oRadio = new f_v_helper_formRadio();
 echo $oRadio->helper(
@@ -180,7 +180,7 @@ echo $oRadio->helper(
 ## f_v_helper_formCheckbox
 
 
-```
+```php
 <?php
 $oCheckbox = new f_v_helper_formCheckbox();
 echo $oCheckbox->helper();
@@ -188,7 +188,7 @@ echo $oCheckbox->helper();
 <input type="checkbox" name="checkbox" value="" />
 ```
 
-```
+```php
 <?php
 $oCheckbox = new f_v_helper_formCheckbox();
 echo $oCheckbox->helper('foo');
@@ -196,7 +196,7 @@ echo $oCheckbox->helper('foo');
 <input type="checkbox" name="foo" value="" />
 ```
 
-```
+```php
 <?php
 $oCheckbox = new f_v_helper_formCheckbox();
 echo $oCheckbox->helper('foo', 1);
@@ -204,7 +204,7 @@ echo $oCheckbox->helper('foo', 1);
 <input type="checkbox" name="foo" value="" checked="checked" />
 ```
 
-```
+```php
 <?php
 $oCheckbox = new f_v_helper_formCheckbox();
 echo $oCheckbox->helper('foo', 'on');
@@ -212,7 +212,7 @@ echo $oCheckbox->helper('foo', 'on');
 <input type="checkbox" name="foo" value="" checked="checked" />
 ```
 
-```
+```php
 <?php
 $oCheckbox = new f_v_helper_formCheckbox();
 echo $oCheckbox->helper('foo', 'bar', array('value' => 'bar'));
@@ -220,7 +220,7 @@ echo $oCheckbox->helper('foo', 'bar', array('value' => 'bar'));
 <input type="checkbox" name="foo" value="bar" checked="checked" />
 ```
 
-```
+```php
 <?php
 $oCheckbox = new f_v_helper_formCheckbox();
 echo $oCheckbox->helper('foo[]', null, array(), array('bar' => 'Bar', 'baz' => 'Baz'));
@@ -229,7 +229,7 @@ echo $oCheckbox->helper('foo[]', null, array(), array('bar' => 'Bar', 'baz' => '
 <label><input type="checkbox" name="foo[]" value="baz" />Baz</label>
 ```
 
-```
+```php
 <?php
 $oCheckbox = new f_v_helper_formCheckbox();
 echo $oCheckbox->helper('foo[]', array('baz'), array(), array('bar' => 'Bar', 'baz' => 'Baz'));
@@ -238,7 +238,7 @@ echo $oCheckbox->helper('foo[]', array('baz'), array(), array('bar' => 'Bar', 'b
 <label><input type="checkbox" name="foo[]" value="baz" checked="checked" />Baz</label>
 ```
 
-```
+```php
 <?php
 $oCheckbox = new f_v_helper_formCheckbox();
 echo $oCheckbox->helper('foo[]', array('baz', 'bar'), array(), array('bar' => 'Bar', 'baz' => 'Baz'));
@@ -247,7 +247,7 @@ echo $oCheckbox->helper('foo[]', array('baz', 'bar'), array(), array('bar' => 'B
 <label><input type="checkbox" name="foo[]" value="baz" checked="checked" />Baz</label>
 ```
 
-```
+```php
 <?php
 $oCheckbox = new f_v_helper_formCheckbox();
 echo $oCheckbox->helper(
@@ -284,7 +284,7 @@ echo $oCheckbox->helper(
 
 ## f_v_helper_formSubmit
 
-```
+```php
 <?php
 $oSubmit = new f_v_helper_formSubmit();
 echo $oSubmit->helper();
@@ -292,7 +292,7 @@ echo $oSubmit->helper();
 <input type="submit" name="submit" value="submit" />
 ```
 
-```
+```php
 <?php
 $oSubmit = new f_v_helper_formSubmit();
 echo $oSubmit->helper(null, 'Go!');
@@ -300,7 +300,7 @@ echo $oSubmit->helper(null, 'Go!');
 <input type="submit" name="submit" value="Go!" />
 ```
 
-```
+```php
 <?php
 $oSubmit = new f_v_helper_formSubmit();
 echo $oSubmit->helper(

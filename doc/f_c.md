@@ -47,6 +47,8 @@ print_r(get_class($oDispacher->object()));
 ## f_c_response
 
 ```php
+<?php
+
 $oResponse = f_c_response::_();
 $oResponse->code(200);
 $oResponse->header('Content-Type', 'text/html; charset=utf-8');

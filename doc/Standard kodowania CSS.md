@@ -4,7 +4,7 @@ Metoda boksowa - czyli css z przestrzeniami nazw (prefiksami)
 
 ## Wstep
 
-```
+```html
 <style type="text/css">
 .box-news .news-title { }
 .box-news .news-text { }
@@ -27,7 +27,7 @@ Metoda boksowa - czyli css z przestrzeniami nazw (prefiksami)
 
 ## Mieszanie selektorow
 
-```
+```html
 <style type="text/css">
 .box-news .news-title { }
 .box-news .news-text { }
@@ -79,15 +79,18 @@ Metoda boksowa - czyli css z przestrzeniami nazw (prefiksami)
 
 ## Rozwiazanie `CSSX`
 
-```
 ./public/css/style.css/
+
+```
     box-user.css
     box-news.css
     fontface.css
 ```
 
-```
 ./app/config/public.php
+
+```php
+<?php
 
 return array(
     'css' => array(
@@ -99,15 +102,15 @@ return array(
 
 ```
 
-```
 ./app/v/script/index/index.php
 
+```php
 <? $this->head->css("/public/css/style.{$this->config->public[css][style][v]}.css") ?>
 ```
 
 ## Klasy dla skryptow js
 
-```
+```html
 <div class="js-tab">
     <a class="js-tab-tab" href="1">1</a>
     <a class="js-tab-tab" href="2">2</a>
