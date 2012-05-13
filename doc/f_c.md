@@ -4,7 +4,7 @@ Kontroller, zadanie, odpowiedz, glowny kontener, helpery, serwisy, dyspozytor
 
 
 ## odwolanie do helperow/serwisow
-~~~
+~~~php
 <?php
 
 class foo extends f_c
@@ -23,7 +23,7 @@ class foo extends f_c
 
 ## f_c_dispacher
 
-```
+```php
 <?php
 
 $oDispacher = f_c_dispacher::_(array(
@@ -46,7 +46,7 @@ print_r(get_class($oDispacher->object()));
 
 ## f_c_response
 
-```
+```php
 $oResponse = f_c_response::_();
 $oResponse->code(200);
 $oResponse->header('Content-Type', 'text/html; charset=utf-8');
