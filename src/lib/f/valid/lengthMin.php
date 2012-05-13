@@ -6,7 +6,7 @@ class f_valid_lengthMin extends f_valid_abstract
     const NOT_MIN = 'NOT_MIN';
 
     protected $_msg = array(
-        self::NOT_MIN => "Minimalna długość/ilość : {mian}",
+        self::NOT_MIN => "Minimalna długość/ilość: {min}",
     );
     protected $_var = array(
         '{min}' => '_min'

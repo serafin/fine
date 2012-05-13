@@ -13,8 +13,16 @@ class f_v_helper_formCheckbox extends f_v_helper_formElement
             $input     = array(
                 'type'  => 'checkbox',
                 'name'  => $sName,
-                'value' => $value,
             );
+
+            if ($value === null) {
+                if ($mVal !== null) {
+                    $input['value'] = $mVal;
+                }
+            }
+            else {
+                $input['value'] = $value;
+            }
 
             if (($value === null && $mVal) || ($value !== null && $value == $mVal)) {
                 $input['checked'] = 'checked';

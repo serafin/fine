@@ -1,0 +1,474 @@
+# Migracja z v1
+
+## Wzorce projektowe
+
+### Singleton
+
+```
+    class my_singleton 
+    {
+
+        protected $_instance;
+
+        protected function __construct()
+        {
+        }
+
+        public static function getInstance()
+        {
+            if ($this->_instance == null) {
+                $this->_instance = new self();
+            }
+            return $this->_instance;
+        }
+
+    }
+```
+
+- nieobiektowosc - dziedziczenie nie dziala
+- problem z testowaniem - przechowuje stan globalny, ktorego nie da sie utworzyc od nowa
+- problem z debbugowaniem - nie da sie ustawic proxy
+
+(ZF2 brak singletonow, Zend_Controller_Front, php manual info na czerwono)
+
+### dekorator
+
+
+```
+	<?php
+	
+	class text
+	{
+	
+		protected $_text;
+	
+		public function __construct($sText)
+		{
+			$this->_text = $sText;
+		}
+	
+		public function getText()
+		{
+			return $this->_text;
+		}
+	
+	}
+	
+	class bold 
+	{
+	
+		protected $_subject;
+	
+		public function __construct($oSubject)
+		{
+			$this->_subject = $oSubject;
+		}
+	
+		public function getText()
+		{
+			return '<b>' . $this->_subject->getText() . '</b>';
+		}
+	
+	}
+	
+	class italic
+	{
+	
+		protected $_subject;
+	
+		public function __construct($oSubject)
+		{
+			$this->_subject = $oSubject;
+		}
+	
+		public function getText()
+		{
+			return '<i>' . $this->_subject->getText() . '</i>';
+		}
+	
+	}
+	
+
+    // 1.
+	$o = new text('Hello World!');
+	echo $o->getText(); // `Hello World!`
+	
+    // 2.
+	$o = new bold(new text('Hello World!'));
+	echo $o->getText(); // `<b>Hello World!</b>`
+	
+    // 3.
+	$o = new italic(new text('Hello World!'));
+	echo $o->getText(); // `<i>Hello World!</i>`
+	
+    // 4.
+	$o = new bold(new italic(new text('Hello World!')));
+	echo $o->getText(); // `<b><i>Hello World!</i></b>`
+```
+
+### fabryka
+
+```
+	<?php
+	
+	$uri = Zend_Uri::factory('http://github.com');
+	print_r(get_class($uri)) // `Zend_Uri_HTTP`
+	
+	$uri = Zend_Uri::factory('ftp://github.com');
+	print_r(get_class($uri)) // `Zend_Uri_FTP`
+```
+
+## interfejsy
+
+```
+	<?php
+	
+	class hello
+	{
+	
+		protected $_filter;
+	
+		public function filter(filter $oFilter)
+		{
+			$this->_filter = $oFilter;
+		}
+	
+		public function render()
+		{
+			return $this->_filter->helper('Hello World!');
+		}
+	
+	}
+	
+	interface filter
+	{
+	
+		public function helper($sString);
+	
+	}
+	
+	class strtolower implements filter
+	{
+	
+		public function helper($sString)
+		{
+			return strtolower($sString);    
+		}
+	
+	}
+	
+	
+	$oHello = new hello();
+	$oHello->filter(new strtolower());
+	echo $oHello->render(); // `hello world!`
+```
+
+(type hinting typow prostych tylko array, nie trzeba sprawdzac czy metoda helper istnieje)
+
+	
+SPL interface Countable
+	
+```
+    <?php
+    
+	interface Countable
+	{
+		abstract public function count();
+	}
+	
+	
+	class text implements Countable
+	{
+	
+		protected $_text;
+	
+		public function __construct($sText)
+		{
+			$this->_text = $sText;
+		}
+	
+		public function count()
+		{
+			return strlen($this->_text);
+		}
+	
+	}
+	
+	$oText = new text('Hello');
+	echo count($oText); // `5`
+
+```
+
+
+## IoC
+
+- Programowanie kontraktowe
+
+- Inversion of Control (IoC)
+
+## stare problemy
+
+- globalna inicjacja
+
+```
+class bootstrap
+{
+
+    public function run()
+    {
+       
+        $this->initDb(); 
+        $this->initRegistry(); 
+        $this->initView(); 
+        ...
+    }
+
+    ...
+
+}
+
+```
+
+
+
+
+
+- helper holdery jako singletony, 
+
+```
+    f_c_helper::_()->redirect; 
+    f_v_helper::_()->uri; 
+```
+
+`f_c_helper` laduje obiekty z `c_helper_*` lub `f_c_helper_*`
+
+- nadmiernosc
+
+```
+    class f_c_helper_uri { ... }
+    class f_v_helper_uri extends f_c_helper_uri { ... }
+```
+
+- problem z lazyloadingiem obiektu tej samej instancji dla widoku i controllera
+
+```
+    f_v_helper::_()->acl = f_c_helper::_()->acl; 
+```
+
+## DI
+
+```
+<?php
+
+class container
+{
+    
+    public function __get($name)
+    {
+        if (! method_exists($this, "_$name")) {
+            return null;
+        }
+        return $this->{"_$name"}();
+    }
+
+    protected function _v()
+    {
+        return $this->v = new f_v();
+    }
+
+    protected function _db()
+    {
+        $this->db = new f_db_mysql();
+        $this->db->connct($this->config->main['db']['host'], ..., ...);
+        $this->db->selectDb($this->config->main['db']['name']);
+        $this->db->query("SET NAMES 'utf-8'");
+        return $this->db;
+    }
+
+    protected function _config()
+    {
+        return $this->config = array(
+            'main' => array(
+                'db' => array(
+                    'host' => '...', 
+                    'name' => '...', 
+                    ...
+                )
+            )
+        );
+        
+    }
+
+    ...
+
+}
+
+$app = new container();
+
+$app->v->news = $app->db->rows("SELECT * FROM news");
+
+```
+(IoC, kontrakty, nie trzeba sie martwic co w jakiej kolejnosci zainicjowan,
+zakleszczenie (np. config do bazy w bazie :P))
+
+
+## helper holder
+
+w kontrolerze
+```
+    <?php
+    
+    class c_index extends f_c_action
+    {
+    
+
+        public function indexAction()
+        {
+            $this->_helper; // == f_c_helper::_();
+
+            $this->_helper->redirect->helper('http://github.com');
+            $this->_helper->redirect('http://github.com');
+            $this->redirect('http://github.com');
+        }
+        
+    }
+    
+
+```
+
+nie w f_c
+
+```
+    <?php
+
+    class c_helper_test
+    {
+
+        public function helper()
+        {
+            f_c_helper::_()->redirect('http://github.com');
+        }
+
+    }
+```
+
+
+## wyjatki
+
+prosty przyklad 
+
+```
+	<?php
+	
+	function division($a, $b)
+	{
+		if ($b == 0) {
+			throw new Exception('Division by zero.');    
+		}
+		return $a / $b;
+	}
+	
+	try {
+		echo 'a';
+		echo division(10, 2);
+		echo 'b';
+	}
+	catch (Exception $e) {
+		echo 'c';
+	}
+	
+	try {
+		echo 'd';
+		echo division(10, 0);
+		echo 'e';
+	}
+	catch (Exception $e) {
+		echo 'f';
+	}
+```
+
+Lapanie wszystkiego
+
+```
+function import($id)
+{
+    $id  = (int)$id;
+    $uri = $oDb->val("SELECT feed_uri FROM feed WHERE feed_id = '$id'");
+    ...
+    if ($bSomeError) {
+        throw new Exception('Invalid import data.');    
+    }
+    ...
+    return $data;
+}
+
+
+try {
+    $data = import(1234);
+    print_r($data);
+}
+catch (Exception $e) {
+
+}
+```
+
+
+Wyjatkiw SPL
+
+```
+	Exception
+		 LogicException             - cos nie tak z kodem aplikacji
+			 BadFunctionCallException   - nieprawidlowo wywolana funkcja, liczba argumentow, zly czas wywolania
+				 BadMethodCallException
+			 DomainException            - domen to zbior poprawnych dopuszczalnych wartosci (np. 'yes', 'no')
+			 InvalidArgumentException 
+			 LengthException            - dane o niewlasciwej dlugosci
+			 OutOfRangeException        - tablice, kolekcje - nieprawidlowy indeks
+		 RuntimeException           - cos nie tak z srodowiskiem, brak pliku, zle dane od klienta
+			 OutOfBoundsException       - odpowiednik OutOfRangeException
+			 OverflowException          - przepelnienie kolekcji 
+			 RangeException             - odpowiednik DomainException
+			 UnderflowException         - przeciwiestwo OverflowException, 
+                                            np. pobranie z konta 5 PLN kiedy usera ma 2 PLN
+			 UnexpectedValueException 
+```
+
+Uzywamy blioteki ktora wyrzuca LogicException a dane podajemy Runtime np. od klienta
+
+```
+    <?php
+
+	function division($a, $b)
+	{
+		if ($b == 0) {
+			throw new InvalidArgumentException('Division by zero.');    
+		}
+		return $a / $b;
+	}
+	
+	try {
+		echo division($_POST['a'], $_POST['b']);
+	}
+	catch (InvalidArgumentException $e) {
+		throw new UnexpectedValueException('Nie poprawne dane do dzielenia', 0, $e);
+	}
+```	
+
+Dobra praktyka
+
+- lapanie wedlug komponentu
+- lapanie wedlug typu SPL
+- opieranie sie na wyjatkach SPL
+
+
+## Podstawowe elementy aplikacji MVC
+
+1. Inicjacja biblioteki
+2. Rozruch aplikacji (bootstrap)
+3. Inicjacja zadania
+4. Router - przetwarza zadanie
+5. Dispacher - uruchamia odpowiednia akcje, odpowiedniego kontrolera
+6. Akcja pobiera dane z modelu i wstrzykuje do widoku
+7. Widok przetwarzany jako odpowiedz
+8. Odpowiedz zwracana do klienta
+

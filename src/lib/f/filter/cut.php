@@ -3,20 +3,20 @@
 class f_filter_cut extends f_filter_abstract
 {
 
-    protected $_lenght = 255;
-    protected $_end    = '...';
+    protected $_length = 255;
+    protected $_end    = '…'; // Unicode Character 'HORIZONTAL ELLIPSIS' (U+2026)
 
     public static function _()
     {
         return new self;
     }
 
-    public function lenght($iLenght = null)
+    public function length($iLength = null)
     {
-        if ($iLenght === null) {
-            return $this->_lenght;
+        if ($iLength === null) {
+            return $this->_length;
         }
-        $this->_lenght = $iLenght;
+        $this->_length = $iLength;
         return $this;
     }
 
@@ -31,8 +31,8 @@ class f_filter_cut extends f_filter_abstract
 
     public function filter($sText)
     {
-        if (isset($sText[$this->_lenght - 1])) {
-                return mb_substr($sText, 0 , $this->_lenght, 'UTF-8') . $this->_end;
+        if (isset($sText[$this->_length - 1])) {
+                return mb_substr($sText, 0 , $this->_length, 'UTF-8') . $this->_end;
         }
         return $sText;
     }

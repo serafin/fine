@@ -9,9 +9,7 @@
 - poszukac tabulatorow w kodzie i zamienic na spacje
 - dodac wszedzie 	_() i __construct
 - f_image
-- f_form* class ustawic w standardowych dekoratorach dla przestrzeni `box-form`
 - f_form to samo co powinien miec co f_form_element tzn. attr, css ... moze `f_form extends f_form_element`?
-- f_form_chackbox::val() obczaic to zeby dzialalo tak jak w fine-v1
 - f_from required prztestowac i czy tak to moze byc?
 - decorDefault na defaultDecor
 - f_from::$helper - obecnie niepotrzebne, co z tym zrobic? moze jednak takie rozwiazanie jak w elementach?
@@ -20,18 +18,17 @@
         + f_form_decor_default::{buffer|object}()
 	+ ignoreRender
         - defaul decor box model
-        - val
-	- ignoreVal
-        - filtry
-        - validatory
+        + val
+	+ ignoreVal
+        + filtry
+        + validatory
 	- ignoreError
         - f_valid_file*
         - dokumentacja f_form_decor wpis zrobic
 		- kazdy element z ososbna , checkbox multi
 		- decoratory rozne przyklady na jednym elemencie
 		- przyklad z decor_formError
-
-
+- dokumnetacja do /doc 
 	
 
 

@@ -6,7 +6,7 @@ class f_valid_lengthMax extends f_valid_abstract
     const NOT_MAX = 'NOT_MAX';
 
     protected $_msg = array(
-        self::NOT_MAX => "Maksymalna długość/ilość : {max}",
+        self::NOT_MAX => "Maksymalna długość/ilość: {max}",
     );
     protected $_var = array(
         '{max}' => '_max'

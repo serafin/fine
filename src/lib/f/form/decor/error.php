@@ -2,7 +2,9 @@
 
 class f_form_decor_error extends f_form_decor_tag
 {
-    
+
+    protected $_placement = self::PLACEMENT_APPEND;
+
     /**
      * @return f_form_decor_error
      */
@@ -81,7 +83,7 @@ class f_form_decor_error extends f_form_decor_tag
         /** @todo sprawdzic czy czasem error nie zwraca tablicy z kluczami walidatorow (typami bledow) */
         // errors
         $errors = array();
-        if ($this->_ignoreOwner === false) {
+        if ($this->_ignoreOwner === false && $this->object->ignoreError() === false) {
             $errors = $this->object->error();
         }
         foreach ((array)$this->_element as $i) {

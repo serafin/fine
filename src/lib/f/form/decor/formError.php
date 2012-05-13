@@ -79,6 +79,9 @@ class f_form_decor_formError extends f_form_decor_tag
             if ($i->ignoreRender()) {
                 continue;
             }
+            if ($i->ignoreError()) {
+                continue;
+            }
             $errors += $i->error();
         }
 

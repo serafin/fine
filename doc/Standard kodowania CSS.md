@@ -1,0 +1,119 @@
+#Standard kodowania CSS
+
+Metoda boksowa - czyli css z przestrzeniami nazw (prefiksami)
+
+## Wstep
+
+```
+<style type="text/css">
+.box-news .news-title { }
+.box-news .news-text { }
+.box-news .news-img { }
+.box-news .news-date { }
+</style>
+<div class="box-news">
+    <div class="news-title">Tytul...</div>
+    <div class="news-text"> 
+        <img  class="news-img" src="..." />
+        Text...
+        <div class="news-date">2012-03-21</div>
+    </div>
+</div>
+```
+
+- przestrzen nazw rozpoczyna sie od ciagu znakow `boks-`
+- nazwa wlasciwa sklada sie ze znakow `[a-zA-Z0-9]+`
+- wszystkie selektory CSS poprzedzone przestrzenia nazw w CSS
+
+## Mieszanie selektorow
+
+```
+<style type="text/css">
+.box-news .news-title { }
+.box-news .news-text { }
+.box-news .news-img { }
+.box-news .news-date { }
+
+.box-user .user-name { }
+.box-user .user-img { }
+</style>
+<div class="box-news">
+    <div class="news-title">Tytul...</div>
+    <div class="news-text"> 
+        <img  class="news-img" src="..." />
+        Text...
+        <div class="news-date">2012-03-21</div>
+
+        Autor:
+        <div class="box-user">
+            <img  class="user-img" src="..." />
+            <span class="user-name">Nickname...</div>
+        </div>
+    </div>
+</div>
+```
+
+```
+<style type="text/css">
+.box-news .news-title { }
+.box-news .news-text { }
+.box-news .news-img { }
+.box-news .news-date { }
+
+.box-user .user-name { }
+.box-user .user-img { }
+</style>
+<div class="box-news box-user">
+    <div class="news-title">Tytul...</div>
+    <div class="news-text"> 
+        <img  class="news-img" src="..." />
+        Text...
+        <div class="news-date">2012-03-21</div>
+
+        Autor:
+        <img  class="user-img" src="..." />
+        <span class="user-name">Nickname...</div>
+    </div>
+</div>
+```
+
+## Rozwiazanie `CSSX`
+
+```
+./public/css/style.css/
+    box-user.css
+    box-news.css
+    fontface.css
+```
+
+```
+./app/config/public.php
+
+return array(
+    'css' => array(
+        'style' => array(
+            'v' => 1
+        )
+    )
+);
+
+```
+
+```
+./app/v/script/index/index.php
+
+<? $this->head->css("/public/css/style.{$this->config->public[css][style][v]}.css") ?>
+```
+
+## Klasy dla skryptow js
+
+```
+<div class="js-tab">
+    <a class="js-tab-tab" href="1">1</a>
+    <a class="js-tab-tab" href="2">2</a>
+    <a class="js-tab-tab" href="3">3</a>
+    <div class="js-tab-content"> 
+    </div>
+</div>
+```
+

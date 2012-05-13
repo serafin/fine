@@ -13,7 +13,7 @@ class f_form_element
     protected $_val;
     protected $_attr          = array();
     protected $_option        = array();
-    protected $_separator     = array();
+    protected $_separator     = '';
     protected $_isArray       = false;
     protected $_required      = false;
     protected $_requiredClass = 'f_valid_notEmpty';
@@ -99,6 +99,14 @@ class f_form_element
         $this->_form = true;
     }
 
+    public function type($sType = null)
+    {
+    	if ($sType === null) {
+            return $this->_type;
+    	}
+        $this->_type = $sType;
+        return $this;
+    }
 
     /**
      * Ustala lub pobiera nazwe elementu
@@ -135,7 +143,7 @@ class f_form_element
      */
     public function val($mValue = null)
     {
-    	if (func_num_args() === 0) {
+    	if (func_num_args() == 0) {
             return $this->_val;
     	}
         
@@ -327,9 +335,11 @@ class f_form_element
             case 1:
 
                 if ($asName === null) {
-                    $this->_option = array();
+                    $this->_isArray = false;
+                    $this->_option  = array();
                 }
                 else if (is_array($asName)) {
+                    $this->_isArray = true;
                     foreach ($asName as $k => $v) {
                         $this->_option[$k] = $v;
                     }
@@ -492,7 +502,7 @@ class f_form_element
             }
             return $this;
     	}
-    	$this->valid[] = $aoValid;
+    	$this->_valid[] = $aoValid;
         return $this;
     }
 
@@ -507,8 +517,7 @@ class f_form_element
         if (func_num_args() === 1) {
             $this->val($mValue);
         }
-
-        $value        = $this->val();
+        $value        = $this->_val;
         $this->_error = array();
 
         if ($this->_required === false && ($value === '' || $value === null)) {
@@ -520,12 +529,20 @@ class f_form_element
         foreach ($this->_valid as $k => $valid) {
 
             // lazy load validotor
-            if (is_array($valid)) {
-                $class = array_shift($valid);
-                $this->valid[$k] = new $class($valid);
-            }
+            if (!is_object($valid)) {
+                if (is_string($valid)) {
+                    $this->_valid[$k] = new $valid;
+                    $valid            = $this->_valid[$k];
 
-            if (!$valid->isValid($valid)) {
+                }
+                else if (is_array($valid)) {
+                    $class            = array_shift($valid);
+                    $this->_valid[$k] = new $class($valid);
+                    $valid            = $this->_valid[$k];
+                }
+            }
+            
+            if (!$valid->isValid($value)) {
                 $bValid = false;
                 foreach ($valid->error() as $i) {
                     $this->_error[] = $i;
@@ -537,6 +554,7 @@ class f_form_element
 
         }
 
+        f_debug::dump($this->_val, 'isValid | ' . get_class($this));
         return $bValid;
     }
     

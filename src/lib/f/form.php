@@ -57,11 +57,21 @@ class f_form /* implements ArrayAccess, IteratorAggregate, Countable */
         return $this->_[$sName];
     }
 
+    /**
+     *
+     * @param string $sName
+     * @param f_form_element $oElement
+     */
     public function __set($sName, $oElement)
     {
         if (isset($this->_[$sName])) {
             $this->_removeElement($sName);
         }
+
+        if ($oElement->name() === null) {
+            $oElement->name($sName);
+        }
+
         $this->_addElement($oElement, $sName);
     }
 
@@ -302,7 +312,7 @@ class f_form /* implements ArrayAccess, IteratorAggregate, Countable */
             if ($element->ignoreValid()) {
                 continue;
             }
-            
+
             if (!$element->isValid()) {
                 $isValid = false;
             }
@@ -416,7 +426,7 @@ class f_form /* implements ArrayAccess, IteratorAggregate, Countable */
     public function val($aValues = null)
     {
         
-        if (func_num_args() === 0) {
+        if (func_num_args() == 0) {
             $values = array();
             foreach ($this->_ as $element) {
                 /* @var $element f_form_element */
@@ -429,9 +439,13 @@ class f_form /* implements ArrayAccess, IteratorAggregate, Countable */
         }
         else {
             foreach ($aValues as $name => $value) {
-                if (isset($this->_[$name])) {
-                    $this->_[$name]->val($value);
+                if (!isset($this->_[$name])) {
+                    continue;
                 }
+                if ($this->_[$name]->ignoreVal()) {
+                    continue;
+                }
+                $this->_[$name]->val($value);
             }
         }
         return $this;

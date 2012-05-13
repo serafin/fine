@@ -1,0 +1,507 @@
+#Standard kodowania PHP
+
+## Ogólne 
+W przypadku plików, które zawierają tylko kod PHP, tag zamykający (`?>`) nie jest dozwolony
+
+### Wcięcie 
+Wcięcia powinny składać się z 4 spacji. Tabulatory nie są dozwolone.
+
+### Maksymalna długość linii
+120 znaków. W netBeans jest opcja prawego marginesu.
+
+### Zakończenie linii
+`\n` (konwencja plikow Unix)
+
+
+## Klasy 
+Nazwa klasy odzwierciedla miejsce pliku klasy w struktorze katalogow. Nazwy klas mogą zawierać tylko znaki alfanumeryczne. Podkreślania są dozwolone tylko w miejscu separator ścieżki pliku (`f_db_mysql` => `f/db/mysql.php`)
+
+Jeśli nazwa klasy składa się z więcej niż jednego wyrazu, pierwsza litera każdego nowego wyraz moze być zapisana dużą literą.
+
+
+### Klasy abstrakcyjne 
+Nazwa klasy abstrakcyjnej konczy sie na `abstract`
+
+### Interfejsy 
+Nazwa interfejsu konczy sie na `interface`. Wyjatkiem sa wyjatki ;)
+
+### Funkcje i metody 
+Nazwy funkcji zawieraja znaki alfanumeryczne. Podkreśleń sie unika. Wyjatkiem sa metody niepubliczne, kiedy rozpoczynają sie od znaku podkreślenia. Nazwy funkcji zaczynaj sie od małej litery. Gdy nazwa funkcji składa się z więcej niż jednego wyrazu, pierwsza litera każdego nowego wyrazu może być zapisana duża litera. Nazwy funkcji powinny być gadatliwe jest to praktyczne, aby w pełni opisać ich przeznaczenia i zachowania. 
+
+### Zmienne 
+Nazwy zmiennych zawieraja znaki alfanumeryczne. Podkreśleń sie unika. Niepubliczne zmienne powinny się rozpoczynać od znaku podkreślenia.
+
+### Stałe 
+
+Stałe mogą zawierać zarówno znaki alfanumeryczne i podkreślenia. Wszystkie litery dużymi. Wyrazy oddzielone znakami podkreślenia.
+
+~~~
+<?php
+
+class foo 
+{
+
+    const TO_JEST_PRZYKLAD_STALEJ = '1';
+    const TO_JEST_PRZYKLAD_STALEJ2 = 'TO_JEST_PRZYKLAD_STALEJ2';
+
+}
+~~~
+
+Unikać definiowania stałych o zasiegu globalnym (przez funkcje `define()`)
+
+## Rozgraniczenie kodu PHP 
+W klasach używany jest tag `<?php`. W plikach html+php używane jest rozgraniczenie `<? ?>`.
+
+## Stringi
+
+~~~
+<?php
+
+$a = 'Hello world!';
+$b = "Hello $name!";
+$c = "SELECT * FROM table WHERE field = 'value' ";
+~~~
+
+### `'`
+- Łańcuch znaków nie zawiera zmiennych podstawienia.
+- W CSS i w atrybucie style.
+
+### `"`
+- Zawiera zmienne.
+- Zapytanie SQL.
+
+### Podstawianie zmiennych
+
+Dozwolone:
+
+~~~
+<?php
+
+$a = "Hello $name!"; 
+$b = "Hello {$nazwa}!"; 
+~~~
+
+Niedozwolone:
+
+~~~
+<?php
+
+$c = "Hello ${nazwa}!"; 
+~~~
+
+### Łączenie stringów
+Stringi łączone za pomocą operatora `.`. Przed i po `.` musi byc dodana spacja w celu zwiekszenia czytelności.
+
+~~~
+<?php
+
+$a   = 'Hello' . ' world'; 
+$sql = "SELECT `id `, `name` FROM `person`" 
+     . "WHERE `surname` = 'Susan'" 
+     . "ORDER BY `name` ASC"; 
+~~~
+
+## Tablice
+
+### Numeryczne
+
+~~~
+<?php
+
+$a1 = array(1, 2, 3, 'Some Text'); 
+$a2 = array(1, 2, 3, 'Some Text', 
+            4, 5, 6, 7, 8, 9, 10); 
+$a2 = array(
+    1, 2, 3, 'Some Text', 
+    4, 5, 6, 7, 8, 9, 10,
+); 
+~~~
+
+### Asocjacyjne 
+
+~~~
+<?php
+
+$a = array('firstKey'  => 'firstValue',
+           'secondKey' => 'secondValue'); 
+$b = array(
+    'firstKey'  => 'firstValue',
+    'secondKey' => 'secondValue',
+); 
+~~~
+
+## Deklaracja klasy 
+
+Tylko jedna klasa jest dozwolone w każdym pliku PHP. Klamra otwierajaca w nowej linii. (Zwrocic uwage na odstepy pomiedzy wlasnosciami i metodami.)
+
+~~~
+<?php
+
+class sampleClass 
+{ 
+
+    // content
+
+} 
+~~~
+
+~~~
+<?php
+
+class sampleClass extends sampleBaseClass implements sampleInterface 
+{ 
+
+    // content
+
+} 
+~~~
+
+~~~
+<?php
+
+class sampleClass extends sampleBaseClass implements sampleInterface, sampleInterface2  
+{ 
+
+    // content
+
+} 
+~~~
+
+~~~
+<?php
+
+class sampleClass extends sampleBaseClass 
+    implements sampleInterface, sampleInterface2, sampleInterface3   
+{ 
+
+    // content
+
+} 
+~~~
+
+
+## Zmienne i stale klas
+Kolejność: const, public static, public, protected static, protected, private static, private.
+
+~~~
+<?php
+
+class sampleClass 
+{ 
+
+    const PROPERTY_0 = '0';
+    const PROPERTY_1 = '1';
+
+    public static $property2;
+    public static $property3;
+
+    public $property4;
+    public $property5;
+
+    protected static $_property6;
+    protected static $_property7;
+
+    protected $_property8;
+    protected $_property9;
+
+    private static $_property10;
+    private static $_property11;
+
+    private $_property12;
+    private $_property13;
+
+} 
+~~~
+
+## Funkcje i metody
+Kolejność: magic, public static, public, protected static, protected, private static, private.
+
+~~~
+<?php
+
+class sampleClass 
+{ 
+
+    public function sampleMethod()
+    {
+        return 'Hello wrold!';
+    }
+
+    public function sampleMethod2()
+    {
+        return 'Hello wrold2!';
+    }
+
+} 
+~~~
+
+
+## If / else / else if 
+
+~~~
+<?php
+
+if ($a == 2 && true) {
+    echo 'a';
+} 
+else if ($b) {
+    echo 'b';
+}
+else {
+    echo '!a ^ !b';
+}
+~~~
+
+(kod bolku zawsze w `{}`, spacje w if)
+
+## Switch
+
+~~~
+<?php
+
+switch ($number) {
+    case '1':
+        // code ...
+        break;
+    case '2':
+        // code ...
+        break;
+    default:
+        // code ...
+}
+~~~
+
+## Pętle
+
+```
+<?php
+
+for ($i = 0; $i < 100; $i++) {
+    echo "$i ";
+}
+
+foreach ($a as $k => $v) {
+    echo "\$a[$k] => '$v'\n";
+}
+
+while ($i++ < 200) {
+    echo "$i ";
+}
+```
+
+## Komentarze
+
+Wszystkie publiczne metody i zmienne powinny byc opisane komentarzem phpdoc (http://phpdoc.org)
+
+## Zagniezdzenia kodu
+
+wariant A
+
+```
+    <?php
+
+    public function loginAction()
+    {
+        if($this->request->login and $this->request->pass)
+        {
+            $u = new m_user();
+            $u->select(array('user_email'=>$this->request->login));
+            if($u->id())
+            {
+                if($u->user_active=='yes')
+                {
+                    if($u->user_locked!='yes')
+                    {
+                        if(c_auth::hash($u->user_salt, $this->request->pass, true)==$u->user_pass)
+                        {
+                            $d = new m_userData();
+                            $this->response->auth = $d->set_mobileapi_auth($u->id());
+                        }
+                        else $this->error(self::ERROR_NOT_LOGGED, 'Nieprawidłowe hasło');
+                    }
+                    else $this->error(self::ERROR_NOT_LOGGED, 'Konto jest zablokowane');
+                }
+                else $this->error(self::ERROR_NOT_LOGGED, 'Konto nie zostało aktywowane');
+            }
+            else $this->error(self::ERROR_NOT_LOGGED, 'Nie ma takiego użytkownika');
+        }
+        else $this->error(self::ERROR_NOT_LOGGED, 'Nie podano e-maila lub hasła');
+    }
+```
+
+wariant B
+
+```
+    <?php
+
+    public function loginAction()
+    {
+
+        if (!$this->request->login || !$this->request->pass) {
+            $this->error(self::ERROR_NOT_LOGGED, 'Nie podano e-maila lub hasła');
+            return;
+        }
+
+        $u = new m_user();
+        $u->select(array('user_email' => $this->request->login));
+
+        if (!$u->id()) {
+            $this->error(self::ERROR_NOT_LOGGED, 'Nie ma takiego użytkownika');
+            return;
+        }
+
+        if (!$u->user_active == 'yes') {
+            $this->error(self::ERROR_NOT_LOGGED, 'Konto nie zostało aktywowane');
+            return;
+        }
+
+        if ($u->user_locked == 'yes') {
+            $this->error(self::ERROR_NOT_LOGGED, 'Konto jest zablokowane');
+            return;
+        }
+
+        if (c_auth::hash($u->user_salt, $this->request->pass, true) != $u->user_pass) {
+            $this->error(self::ERROR_NOT_LOGGED, 'Nieprawidłowe hasło');
+            return
+        }
+
+        $d = new m_userData();
+        $this->response->auth = $d->set_mobileapi_auth($u->id());
+
+    }
+```
+
+wariant C
+
+```
+    <?php
+
+    /**
+     * Logowania wedlug adresu email i hasla, dalasz autoryzacja wedlug klucza
+     */
+    public function loginAction()
+    {
+        
+        // czy jest login i haslo?
+        if (!$this->request->login || !$this->request->pass) {
+            $this->error(self::ERROR_NOT_LOGGED, 'Nie podano e-maila lub hasła');
+            return;
+        }
+
+        // pobieranie rekordu uzytkownika wedlug emaila
+        $u = new m_user();
+        $u->select(array('user_email' => $this->request->login));
+        
+        // czy jest taki uzytkownik?
+        if (!$u->id()) {
+            $this->error(self::ERROR_NOT_LOGGED, 'Nie ma takiego użytkownika');
+            return;
+        }
+
+        // uzytkownik nieaktywowany?
+        if (!$u->user_active == 'yes') {
+            $this->error(self::ERROR_NOT_LOGGED, 'Konto nie zostało aktywowane');
+            return;
+        }
+        
+        // uzytkownik zablokowany?
+        if ($u->user_locked == 'yes') {
+            $this->error(self::ERROR_NOT_LOGGED, 'Konto jest zablokowane');
+            return;
+        }
+
+        // sprawdzenie zasolonego hasla
+        if (c_auth::hash($u->user_salt, $this->request->pass, true) != $u->user_pass) {
+            $this->error(self::ERROR_NOT_LOGGED, 'Nieprawidłowe hasło');
+            return
+        }
+        
+        // zwrocenie klucza autoryzacyjnego
+        $d = new m_userData();
+        $this->response->auth = $d->set_mobileapi_auth($u->id());
+
+    }
+```
+
+
+(nie uzywac or i and)
+
+
+## Potega komentarzy
+
+```
+// adds station to recents list
++ (void)addRecent:(NSDictionary *)station
+{
+    // recents limit
+    int limit = 30;
+    
+    // get recents
+    NSArray *stations = [[self app] objectForKey:ControllerStationRecentDbKey];
+    if (stations == nil) {
+        stations = [NSArray array];
+    }
+    
+    // index of station in recents
+    int index = -1;
+    {
+        NSString *stationID = [station objectForKey:@"id"];
+        for (int i = 0, count = [stations count]; i < count; i++) {
+            if ([[[stations objectAtIndex:i] objectForKey:@"id"] isEqual:stationID]) {
+                index = i;
+                break;
+            }
+        }
+    }
+    
+    // if station is in recents then update only station time
+    if (index >= 0) {
+        NSMutableDictionary *copyDict = [[NSMutableDictionary alloc] initWithDictionary:[stations objectAtIndex:index]];
+        NSMutableArray *copyAr = [[NSMutableArray alloc] initWithArray:stations];
+        
+        [copyDict setObject:[NSDate date] forKey:@"recent"];
+        [copyDict setObject:[station objectForKey:@"title"] forKey:@"title"];
+        
+        [copyAr replaceObjectAtIndex:index withObject:copyDict];
+        
+        [[self app] setObject:copyAr forKey:ControllerStationRecentDbKey];
+        [copyAr release];
+        [copyDict release];
+        
+    }
+    // else cut recents to limit, add new station, sort recents by title
+    else {
+        
+        // cut recents to limit, last used are removed
+        if ([stations count] >= limit) {
+            stations = [stations sortedArrayUsingComparator:^(id a, id b) {
+                return ![(NSDate *)[(NSDictionary *)a objectForKey:@"recent"] compare:
+                         (NSDate *)[(NSDictionary *)b objectForKey:@"recent"]];
+            }];
+            stations = [stations subarrayWithRange:NSMakeRange(0, limit - 1)];
+        }
+        
+        // attach current time to new station 
+        NSMutableDictionary *recentStation = [station mutableCopy];
+        [recentStation setObject:[NSDate date] forKey:@"recent"];
+        
+        // add new station
+        stations = [stations arrayByAddingObject:[NSDictionary dictionaryWithDictionary:recentStation]];
+        
+        // sort recents by title
+        stations = [stations sortedArrayUsingComparator:^(id a, id b) {
+            return [(NSString *)[(NSDictionary *)a objectForKey:@"title"] compare:
+                    (NSString *)[(NSDictionary *)b objectForKey:@"title"]];
+            
+        }];
+        
+        // save recents
+        [[self app] setObject:stations forKey:ControllerStationRecentDbKey];
+    
+    }
+    
+}
+
+```
+
+

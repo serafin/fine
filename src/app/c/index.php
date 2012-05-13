@@ -35,15 +35,23 @@ class c_index extends f_c_action
                 ->attr(array('class' => 'help-block'))
                 ;
         $basic->text->removeDecor('tag');
-        $basic->text->ignoreRender(true);
 
         $basic->element(new f_form_checkbox(array('name' => 'checkbox')));
+        $basic->checkbox->option(array('a'=>A, b => B));
         $basic->checkbox->label('Check me out');
         $basic->checkbox->decor('label')->placement(f_form_decor_default::PLACEMENT_EMBRACE);
         $basic->checkbox->decor('label')->gravity(f_form_decor_label::GRAVITY_RIGHT);
         $basic->checkbox->removeDecor('tag');
 
         $basic->submit = new f_form_submit(array('val' => 'Submit', 'addClass' => 'btn'));
+
+        $basic->val($_POST);
+        $basic->text->valid(new f_valid_lengthMin(array('min' => 3)));
+        $basic->text->valid(new f_valid_digit());
+        $basic->text->ignoreError(true);
+        f_debug::dump($_POST, '$_POST');
+        f_debug::dump($basic->isValid(), 'basic->isValid()');
+        f_debug::dump($basic->val(), 'f_form::val()');
 
         echo $basic->render();
 
@@ -52,6 +60,8 @@ class c_index extends f_c_action
          * End
          */
         echo '</div></body></html>';
+
+        //$this->debug->show();
     }
 
 }
