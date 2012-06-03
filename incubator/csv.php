@@ -16,7 +16,7 @@ class f_csv implements Iterator
     protected $_resource;
     protected $_row;
     protected $_index;
-    protected $_separator = '.';
+    protected $_separator = ',';
     protected $_charset   = 'UTF-8'; 
     protected $_start     = 0; // start line
 

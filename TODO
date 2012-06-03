@@ -1,8 +1,6 @@
 [v2.0]
-- f_c_helper_uri: build, abs, resolvePairsParams moze polaczenie offsetow i pairs? hmm :)?
-- f_c_helper_flash->$storage
+- f_c_helper_flash, f_c_helper_flash->$storage
 - m_ relacje
-- f_form_decor_label - opcja dla przyklejenia tekstu labela prepend, append
 - f_valid_db*
 - DOC f_paging i model
 - f_valid_file*
@@ -14,24 +12,19 @@
 - decorDefault na defaultDecor
 - f_from::$helper - obecnie niepotrzebne, co z tym zrobic? moze jednak takie rozwiazanie jak w elementach?
 - f_form
-        + f_form_decor_view::$variable
-        + f_form_decor_default::{buffer|object}()
-	+ ignoreRender
         - defaul decor box model
-        + val
-	+ ignoreVal
-        + filtry
-        + validatory
-	- ignoreError
         - f_valid_file*
         - dokumentacja f_form_decor wpis zrobic
 		- kazdy element z ososbna , checkbox multi
 		- decoratory rozne przyklady na jednym elemencie
 		- przyklad z decor_formError
-- dokumnetacja do /doc 
 	
 
-
+- wszystkie __toString() zrobic toString i framework ma korzystac z toString
+  wyjatki w __toString nie dzialaja :/
+- f_c_helper_redirect::uri ();
+- notFound->ifNot()
+- f_c_helper_uri -> f_uri
 
 
 [later]

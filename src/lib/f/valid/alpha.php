@@ -20,7 +20,7 @@ class f_valid_alpha extends f_valid_abstract
     {
         $sValue = (string) $mValue;
         $this->_val($sValue);
-		
+
         if ('' === $sValue) {
             $this->_error(self::STRING_EMPTY);
             return false;
@@ -33,5 +33,5 @@ class f_valid_alpha extends f_valid_abstract
 
         return true;
     }
-	
+
 }

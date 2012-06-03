@@ -1,5 +1,9 @@
 <?php
-
+/**
+ * @todo
+ *  - dodac construktor
+ *  - konsturktor statyczny wedlug standardu
+ */
 class f_filter_trim
 {
     
@@ -7,10 +11,10 @@ class f_filter_trim
     {
         return new self;
     }
-	
+
     public function filter($sString)
     {
-    	return trim($sString);
+        return trim($sString);
     }
     
 }

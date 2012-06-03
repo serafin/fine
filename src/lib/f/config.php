@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * @todo dodac do metody path gettera
+ */
 class f_config
 {
     
@@ -37,7 +40,7 @@ class f_config
         $this->{$sName} = include $file;
 
         if ($this->{$sName} === false) {
-            /** @todo throw new f_config_exception_logic "No config file named $sName ($file) or config file return false" */
+            throw new f_config_exception_logic("No config file named $sName ($file) or config file return false");
         }
 
         return $this->{$sName};

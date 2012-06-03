@@ -223,11 +223,7 @@ class f_form_element
                 return $this;
 
             default:
-                /** @todo */
-                throw new f_form_exception(array(
-                    'type' => f_form_exception::BAD_METHOD_CALL,
-                    'msg'  => 'Too many arguments',
-                ));
+                throw new f_form_exception_badMethodCall('Too many arguments');
         }
     }
 

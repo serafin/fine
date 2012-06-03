@@ -1,6 +1,8 @@
 <?php
 
-/** @todo */
+/**
+ * @todo dodac obsluge callbacka przez event
+ */
 class f_filter_callback
 {
 

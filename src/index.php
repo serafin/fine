@@ -24,9 +24,9 @@ class index extends f_c
 
         // session
         //session_start();
-        
+
         // pretty uris
-        $this->uri->resolveRequestUri();
+        $_GET = $this->uri->resolve($_SERVER['REQUEST_URI']);
         
         // run controller action by request
         $this->dispacher->run();

@@ -2,9 +2,9 @@
 
 class f_valid_dbEqual extends f_valid_abstract
 {
-	
+
     const NOT_EQUAL = 'NOT_EQUAL';
-	
+
     protected $_msg = array(
         self::NOT_EQUAL   => 'Błędna wartość',
     );
@@ -66,9 +66,9 @@ class f_valid_dbEqual extends f_valid_abstract
 
     public function isValid($mValue)
     {
-    	$sValue = (string) $mValue;
+        $sValue = (string) $mValue;
         $this->_val($sValue);
-    	
+
         $db  = $this->_db !== null ? $this->_db : f::$c->{$this->_defaultDb};
         $sql = $this->_sql;
         
