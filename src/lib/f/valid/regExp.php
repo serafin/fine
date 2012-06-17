@@ -2,7 +2,7 @@
 
 class f_valid_regExp extends f_valid_abstract
 {
-	
+
     const NOT_MATCH = 'NOT_MATCH';
 
     protected $_msg =  array(
@@ -31,12 +31,12 @@ class f_valid_regExp extends f_valid_abstract
     {
         $sValue = (string) $mValue;
         $this->_val($sValue);
-		
+
         if (!@preg_match($this->pattern, $sValue)) {
             $this->_error(self::NOT_MATCH);
             return false;
         }
-		
+
         return true;
     }
     

@@ -2,11 +2,14 @@
 
 /**
  * @todo dokonczyc, sprawdzic czy & dziala
- * metody god to zle metody
  */
-class f_c_helper_flash
+class f_c_helper_flash extends f_c
 {
-    
+
+    const STATUS_INFO    = 'STATUS_INFO';
+    const STATUS_SUCCESS = 'STATUS_SUCCESS';
+    const STATUS_ERROR   = 'STATUS_ERROR';
+
     protected $_storage;
 
     public static function _(array $config = array())
@@ -21,9 +24,9 @@ class f_c_helper_flash
         }
     }
 
-    public function helper($sText, $sStatus = null)
+    public function helper($sMsg, $sStatus = null, $aParams = null)
     {
-        $this->add($sText, $aisRedirect, $sStatus);
+        return $this->add($sMsg, $sStatus, $aParams);
     }
 
     public function storage(&$storage = null)
@@ -35,19 +38,40 @@ class f_c_helper_flash
         return $this;
     }
 
-    public function add($sText, $aisRedirect = null, $sStatus = null)
+    public function add($sMsg, $sStatus = null, $aParams = null)
     {
-        $_SESSION['_flash'][] = array('text' => $sText, 'status' => $sStatus);
-        if ($aisRedirect !== null) {
-            f_c_helper::_()->redirect->helper($aisRedirect);
-        }
+        $this->_storage[] = array(
+            'msg'    => $sMsg,
+            'status' => $sStatus,
+            'param'  => $aParams,
+        );
+        
+        return $this;
+    }
+
+    public function get()
+    {
+        $msgs = $this->_storage;
+
+        $this->remove();
+
+        return $msgs;
+    }
+
+    public function remove()
+    {
+        $this->_storage = array();
+        return $this;
+    }
+
+    public function redirect($sUri)
+    {
+        $this->redirect($sUri);
+    }
+
+    public function uri($sUri)
+    {
+        $this->redirect($this->uri($sUri));
     }
 
 }
-
-f_c_helper_flash::_()
-        ->msg('m1', $status, $params)
-        ->status('')
-        ->param('a', 'b')
-        ->uri()
-        ->redirect();

@@ -35,7 +35,14 @@ class f_c_response extends f_c
         $this->send();
         return ob_get_clean();
     }
-    
+
+    public function toString()
+    {
+        ob_start();
+        $this->send();
+        return ob_get_clean();
+    }
+
     public function header($sName = null, $sValue = null, $bReplace = false)
     {
         if ($sName === null) {

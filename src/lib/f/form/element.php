@@ -62,6 +62,11 @@ class f_form_element
         return $this->render();
     }
 
+    public function toString()
+    {
+        return $this->render();
+    }
+
     public function toArray()
     {
         return array(
@@ -101,9 +106,9 @@ class f_form_element
 
     public function type($sType = null)
     {
-    	if ($sType === null) {
+        if ($sType === null) {
             return $this->_type;
-    	}
+        }
         $this->_type = $sType;
         return $this;
     }
@@ -116,10 +121,10 @@ class f_form_element
      */
     public function name($sName = null)
     {
-    	if (func_num_args() === 0) {
+        if (func_num_args() === 0) {
             return $this->_name;
-    	}
-    	if (substr($sName, -2) == '[]') {
+        }
+        if (substr($sName, -2) == '[]') {
             $this->_name    = substr($sName, 0, -2);
             $this->_isArray = true;
         }
@@ -143,9 +148,9 @@ class f_form_element
      */
     public function val($mValue = null)
     {
-    	if (func_num_args() == 0) {
+        if (func_num_args() == 0) {
             return $this->_val;
-    	}
+        }
         
         if ($this->_filter) {
             
@@ -265,9 +270,9 @@ class f_form_element
 
     public function removeClass($sName = null)
     {
-    	if ($sName === null) {
+        if ($sName === null) {
             $this->_attr['class'] = array();
-    	}
+        }
 
         $class = explode(' ', $this->_attr['class']);
         foreach ($class as $k => $v) {
@@ -317,7 +322,7 @@ class f_form_element
 
         $this->_attr['style'] = f_c_helper_arrayImplode::helper($style, ';', ':');
         
-    	return $this;
+        return $this;
     }
 
 
@@ -352,45 +357,45 @@ class f_form_element
 
     public function separator($sSeparator = null)
     {
-    	if (func_num_args() === 0) {
+        if (func_num_args() === 0) {
             return $this->_separator;
-    	}
+        }
         $this->_separator = $sSeparator;
         return $this;
     }
 
     public function ignoreError($bIgnore = null)
     {
-    	if ($bIgnore === null) {
+        if ($bIgnore === null) {
             return $this->_ignoreError;
-    	}
+        }
         $this->_ignoreError = $bIgnore;
         return $this;
     }
 
     public function ignoreRender($bIgnore = null)
     {
-    	if ($bIgnore === null) {
+        if ($bIgnore === null) {
             return $this->_ignoreRender;
-    	}
+        }
         $this->_ignoreRender = $bIgnore;
         return $this;
     }
 
     public function ignoreVal($bIgnore = null)
     {
-    	if ($bIgnore === null) {
+        if ($bIgnore === null) {
             return $this->_ignoreVal;
-    	}
+        }
         $this->_ignoreVal = $bIgnore;
         return $this;
     }
 
     public function ignoreValid($bIgnore = null)
     {
-    	if ($bIgnore === null) {
+        if ($bIgnore === null) {
             return $this->_ignoreValid;
-    	}
+        }
         $this->_ignoreValid = $bIgnore;
         return $this;
     }
@@ -446,7 +451,7 @@ class f_form_element
 
         }
 
-    	return $this;
+        return $this;
     }
 
     public function requiredClass($sClassNameValidNotEmpty = null)
@@ -475,8 +480,8 @@ class f_form_element
         }
 
         // setter
-    	$this->_breakOnFail = (boolean) $bBreakOnFail;
-    	return $this;
+        $this->_breakOnFail = (boolean) $bBreakOnFail;
+        return $this;
     }
 
     /**
@@ -487,7 +492,7 @@ class f_form_element
      */
     public function valid($aoValid)
     {
-    	if (is_array($aoValid)) {
+        if (is_array($aoValid)) {
             foreach ($aoValid as $k => $v) {
                 if (is_integer($k)) {
                     $this->_valid[] = $v;
@@ -497,8 +502,8 @@ class f_form_element
                 }
             }
             return $this;
-    	}
-    	$this->_valid[] = $aoValid;
+        }
+        $this->_valid[] = $aoValid;
         return $this;
     }
 
@@ -583,7 +588,7 @@ class f_form_element
      */
     public function filter($aoFilter)
     {
-    	if (is_array($aoFilter)) {
+        if (is_array($aoFilter)) {
             foreach ($aoFilter as $k => $v) {
                 if (is_integer($k)) {
                     $this->_filter[] = $v;
@@ -593,7 +598,7 @@ class f_form_element
                 }
             }
             return $this;
-    	}
+        }
         $this->_filter[] = $aoFilter;
         return $this;
     }
@@ -605,7 +610,7 @@ class f_form_element
             $this->_decor = $abnosDecor;
             return $this;
         }
-    	if (is_array($abnosDecor)) {
+        if (is_array($abnosDecor)) {
             if ($this->_decor === true) {
                 $this->decorDefault();
             }
@@ -618,7 +623,7 @@ class f_form_element
                 }
             }
             return $this;
-    	}
+        }
         if (is_string($abnosDecor)) {
             if ($this->_decor === true) {
                 $this->decorDefault();
@@ -691,9 +696,9 @@ class f_form_element
 
     public function helper($sViewHelperName = null)
     {
-    	if ($sViewHelperName === null) {
+        if ($sViewHelperName === null) {
             return $this->_helper;
-    	}
+        }
         $this->_helper = $sViewHelperName;
         return $this;
     }
@@ -706,9 +711,9 @@ class f_form_element
      */
     public function label($sLabel = null)
     {
-    	if ($sLabel === null) {
+        if ($sLabel === null) {
             return $this->_label;
-    	}
+        }
         $this->_label = $sLabel;
         return $this;
     }
@@ -721,13 +726,13 @@ class f_form_element
      */
     public function desc($sDesc = null)
     {
-    	if ($sDesc === null) {
+        if ($sDesc === null) {
             return $this->_desc;
-    	}
-    	else {
+        }
+        else {
             $this->_desc = $sDesc;
             return $this;
-    	}
+        }
     }
 
 

@@ -6,27 +6,11 @@ class f_c_helper_redirect extends f_c
     protected $_code = 302;
     protected $_exit = true;
     
-    public function helper($asUri, $iRedirectCode = null)
+    public function helper($asUri)
     {
-            
-        if ($iRedirectCode !== null) {
-            $this->code($iRedirectCode);
-        }
-            
-        if (is_array($asUri)) {
-            $asUri = $this->uri->abs($asUri);
-        }
-            
-        $this->response
-                ->redirect($asUri, $this->_code)
-                ->sendHeader();
-                
-        if ($this->_exit) {
-            exit;
-        }
-        
+        $this->redirect($asUri);
     }
-    
+
     public function code($iCode = null)
     {
         if ($iCode === null) {
@@ -45,4 +29,19 @@ class f_c_helper_redirect extends f_c
         return $this;
     }
 
+    public function redirect($asUri)
+    {
+        $this->response
+                ->redirect($asUri, $this->_code)
+                ->sendHeader();
+
+        if ($this->_exit) {
+            exit;
+        }
+    }
+
+    public function uri($asUri)
+    {
+        $this->redirect($this->_c->uri($asUri));
+    }
 }

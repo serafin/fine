@@ -109,6 +109,11 @@ class f_v_helper_head
         return $this->render();
     }
 
+    public function toString()
+    {
+        return $this->render();
+    }
+
     public function helper()
     {
         return $this->render();

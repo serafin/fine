@@ -142,7 +142,7 @@ class f_c_dispacher extends f_c
         $file   = $this->_dir . str_replace('_', '/', $class) . '.php';
 
         // check file
-    	if (! is_file($file)) {
+        if (! is_file($file)) {
             throw new f_c_exception_notFound();
         }
 

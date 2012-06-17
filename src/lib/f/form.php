@@ -85,6 +85,11 @@ class f_form /* implements ArrayAccess, IteratorAggregate, Countable */
         return $this->render();
     }
 
+    public function toString()
+    {
+        return $this->render();
+    }
+
     /**
      * Ustala/pobiera akcje formularza - adres gdzie formularz ma zostać wysłany (wartość atrybutu action elementu form)
      *
@@ -216,9 +221,9 @@ class f_form /* implements ArrayAccess, IteratorAggregate, Countable */
 
     public function removeClass($sName = null)
     {
-    	if ($sName === null) {
+        if ($sName === null) {
             $this->_attr['class'] = array();
-    	}
+        }
 
         $class = explode(' ', $this->_attr['class']);
         foreach ($class as $k => $v) {
@@ -268,7 +273,7 @@ class f_form /* implements ArrayAccess, IteratorAggregate, Countable */
 
         $this->_attr['style'] = f_c_helper_arrayImplode::helper($style, ';', ':');
 
-    	return $this;
+        return $this;
     }
 
 
@@ -346,7 +351,7 @@ class f_form /* implements ArrayAccess, IteratorAggregate, Countable */
             $this->_decor = array();
             return $this;
         }
-    	if (is_array($aosuDecor)) {
+        if (is_array($aosuDecor)) {
             foreach ($aosuDecor as $k => $v) {
                 if (is_integer($k)) {
                     $this->_decor[] = $v;
@@ -356,7 +361,7 @@ class f_form /* implements ArrayAccess, IteratorAggregate, Countable */
                 }
             }
             return $this;
-    	}
+        }
         if (is_string($aosuDecor)) {
             if (!is_object($this->_decor[$aosuDecor])) {
                 if (is_string($this->_decor[$aosuDecor])) {

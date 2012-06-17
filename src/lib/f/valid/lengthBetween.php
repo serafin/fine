@@ -6,7 +6,7 @@ class f_valid_lengthBetween extends f_valid_abstract
     const NOT_BETWEEN = 'NOT_BETWEEN';
 
     protected $_msg = array(
-	self::NOT_BETWEEN => "Wymagana długość/ilość pomiędzy '{min}' i '{max}'",
+        self::NOT_BETWEEN => "Wymagana długość/ilość pomiędzy '{min}' i '{max}'",
     );
     protected $_var = array(
         '{min}' => '_min',

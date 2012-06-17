@@ -6,7 +6,7 @@ class f_valid_formElementEqual extends f_valid_abstract
     const NOT_EQUAL = 'NOT_EQUAL';
 
     protected $_msg = array(
-	self::NOT_EQUAL => 'Wymagana wartość identyczna wartości pola \'{label}\'',
+        self::NOT_EQUAL => 'Wymagana wartość identyczna wartości pola \'{label}\'',
     );
     protected $_var = array(
         '{label}' => '_label',

@@ -1,10 +1,8 @@
 [v2.0]
-- f_c_helper_flash, f_c_helper_flash->$storage
 - m_ relacje
 - f_valid_db*
 - DOC f_paging i model
 - f_valid_file*
-- poszukac tabulatorow w kodzie i zamienic na spacje
 - dodac wszedzie 	_() i __construct
 - f_image
 - f_form to samo co powinien miec co f_form_element tzn. attr, css ... moze `f_form extends f_form_element`?
@@ -19,13 +17,11 @@
 		- decoratory rozne przyklady na jednym elemencie
 		- przyklad z decor_formError
 	
+- db:: deprecated	
 
-- wszystkie __toString() zrobic toString i framework ma korzystac z toString
-  wyjatki w __toString nie dzialaja :/
-- f_c_helper_redirect::uri ();
-- notFound->ifNot()
-- f_c_helper_uri -> f_uri
 
+[test]
+- f_c_helper_flash->$storage
 
 [later]
 - csrf do inkubatora

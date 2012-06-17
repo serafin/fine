@@ -16,7 +16,7 @@ class f_debug
 
     public static function source($sFile, $iLine, $iPaddingLines = 5)
     {
-	if (!is_readable($sFile)) {
+    if (!is_readable($sFile)) {
             return false;
         }
         $sFile  = fopen($sFile, 'r');

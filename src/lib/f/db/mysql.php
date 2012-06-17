@@ -79,7 +79,7 @@ class f_db_mysql
             'query' => $this->_query
         ));
     }
-	
+
     /**
      * Zwraca wyselekcjonowany rekord jako tablice asocjacyjną
      *
@@ -123,8 +123,8 @@ class f_db_mysql
             'query' => $this->_query
         ));
     }
-	
-	
+
+
     /**
      * Zwraca jedno wymiarową tablice numeryczną
      * gdzie wartością pola tablicy jest pierwsze pole z wyselekcjonowanych rekordow
@@ -239,7 +239,7 @@ class f_db_mysql
             'query' => $this->_query
         ));
     }
-	
+
     /**
      * Zwraca wartosc klucza głownego ostatnio dodanego rekordu
      *
@@ -254,7 +254,7 @@ class f_db_mysql
     {
         return $this->_query;
     }
-	
+
     /**
      * Zwraca tablicę asocjacyjną zawierającą pobrany wiersz, lub FALSE jeżeli nie ma więcej wierszy w wyniku.
      *
@@ -269,7 +269,7 @@ class f_db_mysql
     {
         return mysql_fetch_assoc($rQueryResul);
     }
-	
+
     /**
      * Zwraca tablicę zwykłą (numeryczną) zawierającą pobrany wiersz, lub FALSE jeżeli nie ma więcej wierszy w wyniku.
      *
