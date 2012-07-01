@@ -50,7 +50,7 @@ class f_c_dispacher extends f_c
      */
     public static function _(array $config = array()) 
     {
-        return new self();
+        return new self($config);
     }
     
     public function __construct(array $config = array())
@@ -130,7 +130,7 @@ class f_c_dispacher extends f_c
      */
     public function run()
     {
-        
+
         if (!isset($this->_controller[0])) {
             $this->_controller = 'index';
         }
@@ -170,7 +170,7 @@ class f_c_dispacher extends f_c
             $this->_action = 'index';
         }
 
-        // event dispacher_pre
+        /** @event dispacher_pre */
         if ($this->event->is('dispacher_pre')) {
             $this->event->run($oEvent = new f_event(array('id' => 'dispacher_pre', 'subject' => $this)));
             if ($oEvent->cancel()) {
@@ -191,7 +191,7 @@ class f_c_dispacher extends f_c
             'dir'        => $this->_dir,
         );
 
-        // event dispacher_end
+        /** @event dispacher_end */
         if ($this->event->is('dispacher_post')) {
             $this->event->run(new f_event(array('id' => 'dispacher_post', 'subject' => $this)));
         }

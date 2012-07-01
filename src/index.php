@@ -23,19 +23,19 @@ class index extends f_c
         $this->{$this->env}();
 
         // session
-        //session_start();
+        session_start();
 
         // pretty uris
         $_GET = $this->uri->resolve($_SERVER['REQUEST_URI']);
-        
+
         // run controller action by request
         $this->dispacher->run();
 
         // render if not renderd before (render attaches output result to response)
-        //$this->render->renderOnce();
+        $this->render->renderOnce();
 
         // send response to client if not send before
-        //$this->response->sendOnce();
+        $this->response->sendOnce();
         
     }
 

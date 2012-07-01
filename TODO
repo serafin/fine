@@ -19,10 +19,6 @@
 	
 - db:: deprecated	
 
-
-[test]
-- f_c_helper_flash->$storage
-
 [later]
 - csrf do inkubatora
 - f_valid_abstract::msgVar - to co msg tylko ze dla $this->_var;

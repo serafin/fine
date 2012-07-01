@@ -8,8 +8,8 @@ class c_index extends f_c_action
         /**
          * Begin
          */
-        $this->v->head->css('/lib/bootstrap.css');
-        echo "<!DOCTYPE html><html><head>{$this->v->head->render()}</head><body><div class=\"container\">\n\n";
+//        $this->v->head->css('/lib/bootstrap.css');
+//        echo "<!DOCTYPE html><html><head>{$this->v->head->render()}</head><body><div class=\"container\">\n\n";
 
 
         /**
@@ -49,19 +49,29 @@ class c_index extends f_c_action
         $basic->text->valid(new f_valid_lengthMin(array('min' => 3)));
         $basic->text->valid(new f_valid_digit());
         $basic->text->ignoreError(true);
-        f_debug::dump($_POST, '$_POST');
-        f_debug::dump($basic->isValid(), 'basic->isValid()');
-        f_debug::dump($basic->val(), 'f_form::val()');
+//        f_debug::dump($_POST, '$_POST');
+//        f_debug::dump($basic->isValid(), 'basic->isValid()');
+//        f_debug::dump($basic->val(), 'f_form::val()');
 
-        echo $basic->render();
+       // echo $basic->render();
 
 
         /**
          * End
          */
-        echo '</div></body></html>';
+        //echo '</div></body></html>';
 
         //$this->debug->show();
+    }
+
+    public function flashAction()
+    {
+        $this->flash('My message', f_c_helper_flash::STATUS_INFO);
+    }
+    public function flash2Action()
+    {
+        f_debug::dump($this->flash->get());
+
     }
 
 }

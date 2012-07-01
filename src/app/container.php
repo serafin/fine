@@ -41,9 +41,9 @@ class container extends f_c_container
 
     protected function _dispacher()
     {
-        $this->dispacher             = new f_c_dispacher();
-        $this->dispacher->controller = $this->request->get(0);
-        $this->dispacher->action     = $this->request->get(1);
+        $this->dispacher = new f_c_dispacher();
+        $this->dispacher->controller($this->request->get(0));
+        $this->dispacher->action($this->request->get(1));
         return $this->dispacher;
     }
     
@@ -65,8 +65,8 @@ class container extends f_c_container
 
     protected function _flash()
     {
-        $this->flash          = new f_c_helper_flash();
-        $this->flash->storage =& $_SESSION['flash'];
+        $this->flash = new f_c_helper_flash();
+        $this->flash->storage(&$_SESSION['flash']);
         return $this->flash;
     }
 
