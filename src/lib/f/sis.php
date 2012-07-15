@@ -1,28 +1,37 @@
 <?php
 
 /**
- * Single Instance Script
+ * # Single Instance Script
  *
- * example:
- *      $sis = new f_sis();
- *      $sis->id('./cron.sis');
- *      if ($sis->begin()) {
- *          // do single instance cron job
- *      }
+ * ## Example:
+ *  $sis = new f_sis();
+ *  $sis->id('./cron.sis');
+ *  if ($sis->begin()) {
+ *      // do single instance cron job
+ *  }
  *
- * Sis begins:
+ * ## Sis begins:
  *      - when `begin` method returns true,
  *      - when method `begin` does not throws f_sis_exception_running (if `throwException` is on).
- * Sis ends:
+ * ## Sis ends:
  *      - when php script ends,
  *      - if sis object `__destruct` mehtod is called (eg. unset($sis)),
  *      - on demand using method `end`.
  *
- * How it works
+ * ## How it works
  * `PID` (process ID) of current script is stored in file `id` (id method).
  * In next call sis checks if proccess with id equal to `PID` already works.
  *
  * Inspiration: http://blog.crazytje.be/single-instance-php-script/
+ *
+ * ## Example 2 - using exceptions:
+ *  try {
+ *      f_sis::_()->id('./cron.sis')->throwException(true)->begin();
+ *      // do single instance cron job
+ *  }
+ *  catch(f_sis_exception_running $e) {
+ *  }
+ *
  */
 
 class f_sis

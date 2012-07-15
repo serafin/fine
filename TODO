@@ -17,7 +17,11 @@
 		- decoratory rozne przyklady na jednym elemencie
 		- przyklad z decor_formError
 	
-- db:: deprecated	
+- db:: deprecated
+- f_m::db()
+- http://pl.wikipedia.org/wiki/Join_(SQL)
+- f_upload interator
+- $this->levelDir('laout', $sLayoutDir);
 
 [later]
 - csrf do inkubatora
