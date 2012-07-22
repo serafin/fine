@@ -42,7 +42,7 @@ class f_debug_db
                     while ($i = ($num ? mysql_fetch_row($result) : mysql_fetch_assoc($result))) {
                             $rows[] = $i;
                     }
-                    $this->_c->debug->table($rows, 'DB rows');
+                    $this->_c->debug->table($rows, 'DB selected rows');
                 }
                 
             }

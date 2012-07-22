@@ -141,7 +141,7 @@ class f_c_render extends f_c
         if (func_num_args() == 0) {
             return $this->levelDir('layout');
         }
-        $this->levelDir('laout', $sLayoutDir);
+        $this->levelDir('layout', $sLayoutDir);
         return $this;
     }
 

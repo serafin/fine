@@ -29,7 +29,7 @@ class f_m implements IteratorAggregate
     protected $_error;
 
     /**
-     * Tworzy nowy obiekt klasy modelu (PHP >= 5.3)
+     * Statyczny konstruktor
      *
      * @return $this
      */
@@ -993,7 +993,7 @@ class f_m implements IteratorAggregate
         return $oModel;
     }
 
-    private function _join($asRefName, $asField, $asModel, $sType)
+    protected function _join($asRefName, $asField, $asModel, $sType)
     {
         //  table, table alias
         if (is_array($asRefName)) {

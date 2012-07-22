@@ -6,7 +6,6 @@ class f_upload implements IteratorAggregate
 	protected $_key;
 	protected $_index;
 
-
 	public static function each($sInputName = null)
 	{
 		if ($sInputName === null) {

@@ -5,6 +5,8 @@ class c_index extends f_c_action
 
     public function indexAction()
     {
+        f_debug::dump(range(0, 'f'));
+        //filemtime('./asdasdad');
         /**
          * Begin
          */
@@ -71,6 +73,30 @@ class c_index extends f_c_action
     public function flash2Action()
     {
         f_debug::dump($this->flash->get());
+
+    }
+
+    public function imageAction()
+    {
+        //f_debug::dump($i->error());
+    }
+
+    public function cacheAction()
+    {
+        $this->render->off();
+
+        $cache = new f_cache(array('backend' => new f_cache_backend_file()));
+        $cache->prefix('app_');
+
+
+        if(!$cache->start('render')) {
+         
+            //echo 'Gdzie te czasy kiedy Ala miala kota';
+            
+            $cache->stop();
+        }
+
+
 
     }
 

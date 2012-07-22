@@ -4,7 +4,6 @@
 - DOC f_paging i model
 - f_valid_file*
 - dodac wszedzie 	_() i __construct
-- f_image
 - f_form to samo co powinien miec co f_form_element tzn. attr, css ... moze `f_form extends f_form_element`?
 - f_from required prztestowac i czy tak to moze byc?
 - decorDefault na defaultDecor
@@ -17,11 +16,8 @@
 		- decoratory rozne przyklady na jednym elemencie
 		- przyklad z decor_formError
 	
-- db:: deprecated
 - f_m::db()
 - http://pl.wikipedia.org/wiki/Join_(SQL)
-- f_upload interator
-- $this->levelDir('laout', $sLayoutDir);
 
 [later]
 - csrf do inkubatora
@@ -29,3 +25,4 @@
 - f_valid - agregator validatorow, obslugiwany tak jakby byl jednym walidatorem, pomyslec co z kluczami bledow, 
     co z breakOnFail, czy jest to mozliwe?
 - f_error::_renderException - widok w osobnym pliku i mozliwosc zmainy
+- f_cache
