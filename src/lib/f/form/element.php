@@ -313,11 +313,8 @@ class f_form_element
                 break;
 
             default:
-
-                throw new f_form_exception(array(
-                    'type' => f_form_exception::BAD_METHOD_CALL,
-                    'msg'  => 'Too many arguments',
-                ));
+                
+                throw new f_form_exception_badMethodCall('Too many arguments');
         }
 
         $this->_attr['style'] = f_c_helper_arrayImplode::helper($style, ';', ':');
@@ -348,10 +345,9 @@ class f_form_element
                 return $this;
 
             default:
-                throw new f_form_exception(array(
-                    'type' => f_form_exception::BAD_METHOD_CALL,
-                    'msg'  => 'Too many arguments',
-                ));
+                
+                throw new f_form_exception_badMethodCall('Too many arguments');
+                
         }
     }
 

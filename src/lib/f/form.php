@@ -175,11 +175,8 @@ class f_form /* implements ArrayAccess, IteratorAggregate, Countable */
                 return $this;
 
             default:
-                /** @todo */
-                throw new f_form_exception(array(
-                    'type' => f_form_exception::BAD_METHOD_CALL,
-                    'msg'  => 'Too many arguments',
-                ));
+
+                throw new f_form_exception_badMethodCall('Too many arguments');
         }
     }
 
@@ -265,10 +262,8 @@ class f_form /* implements ArrayAccess, IteratorAggregate, Countable */
 
             default:
 
-                throw new f_form_exception(array(
-                    'type' => f_form_exception::BAD_METHOD_CALL,
-                    'msg'  => 'Too many arguments',
-                ));
+                throw new f_form_exception_badMethodCall('Too many arguments');
+                
         }
 
         $this->_attr['style'] = f_c_helper_arrayImplode::helper($style, ';', ':');
@@ -430,28 +425,83 @@ class f_form /* implements ArrayAccess, IteratorAggregate, Countable */
      */
     public function val($aValues = null)
     {
-        
+        // getter
         if (func_num_args() == 0) {
+
             $values = array();
+            
             foreach ($this->_ as $element) {
+
                 /* @var $element f_form_element */
+
                 if ($element->ignoreVal()) {
                     continue;
                 }
-                $values[$element->name()] = $element->val();
+
+                # name  = from[user_name]
+                # value = Emma
+
+                $name  = $element->name();
+                $value = $element->val();
+
+                
+
+                if (strpos($name, '[') !== false) {
+
+                    $current = &$values;
+
+                    foreach (explode('[', str_replace(']', '', $name)) as $i) {
+
+                        if (!isset($current[$i])) {
+                            $current[$i] = array();
+                        }
+
+                        $current = &$current[$i];
+
+                    }
+
+                    $current = $value;
+
+                }
+                else {
+                    $values[$name] = $value;
+
+
+                }
+                
+
             }
             return $values;
+            
         }
+        // setter
         else {
-            foreach ($aValues as $name => $value) {
-                if (!isset($this->_[$name])) {
+
+            foreach ($this->_ as $element) {
+
+                /* @var $element f_form_element */
+                
+                if ($element->ignoreVal()) {
                     continue;
                 }
-                if ($this->_[$name]->ignoreVal()) {
-                    continue;
+
+                $name  = $element->name();
+                $value = null;
+
+                if (strpos($name, '[') !== null) {
+                    $value = $aValues;
+                    foreach (explode('[', str_replace(']', '', $name)) as $i) {
+                        $value = $value[$i];
+                    }
                 }
-                $this->_[$name]->val($value);
+                else {
+                    $value = $aValues[$name];
+                }
+
+                $element->val($value);
+
             }
+
         }
         return $this;
     }
@@ -487,7 +537,14 @@ class f_form /* implements ArrayAccess, IteratorAggregate, Countable */
         if ($sName === null) {
             $sName = $oElement->name();
         }
-        $this->_[$sName] = $oElement;
+
+        if ($sName === null) {
+            $this->_[] = $oElement;
+        }
+        else {
+            $this->_[$sName] = $oElement;
+
+        }
         
         $oElement->form($this);
     }

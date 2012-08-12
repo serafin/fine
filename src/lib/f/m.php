@@ -2,7 +2,16 @@
 
 class f_m implements IteratorAggregate
 {
-    
+
+    const PARAM_FIELD    = 'field';
+    const PARAM_OPERATOR = 'operator';
+    const PARAM_GROUP    = 'group';
+    const PARAM_HAVING   = 'having';
+    const PARAM_ORDER    = 'order';
+    const PARAM_OFFSET   = 'offset';
+    const PARAM_LIMIT    = 'limit';
+    const PARAM_PAGING   = 'paging';
+
     /**
      * Wynik zapytania (rokordy, rekord, krotki danych, wartosc pola lub falsz)
      *
@@ -11,22 +20,21 @@ class f_m implements IteratorAggregate
     public $_;
 
     /** 
-     * private api
+     * Private api
      */
     public static $_metadata    = array();
     public static $_classPrefix = 'm_';
-    
+
+    protected $_class;
     protected $_table;
     protected $_key;
     protected $_field;
     protected $_fieldBack;
-    protected $_select   = array();
-    protected $_join     = array();
-    protected $_param    = array();
-    protected $_linkage  = array();
+    protected $_select    = array();
+    protected $_param     = array();
+    protected $_hardlink  = array();
     protected $_result;
-    protected $_valid;
-    protected $_error;
+    protected $_dependent = array();
 
     /**
      * Statyczny konstruktor
@@ -53,9 +61,10 @@ class f_m implements IteratorAggregate
             $reflection = new ReflectionClass($this);
             foreach ($reflection->getProperties(ReflectionProperty::IS_PUBLIC) as $property) {
                 $name = $property->getName();
-                if ($name[0] != '_') {
-                    self::$_metadata[$class]['field'][] = $name;
+                if ($name[0] == '_') {
+                    continue;
                 }
+                self::$_metadata[$class]['field'][] = $name;
             }
 
             if (count($part) == 1) {
@@ -72,6 +81,7 @@ class f_m implements IteratorAggregate
                 $key = $part[1] . '_id';
                 self::$_metadata[$class]['key'] = in_array($key, self::$_metadata[$class]['field']) ? $key : null;
             }
+            
         }
 
         $this->_table = self::$_metadata[$class]['table'];
@@ -100,9 +110,14 @@ class f_m implements IteratorAggregate
                 return $this->_paging = f::$c->paging;
                         
             default:
-                return $this->{$key} = $this->_createLinkedModel($key);
+                return $this->{$key} =  $this->dependent($key);
                 
         }
+    }
+
+    public function db()
+    {
+        return $this->_db;
     }
 
     /**
@@ -178,13 +193,10 @@ class f_m implements IteratorAggregate
             $this->_field = array();
         }
         else if ($absField === true) {
-            $this->_field = $this->_m[$this->_config][$this->_table]['field'];
+            $this->_field = self::$_metadata[$class]['field'];
         }
         else {
-            throw new f_m_exception(array(
-                'type' => f_m_exception::INVALID_ARGUMENT,
-                'msg'  => "Oczekiwany argument typu: string, array lub boolean lub brak",
-            ));
+            throw new f_m_exception_badMethodCall("Oczekiwany argument typu: string, array lub boolean lub brak");
         }
         return $this;
     }
@@ -230,6 +242,34 @@ class f_m implements IteratorAggregate
             }
         }
         
+        return $this;
+    }
+
+    /**
+     * Przywraca ostatnia uzyta wartosc dla field
+     */
+    public function fieldBack()
+    {
+        if ($this->_fieldBack === null) {
+            return $this;
+        }
+
+        $current          = $this->_field;
+        $this->_field     = $this->_fieldBack;
+        $this->_fieldBack = $current;
+
+        return $this;
+    }
+
+    /**
+     * Ustawia pola standardowe
+     *
+     * @return \f_m 
+     */
+    public function defaultField()
+    {
+        $this->_field = self::$_metadata[$class]['field'];
+
         return $this;
     }
 
@@ -296,6 +336,15 @@ class f_m implements IteratorAggregate
     }
 
     /**
+     * Zwraca dane ostatniego zapytanie
+     * @return mixed
+     */
+    public function data()
+    {
+        return $this->_;
+    }
+
+    /**
      * Ustala lub pobiera wartość dla klucza glownego
      *
      * @param string|null $sValue Id
@@ -314,24 +363,48 @@ class f_m implements IteratorAggregate
     
     /* params for queries */
     
-    public function param($asKey, $sValue = null)
+    public function param($asKey = null, $sValue = null)
     {
-        if (is_array($asKey)) {
-            foreach ($asKey as $k => $v) {
-                if (is_int($k)) {
-                    $this->_param[] = $v;
+        switch (func_num_args()) {
+
+            case 0:
+                // get all params
+                return $this->_param;
+
+            case 1:
+                // set params from array
+                if (is_array($asKey)) {
+                    foreach ($asKey as $k => $v) {
+                        if (is_int($k)) {
+                            $this->_param[] = $v;
+                        }
+                        else {
+                            $this->_param[$k] = $v;
+                        }
+                    }
+                    return $this;
                 }
-                else {
-                    $this->_param[$k] = $v;
-                }
-            }
-            return $this;
+
+                // get param by key
+                return $this->_param[$asKey];
+
+            case 2:
+                // set param
+                $this->_param[$asKey] = $sValue;
+                return $this;
         }
-        if ($sValue === null) {
-            return $this->_param[$asKey];
+
+    }
+
+    public function paramId($isId = null)
+    {
+        if (func_num_args() == 0) {
+            return $this->_param[$this->_key];
         }
-        $this->_param[$asKey] = $sValue;
+
+        $this->_param[$this->_key] = $isId;
         return $this;
+
     }
 
     public function isParam($sKey)
@@ -365,7 +438,12 @@ class f_m implements IteratorAggregate
      */
     public function select($aisParam = null)
     {
-        if ($aisParam !== null && $data = $this->_db->row($this->_sql($aisParam, true, true, true))) {
+
+        if (!is_array($aisParam) && !$this->_param && $this->_key && !$this->_hardlink) {
+            $aisParam = array($this->_key => $this->_db->escape($aisParam));
+        }
+
+        if (($data = $this->_db->row($this->_sql($aisParam, true, true, true)))) {
             $this->val($data);
             $this->_ = $data;
             if ($this->_key !== null && isset($data[$this->_key])) {
@@ -384,9 +462,9 @@ class f_m implements IteratorAggregate
      * @param array|integer|string|null $aisParam Parametry
      * @return $this
      */
-    public function selectAll($aisParam = null)
+    public function selectAll($aParam = null)
     {
-        $this->_ = $this->_db->rows($this->_sql($aisParam, true, true, true));
+        $this->_ = $this->_db->rows($this->_sql($aParam, true, true, true));
         return $this;
     }
 
@@ -396,9 +474,9 @@ class f_m implements IteratorAggregate
      * @param array|integer|string|null $aisParam Parametry
      * @return array|false Tablice | W przpadku nie wyselekcjonowania żadnych rekordow
      */
-    public function selectCol($aisParam = null)
+    public function selectCol($aParam = null)
     {
-        $this->_ = $this->_db->col($this->_sql($aisParam, true, true, true));
+        $this->_ = $this->_db->col($this->_sql($aParam, true, true, true));
         return $this;
     }
 
@@ -408,9 +486,9 @@ class f_m implements IteratorAggregate
      * @param array|integer|string|null $aisParam Parametry
      * @return $this
      */
-    public function selectCols($aisParam = null)
+    public function selectCols($aParam = null)
     {
-        $this->_ = $this->_db->cols($this->_sql($aisParam, true, true, true));
+        $this->_ = $this->_db->cols($this->_sql($aParam, true, true, true));
         return $this;
     }
 
@@ -420,9 +498,9 @@ class f_m implements IteratorAggregate
      * @param array|integer|string|null $aisParam Parametry
      * @return $this
      */
-    public function selectVal($aisParam = null)
+    public function selectVal($aParam = null)
     {
-        $this->_ = $this->_db->val($this->_sql($aisParam, true, true, true));
+        $this->_ = $this->_db->val($this->_sql($aParam, true, true, true));
         return $this;
     }
 
@@ -433,9 +511,9 @@ class f_m implements IteratorAggregate
      * @param string $sExpr Domyślnie *
      * @return $this
      */
-    public function selectCount($aisParam = null, $sExpr = '*')
+    public function selectCount($aParam = null, $sExpr = '*')
     {
-        $this->_ = $this->_db->one("SELECT COUNT($sExpr)".$this->_sql($aisParam, false, true, true));
+        $this->_ = $this->_db->one("SELECT COUNT($sExpr)".$this->_sql($aParam, false, true, true));
         return $this;
     }
 
@@ -445,9 +523,9 @@ class f_m implements IteratorAggregate
      * @param array|integer|string|null $aisParam Parametry
      * @return $this
      */
-    public function selectLoop($aisParam = null)
+    public function selectLoop($aParam = null)
     {
-        $this->_result = $this->_db->query($this->_sql($aisParam, true, true, true));
+        $this->_result = $this->_db->query($this->_sql($aParam, true, true, true));
         return $this;
     }
 
@@ -476,7 +554,7 @@ class f_m implements IteratorAggregate
      *
      * @return $tthis
      */
-    public function selectLast()
+    public function selectInserted()
     {
         $row = $this->_db->row("SELECT * FROM `$this->_table` WHERE `$this->_key` = LAST_INSERT_ID()");
         $this->val($row);
@@ -510,8 +588,8 @@ class f_m implements IteratorAggregate
         foreach ($aData as $k => $v) {
             $aSet[$k] = "`$k` = '{$this->_db->escape($v)}'";
         }
-        if ($this->_linkage) {
-            foreach ($this->_linkage as $k => $v) {
+        if ($this->_hardlink) {
+            foreach ($this->_hardlink as $k => $v) {
                 $aSet[$k] = "`$k` = '{$this->_db->escape($v)}'";
             }
         }
@@ -547,8 +625,8 @@ class f_m implements IteratorAggregate
                 $aField[$k] = true;
             }
         }
-        if ($this->_linkage) {
-            $aLinkage = $this->_linkage;
+        if ($this->_hardlink) {
+            $aLinkage = $this->_hardlink;
             foreach ($aLinkage as $k => $v) {
                 $aField[$k] = true;
                 $aLinkage[$k] = $this->_db->escape($v);
@@ -560,7 +638,7 @@ class f_m implements IteratorAggregate
             foreach ($aField as $field => $true) {
                 $aRow[$field] = "'{$this->_db->escape($data[$field])}'";
             }
-            if ($this->_linkage) {
+            if ($this->_hardlink) {
                 foreach ($aLinkage as $k => $v) {
                     $aRow[$k] = "'$v'";
                 }
@@ -612,8 +690,8 @@ class f_m implements IteratorAggregate
                 $aSet[$k] = "`$k` = '{$this->_db->escape($v)}'";
             }
         }
-        if ($this->_linkage) {
-            foreach ($this->_linkage as $k => $v) {
+        if ($this->_hardlink) {
+            foreach ($this->_hardlink as $k => $v) {
                 $aSet[$k] = "`$k` = '{$this->_db->escape($v)}'";
             }
         }
@@ -701,7 +779,113 @@ class f_m implements IteratorAggregate
         return $this->_;
     }
 
-    /* join */
+    /* relations */
+
+    public function relations()
+    {
+        self::$_metadata[$this->_class]['rel'] = array();
+    }
+
+    /**
+     * Ustala/pobiera relacje
+     *
+     * # Ustalanie
+     *
+     * Standardowe relacje nie musza byc definiowane.
+     * Relacje ustalane sa w wlasciwym modelu w metodzie `relations` np.
+     *  class m_post
+     *  ...
+     *  public function relations()
+     *  {
+     *      $this->relation('user', 'post_id_user', 'user_id');
+     *      $this->relation('user_active', 'post_id_user', 'user_id', "user_status = 'active'");
+     *  }
+     *
+     * # Pobieranie
+     *
+     *  print_r($this->relation('user'));
+     *
+     *  array(
+     *      [rel_field]     => post_id_user
+     *      [rel_rel_table] => post
+     *      [rel_rel_field] => user_id
+     *      [rel_condition] => null
+     *  )
+     *
+     * @param type $sName Nazwa relacji
+     * @param type $sThisField Pole aktualnego modelu
+     * @param type $sRelatedField Pole obce
+     * @param type $sCondition Warunek
+     * @return \f_m
+     */
+    public function relation($sName, $sThisField = null, $sRelatedField = null, $asCondition = null)
+    {
+        $relations =& self::$_metadata[$this->_class]['rel'];
+
+        /**
+         * setter
+         */
+
+        if (func_num_args() > 1) {
+            $relations[$sName] = array(
+                'rel_field'     => $sThisField,
+                'rel_rel_table' => current(explode('_', $sRelatedField, 2)),
+                'rel_rel_field' => $sRelatedField,
+                'rel_condition' => (is_string($asCondition) ? array($asCondition) : $asCondition),
+            );
+            return $this;
+        }
+
+        /**
+         * getter
+         */
+
+        // lazy load relations
+        if ($relations === null) {
+            $this->relations();
+        }
+
+        if (!isset($relations[$sName])) {
+
+            list($relatedTable, $relatedSuffix) = explode('_', $sName, 2);
+
+            $relation = array(
+                'rel_field'     => '',
+                'rel_rel_table' => $relatedTable,
+                'rel_rel_field' => '',
+            );
+
+            // relation n:1 (ref)
+            if (in_array("{$this->_table}_id_{$sName}", self::$_metadata[$this->_class]['field'])) {
+
+                $relation['rel_field']     = "{$this->_table}_id_{$sName}";
+                $relation['rel_rel_field'] = "{$relatedTable}_id";
+
+            }
+            else {
+
+                $relation['rel_field'] = "{$this->_table}_id";
+                $relatedClass          = self::$_metadata[$this->_class]['prefix'] . $relatedTable;
+                $relatedField          = "{$relatedTable}_id_{$this->_table}"
+                                       . ($relatedSuffix !== null ? "_$relatedSuffix" : '');
+
+                // lazy init related model metadata - we need fields
+                if (! isset(self::$_metadata[$relatedClass])) {
+                    new $relatedClass();
+                }
+
+                $relation['rel_rel_field'] = in_array($relatedField, self::$_metadata[$relatedClass]['field'])
+                                           ? $relatedField         // relation 1:n (dep)
+                                           : "{$relatedTable}_id"; // relation 1:1
+            }
+
+            $relations[$sName] = $relation;
+
+        }
+
+        return $relations[$sName];
+    }
+
 
     /**
      * Wykonuje JOIN dołączenie do tabeli według referencji
@@ -711,9 +895,16 @@ class f_m implements IteratorAggregate
      * @param string $asModel Nazwa modelu
      * @return $this
      */
-    public function join($asRefName, $asField = null, $asModel = null)
+    public function join($sRelation, $asField = null, $sModel = null, $sJoinAlias = null, $sModelAlias = null)
     {
-        $this->_join($asRefName, $asField, $asModel, 'JOIN');
+        $this->_param['join'][] = $this->relation($sRelation) + array(
+            'join_type'        => 'JOIN',
+            'join_field'       => $asField,
+            'join_model'       => $sModel,
+            'join_alias'       => $sJoinAlias,
+            'join_model_alias' => $sModelAlias,
+        );
+        
         return $this;
     }
 
@@ -725,9 +916,16 @@ class f_m implements IteratorAggregate
      * @param string $asModel Nazwa modelu
      * @return $this
      */
-    public function joinLeft($asRefName, $asField = null, $asModel = null)
+    public function joinLeft($sRelation, $asField = null, $sModel = null, $sJoinAlias = null, $sModelAlias = null)
     {
-        $this->_join($asRefName, $asField, $asModel, 'LEFT JOIN');
+        $this->_param['join'][] = $this->relation($sRelation) + array(
+            'join_type'        => 'LEFT JOIN',
+            'join_field'       => $asField,
+            'join_model'       => $sModel,
+            'join_alias'       => $sJoinAlias,
+            'join_model_alias' => $sModelAlias,
+        );
+
         return $this;
     }
 
@@ -761,366 +959,272 @@ class f_m implements IteratorAggregate
      * @param <type> $isKey
      * @param <type> $sValue 
      */
-    public function modelLinkage($isKey, $sValue)
+    public function hardlink($sKey, $sValue)
     {
-        $this->_linkage[$isKey] = $sValue;
-    }
-
-    /**
-     * @friend f_m
-     */
-    public function modelRel()
-    {
-        $this->_rel();
+        $this->_hardlink[$sKey] = $sValue;
     }
 
     /* private api */
     
     /**
-     * 
-     */
-    protected function _rel()
-    {
-
-    }
-
-    
-    /**
      * Buduje zapytanie SQL
      *
-     * @param array|integer|null|string $aisParam Parametry
+     * @param array|integer|null|string $aParam Parametry
      * @param boolean $bSelect Czy budowac fragment SELECT
      * @param boolean $bFrom Czy budowac fragment FROM
      * @param boolean $bLinkage Czy budowac fragment powiazania
      * @return string Zapytanie SQL lub fragment zapytania
      */
-    protected function _sql($aisParam, $bSelect, $bFrom, $bLinkage)
+    protected function _sql($aParam, $bSelect, $bFrom, $bLinkage)
     {
-        $select  = null;
-        $from    = null;
-        $where   = null;
-        $groupby = null;
-        $having  = null;
-        $orderby = null;
-        $limit   = null;
-        $offset  = null;
 
-        $aField  = $this->_field;
+        $select          = null;
+        $from            = null;
+        $where           = null;
+        $groupby         = null;
+        $having          = null;
+        $orderby         = null;
+        $limit           = null;
+        $offset          = null;
+        $field           = $this->_field;
+        $aParam          = array_merge((array)$this->_param, (array)$aParam);
+        $logicalOperator = ' AND ';
 
-        // where, group by, having, order by, offset, limit, operator, fields
-        if (! is_array($aisParam)) {
-            $aisParam = $aisParam === null ? array() : array("`{$this->_key}` = '{$this->_db->escape($aisParam)}'");
-        }
-        /** @? po co to? */
-//        if ($bDefaultParam) {
-            $aisParam = array_merge($this->_param, $aisParam);
-//        }
-        $aWhere   = array();
-        foreach ($aisParam as $key => $value) {
+        foreach ($aParam as $paramKey => $paramValue) {
 
-            if (is_int($key)) {
-                $aWhere[] = $value;
+            if (is_int($paramKey)) {
+                $where[] = $paramValue;
                 continue;
             }
 
-            $type = '=';
-            switch ($key) {
-                case 'field'    : $aField   = is_array($value) ? $value : explode(' ', $value); break;
-                case 'operator' : $operator = $value;                                           break;
-                case 'where'    : $aWhere[] = $value;                                           break;
-                case 'group'    :
-                case 'group by' : $groupby  = ' GROUP BY ' . $value; break;
-                case 'having'   : $having   = ' HAVING '   . $value; break;
-                case 'order'    :
-                case 'order by' : $orderby  = ' ORDER BY ' . $value; break;
-                case 'offset'   : $offset   = ' OFFSET '   . $value; break;
-                case 'limit'    : $limit    = ' LIMIT '    . $value; break;
-                case 'paging'   : $offset   = ' OFFSET '   . $value->offset;
-                                  $limit    = ' LIMIT '    . $value->limit; break;
+            switch ($paramKey) {
+
+                case self::PARAM_FIELD:
+                    $field = is_array($paramValue) ? $paramValue : explode(' ', $paramValue);
+                    break;
+
+                case self::PARAM_OPERATOR:
+                    $logicalOperator = $paramValue;
+
+                    if (strlen($logicalOperator) > 0) {
+                        if (substr($logicalOperator, 0, 1) != ' ') {
+                            $logicalOperator = ' '. $logicalOperator;
+                        }
+                        if (substr($logicalOperator, -1) != ' ') {
+                            $logicalOperator .= ' ';
+                        }
+                    }
+
+                    break;
+
+                case self::PARAM_GROUP:
+                    $groupby = ' GROUP BY ' . $paramValue;
+                    break;
+
+                case self::PARAM_HAVING:
+                    $having = ' HAVING ' . $paramValue;
+                    break;
+
+                case self::PARAM_ORDER:
+                    $orderby = ' ORDER BY ' . $paramValue;
+                    break;
+
+                case self::PARAM_OFFSET:
+                    $offset = ' OFFSET ' . $paramValue;
+                    break;
+
+                case self::PARAM_LIMIT:
+                    $limit = ' LIMIT ' . $paramValue;
+                    break;
+
+                case self::PARAM_PAGING:
+                    $offset = ' OFFSET ' . $paramValue->offset();
+                    $limit  = ' LIMIT ' . $paramValue->limit();
+                    break;
+
+                case 'join':
+                    break;
+
                 default:
-                    if (strpos($key, '|') !== false) {
-                        list ($key, $type) = explode('|', $key, 2);
+
+                    // operator porownania
+                    $comparisonOperator = '=';
+                    if (strpos($paramKey, ' ') !== false) {
+                        list ($paramKey, $comparisonOperator) = explode('|', $paramKey, 2);
                     }
-                    if  (is_array($value) && $type === '=') {
-                        $type = 'IN';
+                    if  (is_array($paramValue) && $comparisonOperator === '=') {
+                        $comparisonOperator = 'IN';
                     }
-                    switch ($type) {
-                        case 'BETWEEN' : case 'NOT BETWEEN' :
-                            $aWhere[] = "`$key` $type '{$this->_db->escape($value[0])}' AND '{$this->_db->escape($value[1])}'";
+
+                    switch ($comparisonOperator) {
+
+                        case 'BETWEEN':
+                        case 'NOT BETWEEN':
+                            $where[] = "`$paramKey` $comparisonOperator"
+                                     . " '{$this->_db->escape($paramValue[0])}'"
+                                     . " AND '{$this->_db->escape($paramValue[1])}'";
                             break;
-                        case 'IN' : case 'NOT IN' :
-                            foreach ($value as $k => $v) {
-                                $value[$k] = $this->_db->escape($v);
+
+                        case 'IN': 
+                        case 'NOT IN':
+                            foreach ($paramValue as $k => $v) {
+                                $paramValue[$k] = $this->_db->escape($v);
                             }
-                            $aWhere[] = "`$key` $type ('".implode("','", $value)."')";
+                            $where[] = "`$paramKey` $comparisonOperator ('" . implode("','", $paramValue) . "')";
                             break;
+
                         default:
-                            $aWhere[] = "`$key` $type '{$this->_db->escape($value)}'";
+                            $where[] = "`$paramKey` $comparisonOperator '{$this->_db->escape($value)}'";
                             break;
+
                     }
-            }
-        }
-        $operator = isset($operator) ? (isset($operator[0]) ? ' ' . $operator . ' ' : ' ') : ' AND ' ;
-        if ($aWhere) {
-            $where = " WHERE ".implode($operator, $aWhere);
-        }
 
-        if ($this->_linkage && $bLinkage) {
-            $aLinkage = array();
-            foreach ($this->_linkage as $k => $v) {
-                $aLinkage[$k] = "`$k` = '{$this->_db->escape($v)}'";
             }
 
-            $where = (empty($where) ? ' WHERE ' : substr($where, 0, 7) . '(' . substr($where, 7) . ') AND ')
-                . implode(" AND ", $aLinkage);
+        }
+
+        if ($where) {
+            $where = " WHERE " . implode($logicalOperator, $where);
+        }
+
+        // linkage
+        if ($bLinkage && $this->_hardlink) {
+            $where = " WHERE ($this->_hardlink)" . ($where ? " AND (" . substr($where, 7) . ")" : '');
         }
 
         // select
         if ($bSelect) {
-            $aSelect = array();
-            foreach ($aField as $k => $v) {
-                $aSelect[] =  "`$v`" . (is_int($k) ? '' : ' as ' . $k);
+
+            // this model
+            foreach ($field as $k => $v) {
+                $select[] =  "`$v`" . (is_int($k) ? '' : ' as ' . $k);
             }
-            $select = 'SELECT '.implode(', ', array_merge($aSelect, $this->_select));
+
+            // joins
+            if (isset($aParam['join'])) {
+
+                foreach ($aParam['join'] as $joinKey => $join) {
+
+                    if (!array_key_exists('join_select', $join)) {
+
+                        $cacheSelect = array();
+                        $joinField   = $join['join_field'];
+
+                        if ($joinField === false) { // nie dodajemy pol
+                            $this->_param['join'][$joinKey]['join_select'] = null;
+                            continue;
+                        }
+
+                        if ($joinField === null) { // nie podano pol, to dodajemy wszystkie
+                            $joinClass = self::$_metadata[$this->_class]['prefix'] . $join['rel_rel_table'];
+                            if (!isset(self::$_metadata[$joinClass])) {
+                                new $joinClass();
+                            }
+                            $joinField = self::$_metadata[$joinClass]['field'];
+                        }
+                        else if (is_string($joinField)) { // podano jako string - pola oddzielone spacja
+                            $joinField = explode(' ', $joinField);
+                        }
+
+                        $joinAlias = $join['join_alias'];
+
+
+                        foreach ($joinField as $k => $v) {
+                            $cacheSelect[] = ($joinAlias === null ? '' : "`$joinAlias`" . '.')
+                                           . (is_int($k)
+                                                ? ($joinAlias === null ? "`$v`" : "`{$v}` as `{$joinAlias}_{$v}`")
+                                                : "`$v` as $k"
+                                              );
+                        }
+
+                        $this->_param['join'][$joinKey]['join_select'] = $join['join_select']
+                                                                       = implode(', ', $cacheSelect);
+
+                    }
+                    
+                    $select[] = $join['join_select'];
+                }
+            }
+
+            $select = 'SELECT ' . implode(', ', $select);
         }
 
         // from
         if ($bFrom) {
-            $from   = " FROM `{$this->_table}`" . ($this->_join ? ' ' . implode(' ', $this->_join) : '');
+
+            // this model
+            $from[] = "`{$this->_table}`";
+
+            // joins
+            if (isset($aParam['join'])) {
+
+                foreach ($aParam['join'] as $joinKey => $join) {
+
+
+                    if (!array_key_exists('join_from', $join)) {
+
+                        $joinSql = $join['join_type'] . ' `' . $join['rel_rel_table'] . '`'
+                                . ($join['join_alias'] === null ? '' : " as `{$join['join_alias']}`")
+                                . ' ON ('
+                                . ($join['join_model_alias'] === null ? '' : "`{$join['join_model_alias']}`.")
+                                . "`{$join['rel_field']}`"
+                                . ' = '
+                                . ($join['join_alias'] === null ? '' : "`{$join['join_alias']}`.")
+                                . "`{$join['rel_rel_field']}`";
+
+                        if ($join['rel_condition']) {
+                            foreach ($join['rel_condition'] as $k => $v) {
+                                $joinSql .= is_int($k)
+                                            ? " AND $v"
+                                            : " AND `$k` => '" . $this->_db->escape($v). "'";
+                            }
+                        }
+                        $joinSql .= ')';
+
+                        $this->_param['join'][$joinKey]['join_from'] = $join['join_from']
+                                                                     = $joinSql;
+                    }
+
+                    $from[] = $join['join_from'];
+
+                }
+
+            }
+
+            $from = ' FROM ' . implode(' ', $from);
+
         }
 
         return $select . $from . $where . $groupby . $having . $orderby . $limit . $offset;
+
     }
 
-    protected function _rel11($sRefModel, $sField = null, $sRelatedField = null)
+    /**
+     *
+     * @param type $sDependentModelName
+     * @return f_m
+     */
+    public function dependent($sDependentModelName)
     {
-        $field = $sField !== null ? $sField : "{$this->_table}_id";
 
-        if ($sRelatedField !== null) {
-            list($relTable) = explode('_', $sRelatedField, 2);
-            $relField       = $sRelatedField;
-        }
-        else {
-            $relTable = $sRefModel;
-            $relField = "{$sRefModel}_id";
+        $relation = $this->relation($sDependentModelName);
+
+
+        $class = self::$_metadata[$this->_class]['prefix'] . $relation['rel_rel_table'];
+        $model = new $class;
+        $model->hardlink($relation['rel_rel_field'], $this->{$relation['rel_field']});
+        if (isset($relation['rel_condition'])) {
+            foreach ($relation['rel_condition'] as $k => $v) {
+                $model->hardlink($k, $v);
+            }
         }
 
-        self::$_metadata[$this->_class]['ref'][$sRefModel] = array(
-            'field'    => $field,
-            'relTable' => $relTable,
-            'relField' => $relField,
-        );
-    }
-    
-    protected function _relN1($sRefModel, $sField = null, $sRelatedField = null)
-    {
-        $field = $sField !== null ? $sField : "{$this->_table}_id_$sRefModel";
+        $model->{$relation['rel_rel_field']} = $this->{$relation['rel_field']};
 
-        if ($sRelatedField !== null) {
-            list($relTable) = explode('_', $sRelatedField, 2);
-            $relField       = $sRelatedField;
-        }
-        else if (strpos($sRefModel, '_') === false) {
-            $relTable = $sRefModel;
-            $relField = "{$sRefModel}_id";
-        }
-        else {
-            list($model) = explode('_', $sRefModel, 2);
-            $relTable = $model;
-            $relField = "{$model}_id";
-        }
+        $this->_dependent[$sDependentModelName] = $model;
+
+        return $model;
         
-        self::$_metadata[$this->_class]['ref'][$sRefModel] = array(
-            'field'    => $field,
-            'relTable' => $relTable,
-            'relField' => $relField,
-        );
-    }
-
-    protected function _rel1N($sDepModel, $sField = null, $sRelatedField = null)
-    {
-        $field = $sField !== null ? $sField : "{$this->_table}_id";
-
-        if ($sRelatedField !== null) {
-            list($relTable) = explode('_', $sRelatedField, 2);
-            $relField       = $sRelatedField;
-        }
-        else if (strpos($sDepModel, '_') === false) {
-            $relTable = $sDepModel;
-            $relField = "{$sDepModel}_id_{$this->_table}";
-        }
-        else {
-            list($model, $option) = explode('_', $sDepModel, 2);
-            $relTable = $model;
-            $relField = "{$model}_id_{$this->_table}_{$option}";
-        }
-
-        self::$_metadata[$this->_class]['dep'][$sDepModel] = array(
-            'field'    => $field,
-            'relTable' => $relTable,
-            'relField' => $relField,
-        );
-    }
-
-    protected function _modelDependent($sDependent)
-    {
-        if (!isset(self::$_metadata[$this->_class]['ref'])) {
-            $this->_rel();
-            if (! isset (self::$_metadata[$class]['ref'])) {
-                self::$_metadata[$class]['ref'] = array();
-            }
-            if (! isset (self::$_metadata[$class]['dep'])) {
-                self::$_metadata[$class]['dep'] = array();
-            }
-        }
-
-        if (isset(self::$_metadata[$this->_class]['dep'][$sDependent])) {
-            $rel = self::$_metadata[$this->_class]['dep'][$sDependent];
-        }
-        else if (isset(self::$_metadata[$this->_class]['ref'][$sDependent])) {
-            $rel = self::$_metadata[$this->_class]['dep'][$sDependent] = self::$_metadata[$this->_class]['ref'][$sDependent];
-        }
-        else {
-            throw new Exception("Odwolanie do nieistniejacej relacji o nazwie $sDependent w modelu $this->_class");
-            return;
-        }
-
-        $class  = self::$_metadata[$this->_class]['prefix'].$rel['relTable'];
-        $oModel = new $class;
-        $oModel->modelLinkage($rel['relField'], $this->{$rel['field']});
-        $oModel->{$rel['relField']} = $this->{$rel['field']};
-
-        return $oModel;
-    }
-
-    protected function _join($asRefName, $asField, $asModel, $sType)
-    {
-        //  table, table alias
-        if (is_array($asRefName)) {
-            $aliasJoin = key($asRefName);
-            $asRefName = current($asRefName);
-        }
-        
-        // model, model alias
-        if (is_array($asModel)) {
-            $aliasModel = key($asModel);
-            $asModel    = current($asModel);
-        }
-
-        if ($asModel == null) {
-            $class = $this->_class;
-            $model = self::$_metadata[$this->_class]['table'];
-        }
-        else {
-            $class = self::$_metadata[$this->_class]['prefix'] . $asModel;
-            $model = $asModel;
-        }
-
-        if (!isset(self::$_metadata[$class]['ref'])) {
-            if ($asModel == null) {
-                $this->_rel();
-            }
-            else {
-                $o = new $class;
-                $o->modelRel();
-            }
-            if (!isset(self::$_metadata[$class]['ref'])) {
-                self::$_metadata[$class]['ref'] = array();
-            }
-            if (!isset(self::$_metadata[$class]['dep'])) {
-                self::$_metadata[$class]['dep'] = array();
-            }
-        }
-
-        if (isset(self::$_metadata[$class]['ref'][$asRefName])) {
-            $rel = self::$_metadata[$class]['ref'][$asRefName];
-        }
-        else if (isset(self::$_metadata[$class]['dep'][$asRefName])) {
-            $rel = self::$_metadata[$class]['ref'][$asRefName] = self::$_metadata[$class]['dep'][$asRefName];
-        }
-        else {
-            
-            /**
-             * post
-             * post_id_img
-             */
-            
-            if (property_exists($this, "{$this->_table}_id_{$asRefName}")) { // is ref
-                if (strstr($asRefName, '_')) {
-                    $relTable = current(explode('_', $asRefName));
-                }
-                else {
-                    $relTable = $asRefName;
-                }
-                
-                $rel = array(
-                    'field'    => "{$this->_table}_id_{$asRefName}",
-                    'relTable' => $relTable,
-                    'relField' => "{$relTable}_id",
-                );
-                
-                // cache dynamic created relation to metadata
-                self::$_metadata[$class]['ref'][$asRefName] = $rel;
-            }
-            else {
-                
-                /**
-                 * post
-                 * img_id_post
-                 */
-                if (strstr($asRefName, '_')) {
-                    $relTable = current(explode('_', $asRefName));
-                    $relField = "{$relTable}_id_{$this->_table}_" . end(explode('_', $asRefName));
-                }
-                else {
-                    $relTable = $asRefName;
-                    $relField = "{$relTable}_id_{$this->_table}";
-                }
-                
-                $relClass = self::$_metadata[$this->_class]['prefix'] . $relTable;
-                
-                if (property_exists($relClass, $relField)) { // is dep
-                    
-                }
-                else { // ref 1 to 1 
-                    
-                }
-                
-                
-                
-                
-            }
-            
-            
-            
-            
-//            throw new Exception("Odwolanie do nieistniejacej relacji o nazwie $asRefName w modelu $this->_class");
-//            return;
-        }
-
-        if ($asField !== false) {
-            if ($asField === null) {
-                $classJoin = self::$_metadata[$this->_class]['prefix'] . $rel['relTable'];
-                if (! isset (self::$_metadata[$classJoin])) {
-                    new $classJoin();
-                }
-                $asField = self::$_metadata[$classJoin]['field'];
-            }
-            else if (is_string($asField)){
-                $asField = explode(' ', $asField);
-            }
-            foreach ($asField as $k => $v) {
-                $this->_select[] = ($aliasJoin === null ? '' : "`$aliasJoin`" . '.')
-                                 . (is_int($k) 
-                                        ?   ($aliasJoin === null ? "`$v`" : "`{$v}` as `{$aliasJoin}_{$v}`") 
-                                        : "`$v` as $k"
-                                  );
-            }
-        }
-        $this->_join[] =  $sType. ' `' . $rel['relTable'] . '`' . ($aliasJoin === null ? '' : " as `$aliasJoin`")
-            . ' ON (' . ($aliasModel === null ? '' : "`$aliasModel`.") . "`{$rel['field']}`"
-            . ' = ' . ($aliasJoin === null ? '' : "`$aliasJoin`.") . "`{$rel['relField']}`" . ')';
-
     }
     
 }

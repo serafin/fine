@@ -90,13 +90,135 @@ class c_index extends f_c_action
 
 
         if(!$cache->start('render')) {
-         
+
             //echo 'Gdzie te czasy kiedy Ala miala kota';
-            
+
             $cache->stop();
         }
 
 
+
+    }
+
+    public function formAction()
+    {
+        $this->render->off();
+
+        f_debug::dump($_POST, '$_POST');
+
+        $form = new f_form();
+
+        foreach (array('a', 'b') as $type) {
+
+            foreach (array('from', 'to') as $k => $person) {
+
+                $form->element(new f_form_text(array('name' => "{$type}[{$k}][user_name]")));
+                $form->element(new f_form_text(array('name' => "{$type}[{$k}][user_email]")));
+
+            }
+
+        }
+
+
+        $form->element(new f_form_submit());
+
+        $form->val($_POST);
+        
+        f_debug::dump($form->val(), '$form->val()');
+
+        echo $form->render();
+
+
+
+    }
+
+    public function modelAction()
+    {
+
+        $this->render->off();
+        $this->_c->db = new dbDumpQuery();
+
+
+        $comment = new m_comment();
+        $comment->join('magazine', array('lalala' => 'article_id'), null, 'yogi');
+        $comment->selectAll();
+
+
+        f_debug::dump($comment->param());
+    }
+
+}
+
+
+class dbDumpQuery
+{
+
+    public function escape($s)
+    {
+        return addslashes($s);
+    }
+
+    public function query($s)
+    {
+        f_debug::dump($s, 'query');
+    }
+
+    public function row($s)
+    {
+        f_debug::dump($s, 'row');
+    }
+
+    public function rows($s)
+    {
+        f_debug::dump($s, 'rows');
+    }
+
+    public function col($s)
+    {
+        f_debug::dump($s, 'col');
+    }
+
+    public function cols($s)
+    {
+        f_debug::dump($s, 'cols');
+    }
+
+    public function val($s)
+    {
+        f_debug::dump($s, 'val');
+    }
+
+    public function fetchUsingResult($rRresult)
+    {
+        return null;
+    }
+
+}
+
+class m_article extends f_m
+{
+
+    public $article_id;
+    public $article_type;
+
+    public function relations()
+    {
+        parent::initRelation();
+
+    }
+
+}
+
+class m_comment extends f_m
+{
+
+    public $comment_id;
+    public $comment_type;
+    public $comment_foreignid;
+
+    public function relations()
+    {
+        $this->relation('magazine', 'comment_foreignid', 'article_id', "`comment_type` = 'magazine'");
 
     }
 
