@@ -332,7 +332,7 @@ class f_m implements IteratorAggregate
         foreach (self::$_metadata[$this->_class]['field'] as $field) {
             $this->{$field} = null;
         }
-        /** @todo wyczyscic modele depend */
+        $this->_dependent = array();
     }
 
     /**
@@ -414,7 +414,7 @@ class f_m implements IteratorAggregate
 
     public function removeParam($asKey = null)
     {
-        if ($sKey === null) {
+        if (func_num_args() == 0) {
             $this->_param = array();
         }
         else {
@@ -438,8 +438,7 @@ class f_m implements IteratorAggregate
      */
     public function select($aisParam = null)
     {
-
-        if (!is_array($aisParam) && !$this->_param && $this->_key && !$this->_hardlink) {
+        if (func_num_args() != 0 && !is_array($aisParam) && $this->_key) {
             $aisParam = array($this->_key => $this->_db->escape($aisParam));
         }
 
@@ -590,6 +589,9 @@ class f_m implements IteratorAggregate
         }
         if ($this->_hardlink) {
             foreach ($this->_hardlink as $k => $v) {
+                if (is_int($k)) {
+                    continue;
+                }
                 $aSet[$k] = "`$k` = '{$this->_db->escape($v)}'";
             }
         }
@@ -628,6 +630,9 @@ class f_m implements IteratorAggregate
         if ($this->_hardlink) {
             $aLinkage = $this->_hardlink;
             foreach ($aLinkage as $k => $v) {
+                if (is_int($k)) {
+                    continue;
+                }
                 $aField[$k] = true;
                 $aLinkage[$k] = $this->_db->escape($v);
             }
@@ -692,6 +697,10 @@ class f_m implements IteratorAggregate
         }
         if ($this->_hardlink) {
             foreach ($this->_hardlink as $k => $v) {
+                if (is_int($k)) {
+                    continue;
+                }
+
                 $aSet[$k] = "`$k` = '{$this->_db->escape($v)}'";
             }
         }
@@ -897,14 +906,7 @@ class f_m implements IteratorAggregate
      */
     public function join($sRelation, $asField = null, $sModel = null, $sJoinAlias = null, $sModelAlias = null)
     {
-        $this->_param['join'][] = $this->relation($sRelation) + array(
-            'join_type'        => 'JOIN',
-            'join_field'       => $asField,
-            'join_model'       => $sModel,
-            'join_alias'       => $sJoinAlias,
-            'join_model_alias' => $sModelAlias,
-        );
-        
+        $this->_join('JOIN', $sRelation, $asField, $sModel, $sJoinAlias, $sModelAlias);
         return $this;
     }
 
@@ -918,15 +920,36 @@ class f_m implements IteratorAggregate
      */
     public function joinLeft($sRelation, $asField = null, $sModel = null, $sJoinAlias = null, $sModelAlias = null)
     {
-        $this->_param['join'][] = $this->relation($sRelation) + array(
-            'join_type'        => 'LEFT JOIN',
-            'join_field'       => $asField,
-            'join_model'       => $sModel,
-            'join_alias'       => $sJoinAlias,
-            'join_model_alias' => $sModelAlias,
-        );
-
+        $this->_join('LEFT JOIN', $sRelation, $asField, $sModel, $sJoinAlias, $sModelAlias);
         return $this;
+    }
+
+    /**
+     *
+     * @param type $sDependentModelName
+     * @return f_m
+     */
+    public function dependent($sDependentModelName)
+    {
+
+        $relation = $this->relation($sDependentModelName);
+
+
+        $class = self::$_metadata[$this->_class]['prefix'] . $relation['rel_rel_table'];
+        $model = new $class;
+        $model->hardlink($relation['rel_rel_field'], $this->{$relation['rel_field']});
+        if (isset($relation['rel_condition'])) {
+            foreach ($relation['rel_condition'] as $k => $v) {
+                $model->hardlink($k, $v);
+            }
+        }
+
+        $model->{$relation['rel_rel_field']} = $this->{$relation['rel_field']};
+
+        $this->_dependent[$sDependentModelName] = $model;
+
+        return $model;
+
     }
 
     /* additional */
@@ -1050,7 +1073,7 @@ class f_m implements IteratorAggregate
                     // operator porownania
                     $comparisonOperator = '=';
                     if (strpos($paramKey, ' ') !== false) {
-                        list ($paramKey, $comparisonOperator) = explode('|', $paramKey, 2);
+                        list ($paramKey, $comparisonOperator) = explode(' ', $paramKey, 2);
                     }
                     if  (is_array($paramValue) && $comparisonOperator === '=') {
                         $comparisonOperator = 'IN';
@@ -1074,7 +1097,7 @@ class f_m implements IteratorAggregate
                             break;
 
                         default:
-                            $where[] = "`$paramKey` $comparisonOperator '{$this->_db->escape($value)}'";
+                            $where[] = "`$paramKey` $comparisonOperator '{$this->_db->escape($paramValue)}'";
                             break;
 
                     }
@@ -1089,7 +1112,20 @@ class f_m implements IteratorAggregate
 
         // linkage
         if ($bLinkage && $this->_hardlink) {
-            $where = " WHERE ($this->_hardlink)" . ($where ? " AND (" . substr($where, 7) . ")" : '');
+
+            $hardlink = array();
+            foreach ($this->_hardlink as $k => $v) {
+                if (is_int($k)) {
+                    $hardlink[] = $v;
+                }
+                else {
+                    $hardlink[] = "`$k` = '{$this->_db->escape($v)}'";
+                }
+            }
+            $hardlink = implode(' AND ', $hardlink);
+
+            $where = $where ? " WHERE ($hardlink) AND (" . substr($where, 7) . ")" : " WHERE $hardlink";
+
         }
 
         // select
@@ -1199,32 +1235,28 @@ class f_m implements IteratorAggregate
 
     }
 
-    /**
-     *
-     * @param type $sDependentModelName
-     * @return f_m
-     */
-    public function dependent($sDependentModelName)
+    protected function _join($sType, $sRelation, $asField, $sModel, $sJoinAlias, $sModelAlias)
     {
-
-        $relation = $this->relation($sDependentModelName);
-
-
-        $class = self::$_metadata[$this->_class]['prefix'] . $relation['rel_rel_table'];
-        $model = new $class;
-        $model->hardlink($relation['rel_rel_field'], $this->{$relation['rel_field']});
-        if (isset($relation['rel_condition'])) {
-            foreach ($relation['rel_condition'] as $k => $v) {
-                $model->hardlink($k, $v);
-            }
+        if ($sModel === null) {
+            $relation = $this->relation($sRelation);
+        }
+        else {
+            $class  = self::$_metadata[$this->_class]['prefix'] . $sModel;
+            $oModel = new $class();
+            $relation = $oModel->relation($sRelation);
         }
 
-        $model->{$relation['rel_rel_field']} = $this->{$relation['rel_field']};
+        $this->_param['join'][] = $relation + array(
+            'join_type'        => $sType,
+            'join_field'       => $asField,
+            'join_model'       => $sModel,
+            'join_alias'       => $sJoinAlias,
+            'join_model_alias' => $sModelAlias,
+        );
 
-        $this->_dependent[$sDependentModelName] = $model;
+        return $this;
 
-        return $model;
-        
     }
+
     
 }
