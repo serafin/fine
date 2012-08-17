@@ -1,8 +1,5 @@
 <?php
 
-/**
- * @todo dodac do metody path gettera
- */
 class f_config
 {
     
@@ -20,8 +17,16 @@ class f_config
         }
     }
 
-    public function path($sBasePath)
+    public function path($sBasePath = null)
     {
+        // getter
+
+        if (func_num_args() == 0) {
+            return $this->___path;
+        }
+
+        // setter
+
         if ($this->___path !== null) {
 
             // clear config cache
@@ -31,6 +36,7 @@ class f_config
             
         }
         $this->___path = $sBasePath;
+        return $this;
     }
 
     public function __get($sName)
@@ -40,7 +46,7 @@ class f_config
         $this->{$sName} = include $file;
 
         if ($this->{$sName} === false) {
-            throw new f_config_exception_logic("No config file named $sName ($file) or config file return false");
+            throw new f_config_exception_noConfig("No config file named $sName ($file) or config file return false");
         }
 
         return $this->{$sName};
