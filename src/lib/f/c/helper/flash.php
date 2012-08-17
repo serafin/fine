@@ -1,8 +1,5 @@
 <?php
 
-/**
- * @todo dokonczyc, sprawdzic czy & dziala
- */
 class f_c_helper_flash extends f_c
 {
 
@@ -58,6 +55,11 @@ class f_c_helper_flash extends f_c
         return $msgs;
     }
 
+    public function is()
+    {
+        return (boolean) $this->_storage;
+    }
+
     public function remove()
     {
         $this->_storage = array();
@@ -66,7 +68,7 @@ class f_c_helper_flash extends f_c
 
     public function redirect($sUri)
     {
-        $this->redirect($sUri);
+        $this->_c->redirect($sUri);
     }
 
     public function uri($sUri)
