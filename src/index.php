@@ -13,17 +13,17 @@ class index extends f_c
     public function __construct()
     {
         
-        // init main app cointainer
+        // init main app container
         f::$c = new container();
 
         // init error & exception handler
         $this->error->register();
         
-        // do something for diffrent environment (like debugging)
-        $this->{$this->env}();
-
         // session
         session_start();
+
+        // do something for diffrent environment (like debugging)
+        $this->{$this->env}();
 
         // pretty uris
         $_GET = $this->uri->resolve($_SERVER['REQUEST_URI']);
@@ -41,7 +41,7 @@ class index extends f_c
 
     public function dev()
     {
-        
+        $this->debug;
     }
 
     public function prod()

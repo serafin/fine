@@ -12,11 +12,7 @@ class f_db_mysql
         if (($this->_connect = mysql_connect($sHostname, $sUsername, $sPassword, true))) {
             return $this;
         }
-        throw new f_db_exception(array(
-            'type' => f_db_exception::CONNECT,
-            'msg'  => mysql_error(),
-            'code' => mysql_errno()
-        ));
+        throw new f_db_exception_connection($this->errorMsg(), $this->errorNo());
     }
 
     public function selectDb($sDatabaseName)
@@ -24,11 +20,7 @@ class f_db_mysql
         if (mysql_select_db($sDatabaseName, $this->_connect)) {
             return $this;
         }
-        throw new f_db_exception(array(
-            'type' => f_db_exception::NO_DATABASE,
-            'msg'  => $this->errorMsg(),
-            'code' => $this->errorNo()
-        ));
+        throw new f_db_exception_connection($this->errorMsg(), $this->errorNo());
     }
 
     public function link($rConnectionLinkIdentifier = null)
@@ -72,12 +64,7 @@ class f_db_mysql
         if (($this->_result = mysql_query($sQuery, $this->_connect))) {
             return $this->_result;
         }
-        throw new f_db_exception(array(
-            'type'  => f_db_exception::QUERY,
-            'msg'   => $this->errorMsg(),
-            'code'  => $this->errorNo(),
-            'query' => $this->_query
-        ));
+        throw $this->_exceptionQuery();
     }
 
     /**
@@ -92,12 +79,7 @@ class f_db_mysql
         if (($this->_result = mysql_query($sQuery, $this->_connect))) {
             return mysql_fetch_assoc($this->_result);
         }
-        throw new f_db_exception(array(
-            'type'  => f_db_exception::QUERY,
-            'msg'   => $this->errorMsg(),
-            'code'  => $this->errorNo(),
-            'query' => $this->_query
-        ));
+        throw $this->_exceptionQuery();
     }
 
     /**
@@ -116,12 +98,7 @@ class f_db_mysql
             }
             return $a;
         }
-        throw new f_db_exception(array(
-            'type'  => f_db_exception::QUERY,
-            'msg'   => $this->errorMsg(),
-            'code'  => $this->errorNo(),
-            'query' => $this->_query
-        ));
+        throw $this->_exceptionQuery();
     }
 
 
@@ -142,12 +119,7 @@ class f_db_mysql
             }
             return $a;
         }
-        throw new f_db_exception(array(
-            'type'  => f_db_exception::QUERY,
-            'msg'   => $this->errorMsg(),
-            'code'  => $this->errorNo(),
-            'query' => $this->_query
-        ));
+        throw $this->_exceptionQuery();
     }
 
     /**
@@ -166,11 +138,7 @@ class f_db_mysql
             }
             return $a;
         }
-        throw new f_db_exception(array(
-            'msg'   => $this->errorMsg(),
-            'code'  => $this->errorNo(),
-            'query' => $this->_query)
-        );
+        throw $this->_exceptionQuery();
     }
 
     /**
@@ -188,12 +156,7 @@ class f_db_mysql
             }
             return null;
         }
-        throw new f_db_exception(array(
-            'type'  => f_db_exception::QUERY,
-            'msg'   => $this->errorMsg(),
-            'code'  => $this->errorNo(),
-            'query' => $this->_query
-        ));
+        throw $this->_exceptionQuery();
     }
     
     /**
@@ -208,12 +171,7 @@ class f_db_mysql
         if (($this->_result = mysql_query($sQuery, $this->_connect))) {
             return mysql_fetch_row($this->_result);
         }
-        throw new f_db_exception(array(
-            'type'  => f_db_exception::QUERY,
-            'msg'   => $this->errorMsg(),
-            'code'  => $this->errorNo(),
-            'query' => $this->_query
-        ));
+        throw $this->_exceptionQuery();
     }
 
     /**
@@ -232,12 +190,7 @@ class f_db_mysql
             }
             return $a;
         }
-        throw new f_db_exception(array(
-            'type'  => f_db_exception::QUERY,
-            'msg'   => $this->errorMsg(),
-            'code'  => $this->errorNo(),
-            'query' => $this->_query
-        ));
+        throw $this->_exceptionQuery();
     }
 
     /**
@@ -267,7 +220,7 @@ class f_db_mysql
 
     public function fetchUsingResult($rQueryResult)
     {
-        return mysql_fetch_assoc($rQueryResul);
+        return mysql_fetch_assoc($rQueryResult);
     }
 
     /**
@@ -341,9 +294,9 @@ class f_db_mysql
     }
 
     /**
-     * Buduje bezpieczne zapytanie SQL dla metoda "zaslepek"
+     * Buduje bezpieczne zapytanie SQL metoda "zaslepek"
      *
-     * @param string $sQuery Zapytanie z "zaślepkami"
+     * @param string $sQuery Zapytanie z "zaslepkami"
      * @param array $aArgs zmienne do przeparsowania
      * @return string Zapytanie SQL
      *
@@ -359,18 +312,24 @@ class f_db_mysql
             if (false !== $pos = strpos($query, '?')) {
                 $i      = $this->escape($i);
                 $offest = $pos + strlen($i);
-                $query = substr($query, 0, $pos) . $i . substr($query, $pos+1);
+                $query = substr($query, 0, $pos) . $i . substr($query, $pos + 1);
             }
             else {
-                throw new f_db_exception(array(
-                    'type'  => f_db_exception::INVALID_ARGUMENT,
-                    'msg'   => "Too not enough \"?\" chars(".substr_count($sQuery, "?").") in query"
-                              ." and too many vars(".count($asVar).") passed in second argument",
-                    'code'  => 0,
-                ));
+                throw new f_db_exception_invalidArgument(
+                    "Too not enough \"?\" chars(" . substr_count($sQuery, "?") . ") in query"
+                    . " and too many vars(" . count($asVar) . ") passed in second argument"
+                );
             }
         }
         return $sQuery;
     }
-    
+
+    protected function _exceptionQuery()
+    {
+        $exception        = new f_db_exception_query($this->errorMsg(), $this->errorNo());
+        $exception->Query = $this->_query;
+
+        return $exception;
+    }
+
 }

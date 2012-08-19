@@ -1,9 +1,5 @@
 <?php
-/**
- * @todo
- *  - dodac construktor
- *  - konsturktor statyczny wedlug standardu
- */
+
 class f_filter_trim
 {
     

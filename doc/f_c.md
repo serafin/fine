@@ -1,6 +1,6 @@
 # f_c
 
-Kontroller, zadanie, odpowiedz, glowny kontener, helpery, serwisy, dyspozytor
+Kontroller, żądanie, odpowiedź, glowny kontener, helpery, serwisy, dyspozytor
 
 
 ## odwolanie do helperow/serwisow

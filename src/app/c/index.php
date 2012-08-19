@@ -147,6 +147,23 @@ class c_index extends f_c_action
         f_debug::dump($comment->param());
     }
 
+    public function debugAction()
+    {
+        $this->render->off();
+
+        /* @var $debug f_debug */
+        $debug = $this->debug;
+        $debug->log(rand(1,20), 'rand');
+
+        $debug->warn($this->db->rows("SELECT * FROM article"));
+        $debug->error($this->db->rows("SELECT * FROM article"));
+
+
+
+        $debug->show();
+
+    }
+
 }
 
 

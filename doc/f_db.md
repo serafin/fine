@@ -1,7 +1,9 @@
 # f_db
+
 Obsluga bazy danych.
 
 ## f_db_mysql
+
 Manipulacje danymi bazy MySQL.
 
 ~~~php
@@ -30,7 +32,7 @@ $rows = $oDb->rows("SELECT * FROM news");
 	+---------+------------+-----------+
 
 
-### f_db_mysql::rows
+### f_db_mysql->rows
 
 pobiera rekordy, drugi wymiar to tablica asocjacyjna
 

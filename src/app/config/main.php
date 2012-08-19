@@ -5,8 +5,8 @@ return array(
         'db' => array (
             'host'    => 'localhost',
             'name'    => 'fine',
-            'user'    => 'fine',
-            'pass'    => 'fine',
+            'user'    => 'root',
+            'pass'    => 'follow',
             'charset' => 'utf8'
         ),
         'error' => array(

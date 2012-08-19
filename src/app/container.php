@@ -24,17 +24,8 @@ class container extends f_c_container
     {
         $this->debug = new f_debug();
         $this->db    = new f_debug_db(array('_db' => $this->db));
-        
-        $this->debug->group('PHP Predefined Variables');
-        $this->debug->log($_COOKIE, '$_COOKIE');
-        $this->debug->log($_ENV, '$_ENV');
-        $this->debug->log($_FILES, '$_FILES');
-        $this->debug->log($_GET, '$_GET');
-        $this->debug->log($_POST, '$_POST');
-        $this->debug->log($_REQUEST, '$_REQUEST');
-        $this->debug->log($_SERVER, '$_SERVER');
-        $this->debug->log($_SESSION, '$_SESSION');
-        $this->debug->groupEnd();
+
+        $this->debug->phpPredefinedVariables();
         
         return $this->debug;
     }

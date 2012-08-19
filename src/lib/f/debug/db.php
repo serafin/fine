@@ -27,28 +27,34 @@ class f_debug_db
             
             $this->_c->debug->timer();
             $return = call_user_func_array(array($this->_db, $name), $arguments);
-            $this->_c->debug->log($name == 'lastId' ? 'SELECT LAST_INSERT_ID()' : $arguments[0], 'DB Query');
-            
+            $this->_c->debug->logRaw(array(
+                'label' => 'DB',
+                'data'  => $name == 'lastId' ? 'SELECT LAST_INSERT_ID()' : $arguments[0],
+                'type'  => f_debug::LOG_GROUP,
+            ));
+
             $result = $this->_db->result();
             
             if (is_resource($result)) { // select
-                
+
+                mysql_data_seek($result, 0);
                 $iSelected  = $this->_db->countSelected();
-                $this->_c->debug->log($iSelected, 'DB Selected');
                 
                 if ($iSelected) {
-                    $num  = in_array($sMethod, array( 'col', 'cols', 'val', 'rowNum', 'rowsNum', 'lastId'));
+                    $num  = in_array($sMethod, array('col', 'cols', 'val', 'rowNum', 'rowsNum', 'lastId'));
                     $rows = array();
                     while ($i = ($num ? mysql_fetch_row($result) : mysql_fetch_assoc($result))) {
                             $rows[] = $i;
                     }
-                    $this->_c->debug->table($rows, 'DB selected rows');
+                    $this->_c->debug->table($rows, 'Rows');
                 }
                 
             }
             else if ($result === true) { // update, insert, delete
-                $this->_c->debug->log($this->_db->countAffected(), 'DB Affected');
+                $this->_c->debug->log($this->_db->countAffected(), 'Affected');
             }
+
+            $this->_c->debug->groupEnd();
             
             return $return;
             

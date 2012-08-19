@@ -11,12 +11,14 @@ class f_debug
     const LOG_GROUP_END = 'LOG_GROUP_END';
     
     protected $_log = array();
+    protected $_phpPV = array('_COOKIE' => '', '_ENV' => '', '_FILES' => '', '_POST' => '',
+                              '_GET' => '', '_REQUEST' => '', '_SERVER' => '', '_SESSION' => '');
     protected $_offset;
     protected $_timer;
 
     public static function source($sFile, $iLine, $iPaddingLines = 5)
     {
-    if (!is_readable($sFile)) {
+        if (!is_readable($sFile)) {
             return false;
         }
         $sFile  = fopen($sFile, 'r');
@@ -62,6 +64,50 @@ class f_debug
         return $sOutput;
     }
 
+    public static function dumpFunctionArgs($aArgs, $iArgMaxLenght = 30, $iArgsLimit = 3)
+    {
+
+        if (! $aArgs) {
+            return '';
+        }
+
+        
+
+        $return = array();
+        
+        for ($i = 0, $end = count($aArgs); $i < $end && $i < $iArgsLimit; $i++) {
+            
+            $arg = $aArgs[$i];
+            
+            if (is_bool($arg)) {
+                $return[] = $arg ? 'true' : 'false';
+            }
+            else if (is_float($arg) || is_int($arg)) {
+                $return[] = $arg;
+            }
+            else if (is_string($arg)) {
+                if (strlen($arg) > $iArgMaxLenght) {
+                    $arg = substr($arg, 0, $iArgMaxLenght) . '...';
+                }
+                $return[] = "'" . $arg . "'";
+            }
+            else {
+                $arg = str_replace("\n", '', self::varDumpPretty($arg));
+                if (strlen($arg) > $iArgMaxLenght) {
+                    $arg = substr($arg, 0, $iArgMaxLenght) . '...';
+                }
+                $return[] =  $arg;
+            }
+            
+        }
+
+        $return = implode(', ', $return);
+     
+        return $return;
+    }
+
+
+
     public static function varDumpPretty($mVar)
     {
         ob_start();
@@ -85,7 +131,9 @@ class f_debug
         $this->_timer = new f_timer();
         $this->_timer->start();
     }
-    
+
+    /* log */
+
     public function logRaw($aLog = null)
     {
         if ($aLog === null) {
@@ -102,6 +150,45 @@ class f_debug
         $this->_log[] = $aLog;
         return $this;
     }
+
+    public function phpPredefinedVariables()
+    {
+        $this->group('PHP Predefined Variables');
+        foreach ($this->_phpPV as $k => $v) {
+            $this->log($GLOBALS[$k], '$' . $k);
+            $this->_phpPV[$k] = md5(self::varDumpPretty($GLOBALS[$k]));
+        }
+        $this->groupEnd();
+    }
+
+    public function phpPredefinedVariablesChange()
+    {
+        reset($this->_phpPV);
+        if (strlen(current($this->_phpPV)) == 0) {
+            return;
+        }
+
+        $diff = array();
+
+        foreach ($this->_phpPV as $k => $v) {
+            if ($v == md5(self::varDumpPretty($GLOBALS[$k]))) {
+                continue;
+            }
+            $diff[] = $k;
+        }
+
+        if (!$diff) {
+            return;
+        }
+
+        $this->group('PHP Predefined Variables - Change');
+        foreach ($diff as $i) {
+            $this->log($GLOBALS[$i], '$' . $i);
+        }
+        $this->groupEnd();
+    }
+
+
     
     public function log($mData, $sLabel = null)
     {
@@ -110,12 +197,12 @@ class f_debug
     
     public function warn($mData, $sLabel = null)
     {
-        return $this->logRaw(array('type' => self::LOG_WARN, 'label' => $sLabel, 'data' => $mData));
+        return $this->logRaw(array('type' => self::LOG_WARN, 'label' => $sLabel, 'data' => $mData, 'style' => self::LOG_WARN));
     }
     
     public function error($mData, $sLabel = null)
     {
-        return $this->logRaw(array('type' => self::LOG_ERROR, 'label' => $sLabel, 'data' => $mData));
+        return $this->logRaw(array('type' => self::LOG_ERROR, 'label' => $sLabel, 'data' => $mData, 'style' => self::LOG_ERROR));
     }
     
     public function table($mData, $sLabel = null)
@@ -123,9 +210,9 @@ class f_debug
         return $this->logRaw(array('type' => self::LOG_TABLE, 'label' => $sLabel, 'data' => $mData));
     }
     
-    public function group($sLabel)
+    public function group($sLabel, $mPreview = null)
     {
-        return $this->logRaw(array('type' => self::LOG_GROUP, 'label' => $sLabel));
+        return $this->logRaw(array('type' => self::LOG_GROUP, 'label' => $sLabel, 'data' => $mPreview));
     }
 
     public function groupEnd()
@@ -135,6 +222,8 @@ class f_debug
     
     public function show($sViewScriptPath = './lib/f/debug/show.view')
     {
+        $this->phpPredefinedVariablesChange();
+        
         $oView = new f_v();
         $oView->log = $this->_log;
         echo $oView->renderPath($sViewScriptPath);
