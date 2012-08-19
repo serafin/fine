@@ -23,3 +23,20 @@
 - f_valid - agregator validatorow, obslugiwany tak jakby byl jednym walidatorem, pomyslec co z kluczami bledow, 
     co z breakOnFail, czy jest to mozliwe?
 
+[doc]
+01. wstep
+- instalacja
+ - standaryzacja
+ - pliki
+
+02. Cykl zycia
+-
+03. Glowny kontener aplikacji
+-
+
+. kontroller
+. Model
+ Widok
+. Formularze
+. Przyjazne adresy
+. Obsluga uploadowany plikow

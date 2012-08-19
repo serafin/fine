@@ -12,7 +12,10 @@ class index extends f_c
 
     public function __construct()
     {
-        
+
+        // this, in combination with mysql-statement "SET NAMES 'utf8'", will save a lot of debugging trouble.
+        mb_internal_encoding('UTF-8');
+
         // init main app container
         f::$c = new container();
 

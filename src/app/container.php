@@ -99,7 +99,7 @@ class container extends f_c_container
 
     protected function _uri()
     {
-        $this->uri = new f_c_helper_uri();
+        return $this->uri = new f_c_helper_uri();
     }
     
     protected function _uriAbs()
