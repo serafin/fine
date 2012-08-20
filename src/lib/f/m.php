@@ -1212,7 +1212,7 @@ class f_m implements IteratorAggregate
                             foreach ($join['rel_condition'] as $k => $v) {
                                 $joinSql .= is_int($k)
                                             ? " AND $v"
-                                            : " AND `$k` => '" . $this->_db->escape($v). "'";
+                                            : " AND `$k` = '" . $this->_db->escape($v). "'";
                             }
                         }
                         $joinSql .= ')';

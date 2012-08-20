@@ -37,11 +37,12 @@ class f_debug_db
             
             if (is_resource($result)) { // select
 
-                mysql_data_seek($result, 0);
                 $iSelected  = $this->_db->countSelected();
-                
+
                 if ($iSelected) {
-                    $num  = in_array($sMethod, array('col', 'cols', 'val', 'rowNum', 'rowsNum', 'lastId'));
+                    mysql_data_seek($result, 0);
+
+                    $num  = in_array($name, array('col', 'cols', 'val', 'rowNum', 'rowsNum', 'lastId'));
                     $rows = array();
                     while ($i = ($num ? mysql_fetch_row($result) : mysql_fetch_assoc($result))) {
                             $rows[] = $i;

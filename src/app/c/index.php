@@ -132,111 +132,44 @@ class c_index extends f_c_action
 
     }
 
-    public function modelAction()
+    public function hardrelAction()
     {
+        // Pobieranie listy galerii dla artykulu
 
+        $oGallery = new m_gallery();
+        $oGallery->join('article_mag');
+        $oGallery->param('resource_baseId', 1234);
+        $oGallery->param('resource_baseType', 'article_mag');
+        $oGallery->selectAll();
+
+        // v2
+        $oResource = new m_resource();
+        $oResource->paramGalleryForArticleMag(1234);
+        $oResource->selectAll();
+
+
+        // Pobieranie wszystkich obrazkow
+
+        $oGalleryPic = new m_galleryPic();
+        $oGalleryPic->join('gallery');
+        $oGalleryPic->join('article_mag', null, 'gallery');
+        $oGalleryPic->param('resource_baseId', 1234);
+        $oGalleryPic->param('resource_baseType', 'article_mag');
+        $oGalleryPic->selectAll();
+
+        // v2
+        $oResource = new m_resource();
+        $oResource->paramGalleryPicForArticleMag(1234);
+        $oResource->selectAll();
+        
+         
+
+
+
+
+        $this->debug->show();
         $this->render->off();
-        $this->_c->db = new dbDumpQuery();
-
-
-        $comment = new m_comment();
-        $comment->join('magazine', array('lalala' => 'article_id'), null, 'yogi');
-        $comment->selectAll();
-
-
-        f_debug::dump($comment->param());
-    }
-
-    public function debugAction()
-    {
-        $this->render->off();
-
-        /* @var $debug f_debug */
-        $debug = $this->debug;
-        $debug->log(rand(1,20), 'rand');
-
-        $debug->warn($this->db->rows("SELECT * FROM article"));
-        $debug->error($this->db->rows("SELECT * FROM article"));
-
-
-
-        $debug->show();
-
     }
 
 }
 
-
-class dbDumpQuery
-{
-
-    public function escape($s)
-    {
-        return addslashes($s);
-    }
-
-    public function query($s)
-    {
-        f_debug::dump($s, 'query');
-    }
-
-    public function row($s)
-    {
-        f_debug::dump($s, 'row');
-    }
-
-    public function rows($s)
-    {
-        f_debug::dump($s, 'rows');
-    }
-
-    public function col($s)
-    {
-        f_debug::dump($s, 'col');
-    }
-
-    public function cols($s)
-    {
-        f_debug::dump($s, 'cols');
-    }
-
-    public function val($s)
-    {
-        f_debug::dump($s, 'val');
-    }
-
-    public function fetchUsingResult($rRresult)
-    {
-        return null;
-    }
-
-}
-
-class m_article extends f_m
-{
-
-    public $article_id;
-    public $article_type;
-
-    public function relations()
-    {
-        parent::initRelation();
-
-    }
-
-}
-
-class m_comment extends f_m
-{
-
-    public $comment_id;
-    public $comment_type;
-    public $comment_foreignid;
-
-    public function relations()
-    {
-        $this->relation('magazine', 'comment_foreignid', 'article_id', "`comment_type` = 'magazine'");
-
-    }
-
-}
