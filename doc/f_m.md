@@ -18,7 +18,7 @@ Interfejs obiektowy do pracy z tabelami (Active Record, ORM, Table Data Gateway)
 
 ## Zarys klasy
 
-```
+```php
 <?php
 
 class f_m
