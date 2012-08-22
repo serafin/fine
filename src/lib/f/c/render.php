@@ -3,6 +3,9 @@
 class f_c_render extends f_c
 {
 
+    CONST EVENT_RENDER_PRE  = 'render_pre';
+    CONST EVENT_RENDER_POST = 'render_post';
+
     /** 
      * render result kept for next view level
      * @var string
@@ -179,8 +182,8 @@ class f_c_render extends f_c
     public function render($sViewScript = null)
     {
         /** @event render_pre */
-        if ($this->event->is('render_pre')) {
-            $this->event->run($event = new f_event(array('id' => 'render_pre', 'subject' => $this)));
+        if ($this->event->is(self::EVENT_RENDER_PRE)) {
+            $this->event->run($event = new f_event(array('id' => self::EVENT_RENDER_PRE, 'subject' => $this)));
             if ($event->cancel()) {
                 return;
             }
@@ -219,8 +222,8 @@ class f_c_render extends f_c
         $this->response->body = $this->content;
         
         /** @event render_post */
-        if ($this->event->is('render_post')) {
-            $this->event->run(new f_event(array('id' => 'render_post', 'subject' => $this)));
+        if ($this->event->is(self::EVENT_RENDER_POST)) {
+            $this->event->run(new f_event(array('id' => self::EVENT_RENDER_POST, 'subject' => $this)));
         }
 
     }

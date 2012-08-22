@@ -3,6 +3,9 @@
 class f_c_dispacher extends f_c
 {
 
+    const EVENT_DISPACHER_PRE  = 'dispacher_pre';
+    const EVENT_DISPACHER_POST = 'dispacher_post';
+
     /**
      * @var string Nazwa kontrolera
      */
@@ -171,9 +174,9 @@ class f_c_dispacher extends f_c
         }
 
         /** @event dispacher_pre */
-        if ($this->event->is('dispacher_pre')) {
-            $this->event->run($oEvent = new f_event(array('id' => 'dispacher_pre', 'subject' => $this)));
-            if ($oEvent->cancel()) {
+        if ($this->event->is(self::EVENT_DISPACHER_PRE)) {
+            $this->event->run($event = new f_event(array('id' => self::EVENT_DISPACHER_PRE, 'subject' => $this)));
+            if ($event->cancel()) {
                 return;
             }
         }
@@ -192,8 +195,8 @@ class f_c_dispacher extends f_c
         );
 
         /** @event dispacher_end */
-        if ($this->event->is('dispacher_post')) {
-            $this->event->run(new f_event(array('id' => 'dispacher_post', 'subject' => $this)));
+        if ($this->event->is(self::EVENT_DISPACHER_POST)) {
+            $this->event->run(new f_event(array('id' => self::EVENT_DISPACHER_POST, 'subject' => $this)));
         }
 
     }

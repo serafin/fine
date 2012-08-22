@@ -3,6 +3,9 @@
 class f_c_response extends f_c
 {
 
+    const EVENT_RESPONSE_PRE  = 'response_pre';
+    const EVENT_RESPONSE_POST = 'response_post';
+
     public $body;
     
     protected $_header    = array();
@@ -218,8 +221,8 @@ class f_c_response extends f_c
     
     public function send()
     {
-        if ($this->event->is('response_pre')) {
-            $this->event->run($event = new f_event(array('id' => 'response_pre', 'subject' => $this))); 
+        if ($this->event->is(self::EVENT_RESPONSE_PRE)) {
+            $this->event->run($event = new f_event(array('id' => self::EVENT_RESPONSE_PRE, 'subject' => $this)));
             if ($event->cancel()) {
                 return $this;
             }
@@ -229,8 +232,8 @@ class f_c_response extends f_c
         $this->sendHeader();
         $this->sendBody();
         
-        if ($this->event->is('response_post')) {
-            $this->event->run(new f_event(array('id' => 'response_post', 'subject' => $this))); 
+        if ($this->event->is(self::EVENT_RESPONSE_POST)) {
+            $this->event->run(new f_event(array('id' => self::EVENT_RESPONSE_POST, 'subject' => $this)));
         }
         
         return $this;
