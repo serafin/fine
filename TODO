@@ -1,4 +1,8 @@
 [v2.0]
+- jeszcze raz paging przejrzec i przetestowac bo sie w modelu pozmienialo
+- f_db to nakladka ma mysql_* wiec tam metoda lastInsertedId, w modelu powinno byc sensownie wedlug modelu
+- test f_db::prepare
+- test modele dla innego serwisu bazy
 - f_valid_db*
 - DOC f_paging i model
 - f_valid_file*

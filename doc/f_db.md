@@ -4,9 +4,9 @@ Obsluga bazy danych.
 
 ## f_db_mysql
 
-Manipulacje danymi bazy MySQL.
+Manipulacje danymi bazy MySQL. Nakladka na na funkcje `mysql_*`.
 
-~~~php
+```php
 <?php
 
 $oDb = new f_db_mysql();
@@ -14,8 +14,15 @@ $oDb->connect('localhost', 'user', 'password');
 $oDb->selectDb('blog');
 $oDb->query("SET NAMES 'utf8'");
 
-$oDb->query("INSERT INTO news (news_title, news_text) VALUES ('Tytul', 'Tresc newsa...')");
+$oDb->query("INSERT INTO news (news_title, news_text) VALUES ('Aaa', 'Aaa aaa')");
+$oDb->query("INSERT INTO news (news_title, news_text) VALUES ('Bbb', 'Bbb bbb')");
+$oDb->query("INSERT INTO news (news_title, news_text) VALUES ('Ccc', 'Ccc ccc')");
+$oDb->query("INSERT INTO news (news_title, news_text) VALUES ('Ddd', 'Ddd ddd')");
+$oDb->query("INSERT INTO news (news_title, news_text) VALUES ('Eee', 'Eee eee')");
+
 $rows = $oDb->rows("SELECT * FROM news");
+
+?>
 ```
 
 
@@ -31,18 +38,22 @@ $rows = $oDb->rows("SELECT * FROM news");
 	| 5       | Eee        | Eee eee   |
 	+---------+------------+-----------+
 
+### Metody pobierajace dane
 
-### f_db_mysql->rows
+#### rows
 
-pobiera rekordy, drugi wymiar to tablica asocjacyjna
+Pobiera rekordy. Drugi wymiar to tablica asocjacyjna.
 
 ```php
 <?php
 
 $result = $oDb->rows("SELECT * FROM news LIMIT 2");
-
 print_r($result);
 
+?>
+```
+
+```
 Array
 (
     [0] => Array
@@ -60,17 +71,18 @@ Array
 )
 ```
 
-### f_db_mysql::row
+#### row
 
-pobiera rekord jako tablice asocjacyjna
+Pobiera rekord jako tablice asocjacyjna.
 
 ```php
 <?php
 
 $result = $oDb->row("SELECT * FROM news WHERE news_id = '1'");
-
 print_r($result);
+?>
 
+```
 Array
 (
     [news_id] => 1
@@ -79,20 +91,21 @@ Array
 )
 ```
 
-### f_db_mysql::cols
+#### cols
 
 Zwraca jedno wymiarową tablice asocjacyjną gdzie kluczem jest pierwsze pole,
 a wartością drugie z wyselekcjonowanych rekordow
-
 
 ```php
 <?php
 
 $result = $oDb->cols("SELECT news_id, news_title FROM news LIMIT 2");
-
 print_r($result);
 
+?>
+```
 
+```
 Array
 (
     [1] => Aaa
@@ -100,7 +113,7 @@ Array
 )
 ```
 
-### f_db_mysql::col
+#### col
 
 Zwraca jedno wymiarową tablice numeryczną
 gdzie wartością pola tablicy jest pierwsze pole z wyselekcjonowanych rekordow
@@ -110,10 +123,12 @@ gdzie wartością pola tablicy jest pierwsze pole z wyselekcjonowanych rekordow
 <?php
 
 $result = $oDb->col("SELECT news_title FROM news LIMIT 2");
-
 print_r($result);
 
+?>
+```
 
+```
 Array
 (
     [0] => Aaa
@@ -121,7 +136,7 @@ Array
 )
 ```
 
-### f_db_mysql::val
+#### val
 
 Zwraca wartosc pierwszego pola z pierwszego wyselekcjonowanego rekordu
 
@@ -129,11 +144,32 @@ Zwraca wartosc pierwszego pola z pierwszego wyselekcjonowanego rekordu
 <?php
 
 $result = $oDb->val("SELECT news_title FROM news WHERE news_id = '1'");
-
 print_r($result);
 
+?>
+```
 
+```
 Aaa
 ```
 
+### Bezpieczenstwo
 
+```php
+ <?php
+
+ // Dane wejściowe z fomularza
+
+ $_POST['user_name'] = "Architekt";
+ $_POST['user_pass'] = "ble ble ble ' OR 1 = 1 --";
+
+ // Kontroller
+
+ $aUser = $oDb->row($oDb->prepare("SELECT user_id FROM user WHERE user_name = '?' AND user_pass = '?'",
+            array($_GET['user_name'], $_GET['user_pass'])));
+
+ // Zostanie wykonane zapytanie:
+ // SELECT user_id FROM user WHERE user_name = 'Architekt' AND user_pass = 'ble ble ble \' OR 1 = 1 --'
+ 
+ ?>
+```

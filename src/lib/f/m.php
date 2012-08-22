@@ -1,6 +1,6 @@
 <?php
 
-class f_m implements IteratorAggregate
+class f_m implements IteratorAggregate, Countable
 {
 
     const PARAM_FIELD    = 'field';
@@ -130,6 +130,15 @@ class f_m implements IteratorAggregate
             $this->selectAll();
         }
         return new ArrayIterator($this->_);
+    }
+
+    /**
+     * Implementacja interfejsu Coutable
+     * @return int
+     */
+    public function count()
+    {
+        return count($this->_);
     }
 
     /* setup */
@@ -316,7 +325,7 @@ class f_m implements IteratorAggregate
      * @param array $aKeyValue Pola jako klucze $aKeyValue, wartosci modelu jako wartosci $aKeyValue
      * @return $this
      */
-    public function valField($aKeyValue)
+    public function fieldAndVal($aKeyValue)
     {
         $this->field(array_keys($aKeyValue));
         $this->val($aKeyValue);
@@ -428,7 +437,7 @@ class f_m implements IteratorAggregate
         return $this;
     }
 
-    /* queries */
+    /* select */
     
     /**
      * Selekcjonuje jeden rekord z tabeli, zapisuje go do pola _, zapisuje pobrane dane do pol publicznych obiektu
@@ -468,10 +477,10 @@ class f_m implements IteratorAggregate
     }
 
     /**
-     * Zwraca jedno wymiarową tablice numeryczną gdzie wartościami tablicy jest pierwsze pole z wyselekcjonowanych rekordow
+     * Pobiera jedno wymiarową tablice numeryczną gdzie wartościami tablicy jest pierwsze pole z wyselekcjonowanych rekordow
      *
      * @param array|integer|string|null $aisParam Parametry
-     * @return array|false Tablice | W przpadku nie wyselekcjonowania żadnych rekordow
+     * @return $this
      */
     public function selectCol($aParam = null)
     {
@@ -560,6 +569,116 @@ class f_m implements IteratorAggregate
         $this->{$this->_key} = $aRow[$this->_key];
         return $this;
     }
+
+    /* fetch - select + return data */
+
+    /**
+     * Selekcjonuje jeden rekord z tabeli
+     *
+     * @param array|integer|string $aisParam Parametry
+     * @return array
+     */
+    public function fetch($aisParam = null)
+    {
+        $this->select($aisParam);
+        return $this->_;
+    }
+
+    /**
+     * Selekcjonuje wiele rekordow z tabeli
+     *
+     * @param array|integer|string|null $aisParam Parametry
+     * @return array
+     */
+    public function fetchAll($aParam = null)
+    {
+        $this->selectAll($aParam);
+        return $this->_;
+    }
+
+    /**
+     * Zwraca jedno wymiarową tablice numeryczną gdzie wartościami tablicy jest pierwsze pole z wyselekcjonowanych rekordow
+     *
+     * @param array|integer|string|null $aisParam Parametry
+     * @return array|false Tablice | W przpadku nie wyselekcjonowania żadnych rekordow
+     */
+    public function fetchCol($aParam = null)
+    {
+        $this->selectCol($aParam);
+        return $this->_;
+    }
+
+    /**
+     * Pobiera jedno wymiarową tablice asocjacyjną gdzie kluczem jest pierwsze pole a wartością drugie z wyselekcjonowanych rekordow
+     *
+     * @param array|integer|string|null $aisParam Parametry
+     * @return array
+     */
+    public function fetchCols($aParam = null)
+    {
+        $this->selectCols($aParam);
+        return $this->_;
+    }
+
+    /**
+     * Pobiera wartosc pierwszego pola z pierwszego wyselekcjonowanego rekordu, zapisuje ja do _
+     *
+     * @param array|integer|string|null $aisParam Parametry
+     * @return string
+     */
+    public function fetchVal($aParam = null)
+    {
+        $this->selectVal($aParam);
+        return $this->_;
+    }
+
+    /**
+     * Wykonuje zapytanie SELECT COUNT, wartosc zapytania zapisuje do pola _
+     *
+     * @param array|integer|string|null $aisParam Parametry
+     * @param string $sExpr Domyślnie *
+     * @return int
+     */
+    public function fetchCount($aParam = null, $sExpr = '*')
+    {
+        $this->selectCount($aParam, $sExpr);
+        return $this->_;
+    }
+
+    /**
+     * Pobiera kolejny rekod zapytania wykonanego przez metode selectLoop()
+     *
+     * @return array
+     */
+    public function fetchNext()
+    {
+        if (($data = $this->_db->fetchUsingResult($this->_result))) {
+            $this->val($data);
+            $this->_ = $data;
+            if ($this->_key !== null && isset($data[$this->_key])) {
+                $this->{$this->_key} = $data[$this->_key];
+            }
+        }
+        else {
+            $this->removeVal();
+        }
+        return $this;
+    }
+
+    /**
+     * Pobiera do modelu ostatnio dodany rekorod do bazy
+     *
+     * @return $tthis
+     */
+    public function fetchInserted()
+    {
+        $row = $this->_db->row("SELECT * FROM `$this->_table` WHERE `$this->_key` = LAST_INSERT_ID()");
+        $this->val($row);
+        $this->{$this->_key} = $row[$this->_key];
+        return $this;
+    }
+
+    /* queries - insert, update, delete */
 
     /**
      * Dodaje rekord do tabeli
@@ -775,19 +894,6 @@ class f_m implements IteratorAggregate
         return $this;
     }
 
-    /**
-     * Wykonuje zapytanie SELECT COUNT, wartosc zapytania zapisuje do pola _
-     *
-     * @param array|integer|string|null $aisParam Parametry
-     * @param string $sExpr Domyślnie *
-     * @return $this
-     */
-    public function count($aisParam = null, $sExpr = '*')
-    {
-        $this->selectCount($aisParam, $sExpr);
-        return $this->_;
-    }
-
     /* relations */
 
     public function relations()
@@ -894,7 +1000,6 @@ class f_m implements IteratorAggregate
 
         return $relations[$sName];
     }
-
 
     /**
      * Wykonuje JOIN dołączenie do tabeli według referencji
@@ -1257,6 +1362,5 @@ class f_m implements IteratorAggregate
         return $this;
 
     }
-
     
 }
