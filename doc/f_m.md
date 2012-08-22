@@ -25,9 +25,9 @@ class f_m
 {
 
     /**
-     * Zwraca obiekt polaczanie za baz danych typu f_db_mysql
+     * Polaczenie z baza
      */
-    public function db(); // zwraca obiekt f_db_mysql
+    public function db(); // zwraca obiekt polaczennia typu f_db_mysql
     
     /** 
      * Pola
