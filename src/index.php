@@ -44,7 +44,7 @@ class index extends f_c
 
     public function dev()
     {
-        $this->debug;
+        $this->debug->init();
     }
 
     public function prod()

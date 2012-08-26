@@ -1,0 +1,144 @@
+# f_c
+
+Kontroller, żądanie, odpowiedź, glowny kontener, helpery, serwisy, dyspozytor
+
+
+## Helpery/serwisy
+
+
+### Dostep i wywolanie
+
+```php
+<?php
+
+class c_test extends f_c
+{
+
+    public function test()
+    {
+        $this->_c->redirect->helper('http://ubuntu.com/');
+        $this->redirect->helper('http://ubuntu.com/'); //f_c::__get('redirect')
+        $this->redirect('http://ubuntu.com/'); //f_c::__call('redirect', array('http://ubuntu.com/'))
+    }
+
+}
+
+?>
+```
+
+###  f_c_helper_connectionClose
+
+Wczesniesze zamykanie polaczenia.
+Mozna wtedy w tle wykonac jakies czasochlonne zadanie.
+Nie trzeba specjalnie tworzyc crona.
+
+### f_c_helper_flash
+
+Przekazywanie wiadomosci uzytkownikowi pomiedzy żądaniami.
+
+```php
+<?php
+
+$flash = new f_c_helper_flash();
+$flash->storage(&$_SESSION['flash']);
+
+$flash->add('Zostales zalogowany', f_c_helper_flash::STATUS_SUCCESS, array('email' => 'user@domain.com'));
+
+$flash->uri(array('dashboard', 'wall')); // robi redirect na /dashboard/wall
+
+?>
+
+Metoda `c_dashboard->wallAction`
+
+<?php
+
+$flash = new f_c_helper_flash();
+$flash->storage(&$_SESSION['flash']);
+
+if ($flash->is()) {
+    foreach ($flash->get() as $msg) {
+        echo $msg['msg'] . $msg['param']['email'];
+    }
+}
+
+?>
+```
+
+### f_c_helper_redirect
+
+Redirect. Teraz metodzie redirect trzbeba podac caly adres.
+
+```php
+<?php
+
+$this->redirect($this->uri(array('user', 'profile', 1234)));
+
+// lub
+
+$this->redirect->uri(array('user', 'profile', 1234));
+
+?>
+```
+
+W fine1, jest blad. Adres jest skladany czasem 2 razy.
+Redirect nie dziala dla absolutnych adresow.
+Zgodnie ze standardem HTTP 1.1 w headerze `Location` adres musi byc  absolutny.
+w fine2 zostalo to wszystko poprawione.
+
+## Hierarchi serwisow kontenera glownego
+
+```
+f::$c // container
+     ->config
+     ->db
+     ->debug
+     ->dispacher
+     ->env
+     ->error
+     ->event
+     ->flash
+     ->reg
+     ->request
+     ->response
+     ->render
+     ->v // f_v
+        ->_c // v_container
+            ->c // container
+     ->vc // v_container
+     ->uri
+     ->uriAbs
+     ->uriBase
+
+```
+
+Z widoku mozna latwo sie dostac do aktualnego kontroller - dispacher przechowuje uruchomiony obiekt.
+
+```php
+
+Wywolany adres `/`
+
+<?php
+
+class c_index extends f_c_action
+{
+
+    public function indexAction()
+    {
+
+    }
+
+    public function hello()
+    {
+        return 'Hello World!';
+    }
+
+}
+?>
+
+Plik `./app/v/script/index/index.php`
+
+<?php
+echo $this->_c->c->dispacher->object()->hello()
+
+?>
+```

@@ -198,7 +198,7 @@ class f_db_mysql
      *
      * @return int Wartosc klucza ostatnio dodanego rekordu
      */
-    public function lastId()
+    public function lastInsertId()
     {
         return $this->val("SELECT LAST_INSERT_ID()");
     }
@@ -326,8 +326,9 @@ class f_db_mysql
 
     protected function _exceptionQuery()
     {
-        $exception        = new f_db_exception_query($this->errorMsg(), $this->errorNo());
-        $exception->Query = $this->_query;
+        $exception            = new f_db_exception_query($this->errorMsg(), $this->errorNo());
+        $exception->Query     = $this->_query;
+        $exception->_metadata = array('Query' => 'sql');
 
         return $exception;
     }

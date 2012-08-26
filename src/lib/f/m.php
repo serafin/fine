@@ -35,6 +35,7 @@ class f_m implements IteratorAggregate, Countable
     protected $_hardlink  = array();
     protected $_result;
     protected $_dependent = array();
+    protected $_paging;
 
     /**
      * Statyczny konstruktor
@@ -106,9 +107,6 @@ class f_m implements IteratorAggregate, Countable
                 $this->_db = f::$c->{$service};
                 return $this->_db;
                 
-            case '_paging':
-                return $this->_paging = f::$c->paging;
-                        
             default:
                 return $this->{$key} =  $this->dependent($key);
                 
@@ -416,6 +414,15 @@ class f_m implements IteratorAggregate, Countable
 
     }
 
+    public function paramPaging()
+    {
+        $this->paging()
+                ->all($this->fetchCount())
+                ->paging();
+        
+        $this->param(self::PARAM_PAGING, $this->paging());
+    }
+
     public function isParam($sKey)
     {
         return isset($this->_param[$sKey]);
@@ -521,7 +528,7 @@ class f_m implements IteratorAggregate, Countable
      */
     public function selectCount($aParam = null, $sExpr = '*')
     {
-        $this->_ = $this->_db->one("SELECT COUNT($sExpr)".$this->_sql($aParam, false, true, true));
+        $this->_ = $this->_db->val("SELECT COUNT($sExpr)".$this->_sql($aParam, false, true, true));
         return $this;
     }
 
@@ -786,7 +793,7 @@ class f_m implements IteratorAggregate, Countable
     {
         if ($aisParam === null) {
             if ($this->{$this->_key} !== null) {
-                $aisParam = $this->{$this->_key};
+                $aisParam = array($this->_key => $this->{$this->_key});
             }
             else {
                 throw new LogicException("Oczekiwany warunek modyfikowania rekordow.");
@@ -1058,27 +1065,19 @@ class f_m implements IteratorAggregate, Countable
     }
 
     /* additional */
-    
-    public function paging($aConfig = array())
+
+    /**
+     * @param type $aConfig
+     * @return f_paging
+     */
+    public function paging()
     {
-        if (! isset($aConfig['all']) && ! isset($this->_paging->all)) {
-            $aConfig['all'] = $this->count();
+        if ($this->_paging === null) {
+            $this->_paging = new f_paging();
         }
 
-        foreach ($aConfig as $k => $v) {
-            $this->_paging->{$k} = $v;
-        }
-
-        $this->_paging->paging();
-
-        $this->param(array(
-            'limit'  => $this->_paging->limit,
-            'offset' => $this->_paging->offset,
-        ));
-
-        return $this;
+        return $this->_paging;
     }
-
 
     /* friend api */
     

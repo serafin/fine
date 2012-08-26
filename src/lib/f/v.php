@@ -6,10 +6,10 @@ class f_v
     public $_c;
     public $_defaultPath = 'app/v/script/';
 
-    public function  __get($sName)
-    {
-        return $this->{$sName} = $this->_c->{$sName};
-    }
+//    public function  __get($sName)
+//    {
+//        return $this->{$sName} = $this->_c->{$sName};
+//    }
 
     public function  __call($sName, $aArg)
     {

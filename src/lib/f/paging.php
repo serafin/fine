@@ -64,7 +64,7 @@ class f_paging extends f_c
      * Jezeli w adresie pierwsza strona ma byc jako liczba 1 to _firstPage musi miec wartosc 1
      * @var type 
      */
-    protected $_firstPage = 1;
+    protected $_firstPage = 0;
 
     /**
      * Kontener dla dodatkowych parametrow
@@ -107,7 +107,7 @@ class f_paging extends f_c
         // Automatycznie uruchomienie obliczen stronicowania
         if ($this->_all && $this->_pages === null) {
             if ($this->_page === null) {
-                $this->page((int) f::$c->request->get($this->_uriParam));
+                $this->_page((int) f::$c->request->get($this->_uriParam));
             }
             $this->paging();
         }
@@ -237,7 +237,7 @@ class f_paging extends f_c
 
     public function render()
     {
-        return f::$c->v->{$this->helper}($this);
+        return f::$c->v->{$this->_helper}($this);
     }
 
     /**

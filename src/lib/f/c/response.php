@@ -242,9 +242,9 @@ class f_c_response extends f_c
     protected function _headerFormat($name)
     {
         return str_replace(' ', '-', ucwords(strtolower(str_replace(
-                array('-', '_'),
-                ' ',
-                $name
+            array('-', '_'),
+            ' ',
+            $name
        ))));
     }
 

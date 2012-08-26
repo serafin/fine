@@ -6,9 +6,9 @@ class f_c_helper_redirect extends f_c
     protected $_code = 302;
     protected $_exit = true;
     
-    public function helper($asUri)
+    public function helper($sUri)
     {
-        $this->redirect($asUri);
+        $this->redirect($sUri);
     }
 
     public function code($iCode = null)
@@ -29,10 +29,10 @@ class f_c_helper_redirect extends f_c
         return $this;
     }
 
-    public function redirect($asUri)
+    public function redirect($sUri)
     {
         $this->response
-                ->redirect($asUri, $this->_code)
+                ->redirect($sUri, $this->_code)
                 ->sendHeader();
 
         if ($this->_exit) {

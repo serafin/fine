@@ -161,15 +161,40 @@ class c_index extends f_c_action
         $oResource = new m_resource();
         $oResource->paramGalleryPicForArticleMag(1234);
         $oResource->selectAll();
-        
+
+        $oArticle = new m_article();
+        foreach ($oArticle as $v) {
+            
+        }
          
+        $oArticle->paramPaging();
+        $oArticle->selectAll();
 
-
+        $this->debug->log('c', '3', f_debug::LOG_TYPE_VAL);
+        $this->debug->log(array(array('a' => 1, 'b' => 2), array('a' => 11, 'b' => 22)), 'd', f_debug::LOG_TYPE_TABLE);
+        $this->debug->log(array('a' => 1, 'b' => 2, 'c' => 11, 'd' => 22), 'd', f_debug::LOG_TYPE_LIST);
 
 
         $this->debug->show();
         $this->render->off();
+
     }
 
+    public function geshiAction()
+    {
+        $this->render->off();
+        $this->bundle('geshi');
+
+
+        $geshi = new GeSHi();
+        $geshi->set_language('php');
+        $geshi->enable_keyword_links(false);
+        $geshi->set_header_type(GESHI_HEADER_NONE);
+        $geshi->set_source(file_get_contents('index.php'));
+        echo $geshi->parse_code();
+
+        $this->db->query('SELECT * FROM dupa');
+
+    }
 }
 

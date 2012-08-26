@@ -1,6 +1,6 @@
 <?php
 
-class c_error extends f_c
+class c_error extends f_c_action
 {
 
     public function error()
@@ -13,7 +13,7 @@ class c_error extends f_c
                 break;
 
             default:
-                $this->internalError();
+                $this->internalErrorAction();
                 break;
         }
         
@@ -31,13 +31,14 @@ class c_error extends f_c
             ->send();
     }
 
-    public function internalError()
+    public function internalErrorAction()
     {
         $this->render->off();
         
         if ($this->env == 'dev') {
             return;
         }
+        
         $this->response
             ->code(500)
             ->body("500 Internal Server Error")

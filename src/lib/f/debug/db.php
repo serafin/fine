@@ -13,26 +13,36 @@ class f_debug_db
      */
     protected $_c;
 
+    /**
+     * Prefix labela debuga
+     * @var string
+     */
+    protected $_label;
+
 
     public function __construct(array $config = array())
     {
-        $this->_db = $config['_db'];
-        $this->_c  = f::$c;
+        $this->_db    = $config['db'];
+        $this->_label = $config['label'];
+        $this->_c     = f::$c;
     }
     
     public function __call($name, $arguments)
     {
-        
-        if (in_array($name, array('query', 'row', 'rows', 'col', 'cols', 'val', 'rowNum', 'rowsNum', 'lastId'))) {
-            
-            $this->_c->debug->timer();
-            $return = call_user_func_array(array($this->_db, $name), $arguments);
-            $this->_c->debug->logRaw(array(
-                'label' => 'DB',
-                'data'  => $name == 'lastId' ? 'SELECT LAST_INSERT_ID()' : $arguments[0],
-                'type'  => f_debug::LOG_GROUP,
-            ));
 
+        /* @var $debug f_debug */
+        $debug = $this->_c->debug;
+
+        if (in_array($name, array('query', 'row', 'rows', 'col', 'cols', 'val', 'rowNum', 'rowsNum', 'lastInsertId'))) {
+            
+            $debug->timer()->start();
+            $return = call_user_func_array(array($this->_db, $name), $arguments);
+            $debug->timer()->stop();
+            $data = $name == 'lastInsertId' ? 'SELECT LAST_INSERT_ID()' : $arguments[0];
+            $debug->log($data, "{$this->_label}$name", f_debug::LOG_TYPE_CODE_SQL,
+                        $debug->timer()->get() > 1 ? f_debug::LOG_STYLE_WARNING : f_debug::LOG_STYLE_DB,
+                        f_debug::LOG_TREE_BRANCH
+                        );
             $result = $this->_db->result();
             
             if (is_resource($result)) { // select
@@ -40,23 +50,31 @@ class f_debug_db
                 $iSelected  = $this->_db->countSelected();
 
                 if ($iSelected) {
-                    mysql_data_seek($result, 0);
 
-                    $num  = in_array($name, array('col', 'cols', 'val', 'rowNum', 'rowsNum', 'lastId'));
-                    $rows = array();
-                    while ($i = ($num ? mysql_fetch_row($result) : mysql_fetch_assoc($result))) {
-                            $rows[] = $i;
+                    mysql_data_seek($result, 0);
+                    $rows   = array();
+                    $j      = 0;
+                    $method = in_array($name, array('col', 'cols', 'val', 'rowNum', 'rowsNum', 'lastId'))
+                            ? 'fetchNumUsingResult'
+                            : 'fetchUsingResult';
+
+                    while ($i = $this->_db->{$method}($result)) {
+                        if ($j > 1) { // blokada
+                            $rows[] = array_fill_keys(array_keys($i), '...');
+                            break;
+                        }
+                        $rows[] = $i;
+                        $j++;
                     }
-                    $this->_c->debug->table($rows, 'Rows');
+                    $debug->log($rows, 'Selected rows: ' . $iSelected , f_debug::LOG_TYPE_TABLE);
                 }
                 
             }
             else if ($result === true) { // update, insert, delete
-                $this->_c->debug->log($this->_db->countAffected(), 'Affected');
+                $this->_c->debug->log($this->_db->countAffected(), 'Affected rows', f_debug::LOG_TYPE_VAL);
             }
+            $this->_c->debug->log(null, null, f_debug::LOG_TYPE_NO_DATA, null, f_debug::LOG_TREE_CLOSE);
 
-            $this->_c->debug->groupEnd();
-            
             return $return;
             
         }

@@ -1,11 +1,11 @@
 [v2.0]
 - jeszcze raz paging przejrzec i przetestowac bo sie w modelu pozmienialo
-- f_db to nakladka ma mysql_* wiec tam metoda lastInsertedId, w modelu powinno byc sensownie wedlug modelu
 - test f_db::prepare
 - test modele dla innego serwisu bazy
 - f_valid_db*
+  nie robic, opisac to jak to ma byc zrobione, zrobic dokument jak pisac wlasne walidatory
 - DOC f_paging i model
-- f_valid_file*
+- f_valid_file* - opisac
 - dodac wszedzie 	_() i __construct
 - f_form to samo co powinien miec co f_form_element tzn. attr, css ... moze `f_form extends f_form_element`?
 - f_from required prztestowac i czy tak to moze byc?
@@ -19,28 +19,15 @@
 		- decoratory rozne przyklady na jednym elemencie
 		- przyklad z decor_formError
 	
-- http://pl.wikipedia.org/wiki/Join_(SQL)
+- f_valid:: i translate
+- wstep pokazac mode, widok, hello world
+- unit testy formularza
+- w dokumentcie model opisac stronnicowanie danych
+
+
 
 [later]
 - csrf do inkubatora
 - f_valid_abstract::msgVar - to co msg tylko ze dla $this->_var;
 - f_valid - agregator validatorow, obslugiwany tak jakby byl jednym walidatorem, pomyslec co z kluczami bledow, 
     co z breakOnFail, czy jest to mozliwe?
-
-[doc]
-01. wstep
-- instalacja
- - standaryzacja
- - pliki
-
-02. Cykl zycia
--
-03. Glowny kontener aplikacji
--
-
-. kontroller
-. Model
- Widok
-. Formularze
-. Przyjazne adresy
-. Obsluga uploadowany plikow
