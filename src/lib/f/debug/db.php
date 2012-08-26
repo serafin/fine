@@ -59,7 +59,7 @@ class f_debug_db
                             : 'fetchUsingResult';
 
                     while ($i = $this->_db->{$method}($result)) {
-                        if ($j > 1) { // blokada
+                        if ($j > 1000) { // blokada
                             $rows[] = array_fill_keys(array_keys($i), '...');
                             break;
                         }

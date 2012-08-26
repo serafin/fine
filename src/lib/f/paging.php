@@ -92,9 +92,6 @@ class f_paging extends f_c
     /**
      * Konstruktor
      *
-     * Po podaniu parametru all dane wyjsciowe stronicowania zostaja obliczone automatycznie.
-     * Numer strony zostaje automatycznie pobrany z obiektu zadania jesli nie zostanie podany.
-     *
      * @param array $config
      * @return f_paging
      */
@@ -102,14 +99,6 @@ class f_paging extends f_c
     {
         foreach ($config as $k => $v) {
             $this->{$k} = $v;
-        }
-
-        // Automatycznie uruchomienie obliczen stronicowania
-        if ($this->_all && $this->_pages === null) {
-            if ($this->_page === null) {
-                $this->_page((int) f::$c->request->get($this->_uriParam));
-            }
-            $this->paging();
         }
     }
 
@@ -124,12 +113,15 @@ class f_paging extends f_c
     {
         if ($this->_all > 0) {
 
-            /** @todo uwzglednic parametr numru pierwszej strony */
-            $this->_pages = (int) ceil($this->_all / $this->_limit);
-            $this->_page = ($this->_page > 0 && $this->_page < $this->_pages) ? $this->_page : 0;
+            if ($this->_page === null) {
+                $this->_page = (int) f::$c->request->get($this->_uriParam);
+            }
+
+            $this->_pages  = (int) ceil($this->_all / $this->_limit);
+            $this->_page   = ($this->_page > 0 && $this->_page < $this->_pages) ? $this->_page : 0;
             $this->_offset = $this->_limit * $this->_page;
-            $this->_prev = ($this->_page > 0) ? $this->_page - 1 : null;
-            $this->_next = ($this->_page < $this->_pages - 1) ? $this->_page + 1 : null;
+            $this->_prev   = ($this->_page > 0) ? $this->_page - 1 : null;
+            $this->_next   = ($this->_page < $this->_pages - 1) ? $this->_page + 1 : null;
         }
 
         return $this;
@@ -303,7 +295,7 @@ class f_paging extends f_c
      * @param type $sUriParam
      * @return string|f_paging
      */
-    public function uriParam($sUriParam)
+    public function uriParam($sUriParam = null)
     {
         if (func_num_args() == 0) {
             return $this->_uriParam;

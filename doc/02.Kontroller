@@ -142,3 +142,46 @@ echo $this->_c->c->dispacher->object()->hello()
 
 ?>
 ```
+
+## Router
+
+```php
+<?php
+
+
+class index
+{
+
+    public function __construct()
+    {
+        /* ... */
+
+        $this->router();
+
+        /* ... */
+    }
+
+    public function router()
+    {
+        foreach (array(
+            '#^(login|register|logout|reset|bye|activate|newpass|newemail)$#'     => 'auth/$1',
+            '#^(login|register|logout|reset|bye|activate|newpass|newemail)/(.*)#' => 'auth/$1/$2',
+            '#^user/([a-zA-Z0-9-_.]+)(/?)$#'                                      => 'user/index/$1$2',
+            '#^user/([a-zA-Z0-9-_.]+)/([a-zA-Z0-9-_.]+)(.*)$#'                    => 'user/$2/$1$3',
+            '#^group/([0-9]+)/?$#'                                                => 'group/index/$1',
+            '#^group/([a-zA-Z0-9-_.]+)/([a-zA-Z0-9-_.]+)(.*)$#'                   => 'group/$2/$1$3',
+            )
+            as $k => $v
+        ) {
+            if (preg_match($k, $_SERVER['REQUEST_URI'])) {
+                $_SERVER['REQUEST_URI'] = preg_replace($k, $v, $_SERVER['REQUEST_URI']);
+                break;
+            }
+        }
+    }
+
+}
+
+new index();
+?>
+```

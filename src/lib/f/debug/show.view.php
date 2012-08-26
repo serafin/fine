@@ -132,7 +132,7 @@ $ec = " onclick=\"(this.nextSibling.nextSibling.style.display=='' ? this.nextSib
                         if (!is_scalar($log['data'])) {
                             $log['data'] = f_debug::varDumpPretty($log['data']);
                         }
-                        $data = f_debug::highlight($log['data'], 'sql');
+                        $data = f_debug::highlight($log['data'], 'mysql');
                         break;
 
                     case f_debug::LOG_TYPE_TEXT_PLAIN:

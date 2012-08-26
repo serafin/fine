@@ -328,7 +328,7 @@ class f_db_mysql
     {
         $exception            = new f_db_exception_query($this->errorMsg(), $this->errorNo());
         $exception->Query     = $this->_query;
-        $exception->_metadata = array('Query' => 'sql');
+        $exception->_metadata = array('Query' => 'mysql');
 
         return $exception;
     }

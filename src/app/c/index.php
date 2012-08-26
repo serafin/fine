@@ -5,6 +5,28 @@ class c_index extends f_c_action
 
     public function indexAction()
     {
+//        $article = new m_article();
+//        $article->article_type = 'mag';
+//        $article->save();
+//        $article->selectInserted();
+//
+//        $article->insertAll(array_fill(0, 2000, $article->val()));
+//
+
+
+        $this->debugshow();
+        
+        $article = new m_article();
+        $article->param('article_type', 'mag');
+        $article->paramPaging();
+        $article->selectAll();
+        m_article::_()->delete(array($article->key() => array(1,2,3,4,5,6,7,8,9)));
+        echo $this->v->paging($article->paging());
+
+    }
+
+    public function index2Action()
+    {
         f_debug::dump(range(0, 'f'));
         //filemtime('./asdasdad');
         /**

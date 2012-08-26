@@ -21,7 +21,7 @@ class f_event
         $this->_subject   = $config['subject'];
         $this->_val       = $config['val'];
         
-        foreach ($config['param'] as $k => $v) {
+        foreach ((array)$config['param'] as $k => $v) {
             $this->{$k} = $v;
         }
     }
