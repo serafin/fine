@@ -184,12 +184,77 @@ class f_v_helper_head
             $this->_data[$sType][] = $asArg;
         }
         
+        return $this;
     }
     
     public function remove($sType)
     {
         unset($this->_data[$sType]);
     }
-        
+
+    public function charset($sCharset)
+    {
+        return $this->head('charset', $sCharset);
+    }
+
+    public function title($sTitle)
+    {
+        return $this->head('title', $sTitle);
+    }
+
+    public function keywords($sKeywords)
+    {
+        return $this->head('keywords', $sKeywords);
+    }
+
+    public function description($sDescription)
+    {
+        return $this->head('description', $sDescription);
+    }
+
+    public function favicon($sFavicon)
+    {
+        return $this->head('favicon', $sFavicon);
+    }
+
+    public function rss($sUri, $sTitle = null)
+    {
+        return $this->head('rss', array('href' => $sUri, 'title' => $sTitle));
+    }
+
+    public function atom($sUri, $sTitle = null)
+    {
+        return $this->head('atom', array('href' => $sUri, 'title' =>  $sTitle));
+    }
+
+    public function css($sUri)
+    {
+        return $this->head('css', $sUri);
+    }
+
+    public function js($sUri, $sContent = null)
+    {
+        return $this->head('js', array('href' => $sUri, 'content' => $sContent));
+    }
+
+    public function jscode($sContent)
+    {
+        return $this->head('jscode', $sContent);
+    }
+
+    public function jsblock($sContent)
+    {
+        return $this->head('jsblock', $sContent);
+    }
+
+    public function csscode($sContent)
+    {
+        return $this->head('csscode', $sContent);
+    }
+
+    public function cssblock($sContent)
+    {
+        return $this->head('cssblock', $sContent);
+    }
     
 }

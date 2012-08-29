@@ -573,7 +573,7 @@ class f_m implements IteratorAggregate, Countable
     {
         $row = $this->_db->row("SELECT * FROM `$this->_table` WHERE `$this->_key` = LAST_INSERT_ID()");
         $this->val($row);
-        $this->{$this->_key} = $aRow[$this->_key];
+        $this->{$this->_key} = $row[$this->_key];
         return $this;
     }
 
@@ -891,7 +891,7 @@ class f_m implements IteratorAggregate, Countable
             $this->{$this->_key} = $iId;
         }
 
-        if ($this->{$this->_key} === null) {
+        if ($this->_key === null || $this->{$this->_key} === null) {
             $this->insert();
         }
         else {
@@ -1065,6 +1065,12 @@ class f_m implements IteratorAggregate, Countable
     }
 
     /* additional */
+    
+    public function lastInsertId()
+    {
+        $this->selectInserted();
+        return $this->id();
+    }
 
     /**
      * @param type $aConfig

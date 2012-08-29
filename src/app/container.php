@@ -24,7 +24,9 @@ class container extends f_c_container
     {
         $this->debug = new f_debug();
         $this->db    = new f_debug_db(array('db' => $this->db, 'label' => '$f::c->db->'));
+        f_debug_dispacher::_()->register();
 
+        $this->debug->on();
         $this->debug->phpPredefinedVariables();
         
         return $this->debug;

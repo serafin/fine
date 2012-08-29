@@ -20,6 +20,7 @@ class f_c_container extends f_di
 
         // get helper from lib
         $class  = "f_c_helper_$sName";
+        
         $object = new $class();
         if (! $object instanceof f_di_asNew_interface) {
             $this->{$sName} = $object;

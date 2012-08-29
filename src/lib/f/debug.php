@@ -2,8 +2,6 @@
 
 class f_debug
 {
-    
-    public $log = array();
 
     const LOG_STYLE_DEFAULT = 'LOG_STYLE_DEFAULT';
     const LOG_STYLE_WARNING = 'LOG_STYLE_WARNING';
@@ -26,10 +24,14 @@ class f_debug
     const LOG_TYPE_TEXT_PLAIN = 'LOG_TYPE_TEXT_PLAIN';
     const LOG_TYPE_TEXT_HTML  = 'LOG_TYPE_TEXT_HTML';
 
+    public $log = array();
+
     protected $_phpPV = array('_COOKIE' => '', '_ENV' => '', '_FILES' => '', '_POST' => '',
                               '_GET' => '', '_REQUEST' => '', '_SERVER' => '', '_SESSION' => '');
     protected $_offset;
     protected $_timer;
+    protected $_on;
+    protected $_limit = 1000;
 
     /** @todo remove this */
     public static function source($sFile, $iLine, $iPaddingLines = 5)
@@ -99,32 +101,32 @@ class f_debug
 
             $geshi->set_highlight_lines_extra_style('background:#eee;');
             $geshi->highlight_lines_extra($iPaddingLines);
-            
+
             $geshi->set_overall_style('font-size:14px;', true);
 
 
         }
 
 
-        
+
         return $geshi->parse_code();
 
     }
-    
+
     public static function dump($mVar, $sLabel = null, $bEcho = true)
     {
         $label = ($sLabel === null) ? '' : '<span style="color:#666; font-family:monospace;">'.trim($sLabel) . '</span> ';
-        
-        $sOutput = '<pre style="background:black;margin:5px 0px 0 0px;color:#0f0;padding:10px;text-align:left;border-radius:5px;">' 
-                  . $label 
+
+        $sOutput = '<pre style="background:black;margin:5px 0px 0 0px;color:#0f0;padding:10px;text-align:left;border-radius:5px;">'
+                  . $label
                   . htmlspecialchars(self::varDumpPretty($mVar), ENT_QUOTES)
                   . '</pre>';
-        
+
         if ($bEcho) {
             echo($sOutput);
             return;
         }
-        
+
         return $sOutput;
     }
 
@@ -136,11 +138,11 @@ class f_debug
         }
 
         $return = array();
-        
+
         for ($i = 0, $end = count($aArgs); $i < $end && $i < $iArgsLimit; $i++) {
-            
+
             $arg = $aArgs[$i];
-            
+
             if (is_bool($arg)) {
                 $return[] = $arg ? 'true' : 'false';
             }
@@ -160,11 +162,11 @@ class f_debug
                 }
                 $return[] =  $arg;
             }
-            
+
         }
 
         $return = implode(', ', $return);
-     
+
         return $return;
     }
 
@@ -182,7 +184,7 @@ class f_debug
         }
         return self::varDumpPretty($mVal);
     }
-    
+
     public function __construct(array $config = array())
     {
         $this->_offset = new f_timer();
@@ -191,13 +193,44 @@ class f_debug
         foreach ($config as $k => $v) {
             $this->{$k}($v);
         }
-        
+
     }
 
     public function init()
     {
+        $this->on();
+        return $this;
     }
-    
+
+    public function on()
+    {
+        $this->_on = true;
+        return $this;
+    }
+
+    public function off()
+    {
+        $this->_on = false;
+        return $this;
+    }
+
+    public function limit($iLogLimit = null)
+    {
+        if (func_num_args() == 0) {
+            return $this->_limit;
+        }
+        $this->_limit = $iLogLimit;
+        return $this;
+    }
+
+    public function remove()
+    {
+        $this->log = array();
+    }
+
+
+    /* Log */
+
     public function timer()
     {
         if (!$this->_timer) {
@@ -206,7 +239,69 @@ class f_debug
         return $this->_timer;
     }
 
-    /* log */
+
+    public function log($mData, $sLabel = null, $tType = null, $tStyle = null, $tTree = null)
+    {
+        if (!$this->_on) {
+            return;
+        }
+
+        if (count($this->log) >= $this->_limit) {
+            return;
+        }
+
+
+        $log = array('data' => $mData, 'label' => $sLabel, 'type' => $tType,
+                     'style' => $tStyle, 'tree' => $tTree, 'offset' => $this->_offset->get());
+        if ($this->_timer) {
+            $log['time'] = $this->_timer->stop()->get();
+            $this->_timer = null;
+        }
+
+        $log['offset'] = $this->_offset->get();
+
+        $this->log[] = $log;
+    }
+
+    public function warn($mData, $sLabel = null, $tType = null)
+    {
+        $this->log($mData, $sLabel, $tType, self::LOG_STYLE_WARNING);
+    }
+
+    public function error($mData, $sLabel = null, $tType = null)
+    {
+        $this->log($mData, $sLabel, $tType, self::LOG_STYLE_ERROR);
+    }
+
+    public function val($mData, $sLabel = null, $tStyle = null)
+    {
+        $this->log($mData, $sLabel, self::LOG_TYPE_VAL, $tStyle);
+    }
+
+    public function table($mData, $sLabel = null, $tStyle = null)
+    {
+        $this->log($mData, $sLabel, self::LOG_TYPE_TABLE, $tStyle);
+    }
+
+    public function enum($mData, $sLabel = null, $tStyle = null)
+    {
+        $this->log($mData, $sLabel, self::LOG_TYPE_LIST, $tStyle);
+    }
+
+    public function show($sViewScriptPath = './lib/f/debug/show.view')
+    {
+        if (!$this->_on) {
+            return;
+        }
+
+        $this->phpPredefinedVariablesChange();
+
+        $oView = new f_v();
+        $oView->log = $this->log;
+        echo $oView->renderPath($sViewScriptPath);
+    }
+
+    /* PHP Predefined Variables */
 
     public function phpPredefinedVariables()
     {
@@ -248,53 +343,7 @@ class f_debug
         }
         $this->log(null, null, self::LOG_TYPE_NO_DATA, null, self::LOG_TREE_CLOSE);
     }
-    
-    public function log($mData, $sLabel = null, $tType = null, $tStyle = null, $tTree = null)
-    {
-        $log = array('data' => $mData, 'label' => $sLabel, 'type' => $tType,
-                     'style' => $tStyle, 'tree' => $tTree, 'offset' => $this->_offset->get());
-        if ($this->_timer) {
-            $log['time'] = $this->_timer->stop()->get();
-            $this->_timer = null;
-        }
 
-        $log['offset'] = $this->_offset->get();
 
-        $this->_log[] = $log;
-    }
-
-    public function warn($mData, $sLabel = null, $tType = null)
-    {
-        $this->log($mData, $sLabel, $tType, self::LOG_STYLE_WARNING);
-    }
-
-    public function error($mData, $sLabel = null, $tType = null)
-    {
-        $this->log($mData, $sLabel, $tType, self::LOG_STYLE_ERROR);
-    }
-
-    public function val($mData, $sLabel = null, $tStyle = null)
-    {
-        $this->log($mData, $sLabel, self::LOG_TYPE_VAL, $tStyle);
-    }
-
-    public function table($mData, $sLabel = null, $tStyle = null)
-    {
-        $this->log($mData, $sLabel, self::LOG_TYPE_TABLE, $tStyle);
-    }
-
-    public function enum($mData, $sLabel = null, $tStyle = null)
-    {
-        $this->log($mData, $sLabel, self::LOG_TYPE_LIST, $tStyle);
-    }
-
-    public function show($sViewScriptPath = './lib/f/debug/show.view')
-    {
-        $this->phpPredefinedVariablesChange();
-        
-        $oView = new f_v();
-        $oView->log = $this->_log;
-        echo $oView->renderPath($sViewScriptPath);
-    }
 
 }
