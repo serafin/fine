@@ -5,6 +5,7 @@ class c_index extends f_c_action
 
     public function indexAction()
     {
+
 //        $article = new m_article();
 //        $article->article_type = 'mag';
 //        $article->save();
@@ -12,7 +13,6 @@ class c_index extends f_c_action
 //
 //        $article->insertAll(array_fill(0, 2000, $article->val()));
 //
-
 
         $this->debugshow();
         

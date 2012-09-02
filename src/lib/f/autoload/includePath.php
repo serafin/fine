@@ -8,12 +8,18 @@ class f_autoload_includePath
     protected $_separator = '_';
     
 
+    /**
+     * Static oknstructor
+     *
+     * @return f_autoload_includePath
+     */
     public static function _()
     {
         return new self;
     }
 
     /**
+     * Constructor
      *
      * @param array $config
      */
@@ -24,6 +30,11 @@ class f_autoload_includePath
         }
     }
 
+    /**
+     *
+     * @param array $aIncludePaths
+     * @return f_autoload_includePath|array
+     */
     public function path(array $aIncludePaths = array())
     {
         if (func_num_args()) {
@@ -35,6 +46,11 @@ class f_autoload_includePath
         }
     }
 
+    /**
+     *
+     * @param type $sFileSuffix
+     * @return f_autoload_includePath|string
+     */
     public function suffix($sFileSuffix= null)
     {
         if (func_num_args()) {
@@ -46,6 +62,11 @@ class f_autoload_includePath
         }
     }
 
+    /**
+     *
+     * @param type $sSeparator
+     * @return f_autoload_includePath|string
+     */
     public function separator($sSeparator = null)
     {
         if (func_num_args()) {
@@ -57,6 +78,10 @@ class f_autoload_includePath
         }
     }
 
+    /**
+     *
+     * @return f_autoload_includePath
+     */
     public function register()
     {
         set_include_path(implode(PATH_SEPARATOR, $this->_path));
@@ -64,6 +89,10 @@ class f_autoload_includePath
         return $this;
     }
 
+    /**
+     *
+     * @return f_autoload_includePath
+     */
     public function unregister()
     {
         spl_autoload_unregister(array($this, 'load'));

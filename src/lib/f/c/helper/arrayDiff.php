@@ -8,8 +8,8 @@ class f_c_helper_arrayDiff
      *
      * <b>Przyklad:</b>
      * <code>
-     * $a = f_c_helper_arrayDiff::helper(array('a', 'b', 'c', 'd'), array('a', 'c', 'e'));
-     * $a => array('b', 'd')
+     * >> f_c_helper_arrayDiff::helper(array('a', 'b', 'c', 'd'), array('a', 'c', 'e'));
+     * => array('b', 'd')
      * </code>
      *
      * @param array $aMinuend Odjamna

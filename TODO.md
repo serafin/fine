@@ -11,3 +11,4 @@
 9. DebugTool - logowanie debugow i pokazywanie ich w osobnym oknie dla wielu programistow na raz
 10. f_event parametry nie jako wlasciwosci obiektu tylko stworzyc metody isParam, param, removeParam - trzymac sie standardu
 11. f_db transakcje z fine v1.10
+12. jezeli helper nie zostal odnaleziony to lady wyjatek - da sie to zrobic, to samo z modelem w modelu

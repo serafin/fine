@@ -8,14 +8,14 @@ class f_c_helper_arrayExplode
      *
      * <b>Przyklad</b>
      * <code>
-     * $a = f_c_helper_arrayExplode::helper('a=b&c=d');
-     * $a => array('a' => 'b', 'c' => 'd')
+     * >> f_c_helper_arrayExplode::helper('a=b&c=d');
+     * => array('a' => 'b', 'c' => 'd')
      * </code>
      *
      * <b>Przyklad 2</b>
      * <code>
-     * $a = f_c_helper_arrayExplode::helper('a|b||c|d', '||', '|');
-     * $a => array('a' => 'b', 'c' => 'd')
+     * >> f_c_helper_arrayExplode::helper('a|b||c|d', '||', '|');
+     * => array('a' => 'b', 'c' => 'd')
      * </code>
      *
      * @param string $sString String do rozdzielenia

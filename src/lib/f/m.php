@@ -40,7 +40,7 @@ class f_m implements IteratorAggregate, Countable
     /**
      * Statyczny konstruktor
      *
-     * @return $this
+     * @return f_m
      */
     public static function _(array $config = array())
     {

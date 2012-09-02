@@ -3,6 +3,11 @@
 class container extends f_c_container
 {
 
+    /**
+     * Konfigi
+     *
+     * @return f_config
+     */
     protected function _config()
     {
         $this->config       = new f_config(array('path' =>  'app/config/'));
@@ -10,6 +15,11 @@ class container extends f_c_container
         return $this->config;
     }
 
+    /**
+     * Baza danych mysql
+     *
+     * @return f_db_mysql
+     */
     protected function _db()
     {
         $config   = $this->config->main['db'];
@@ -78,6 +88,11 @@ class container extends f_c_container
         return $this->response = new f_c_response();
     }
 
+    /**
+     * Renderowanie widoku
+     *
+     * @return f_c_render
+     */
     protected function _render()
     {
         $this->render             = new f_c_render();

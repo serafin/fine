@@ -8,14 +8,14 @@ class f_c_helper_arrayImplode
      *
      * <b>Przyklad</b>
      * <code>
-     * $s = f_c_helper_arrayImplode::helper(array('a' => 'b', 'c' => 'd'));
-     * $s => 'a=b&c=d'
+     * >> f_c_helper_arrayImplode::helper(array('a' => 'b', 'c' => 'd'));
+     * => 'a=b&c=d'
      * </code>
      *
      * <b>Przyklad 2</b>
      * <code>
-     * $s = f_c_helper_arrayImplode::helper(array('a' => 'b', 'c' => 'd'), '||', '|');
-     * $s => 'a|b||c|d'
+     * >> f_c_helper_arrayImplode::helper(array('a' => 'b', 'c' => 'd'), '||', '|');
+     * => 'a|b||c|d'
      * </code>
      *
      * @param array $aKeyValue Tablica asocjacyjna

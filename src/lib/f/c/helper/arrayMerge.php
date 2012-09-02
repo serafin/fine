@@ -8,14 +8,14 @@ class f_c_helper_arrayMerge
      *
      * <b>Przyklad</b>
      * <code>
-     * $a = f_c_helper_arrayMerge::helper(array('a' => 'b', 'c' => 'd'), array('c' => 'c', 'e' => 'f'));
-     * $a => array('a' => 'b', 'c' => 'c', 'e' => 'f')
+     * >> f_c_helper_arrayMerge::helper(array('a' => 'b', 'c' => 'd'), array('c' => 'c', 'e' => 'f'));
+     * => array('a' => 'b', 'c' => 'c', 'e' => 'f')
      * </code>
      *
      * <b>Przyklad 2</b>
      * <code>
-     * $a = f_c_helper_arrayMerge::helper(array(array('a' => 'b', 'c' => 'd'), array('c' => 'c', 'e' => 'f')));
-     * $a => array('a' => 'b', 'c' => 'c', 'e' => 'f')
+     * >> f_c_helper_arrayMerge::helper(array(array('a' => 'b', 'c' => 'd'), array('c' => 'c', 'e' => 'f')));
+     * => array('a' => 'b', 'c' => 'c', 'e' => 'f')
      * </code>
      *
      * @param array $aArray1 tablica do złączenia lub tablica tablic do złączenia <=> $aArray2 == null

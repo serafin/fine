@@ -11,7 +11,15 @@ class f_c_helper_byte2size
     const SIZE_kB = 1024;
     const SIZE_MB = 1048576;
     const SIZE_GB = 1073741824;
-    
+
+    /**
+     *
+     * @param type $iSize
+     * @param type $tUnit
+     * @param type $iRound
+     * @return string
+     * @throws f_c_exception_domain
+     */
     public function helper($iSize, $tUnit = null, $iRound = 2)
     {
         if ($tUnit !== null) {

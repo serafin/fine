@@ -72,6 +72,11 @@ class f_c_render extends f_c
                 : $this->{$method}($level);
     }
 
+    /**
+     * Renderuje widok i ustawia go jako cialo odpowiedzi
+     *
+     * @param string $sViewScript
+     */
     public function helper($sViewScript = null)
     {
         $this->render($sViewScript);
