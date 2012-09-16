@@ -35,7 +35,7 @@ class f_v_helper_head
         ),
         'favicon' => array(
             'mode'      => 'item',
-            'template'  => "\t<link href=\"/{href}\" rel=\"shortcut icon\">\n",
+            'template'  => "\t<link href=\"{href}\" rel=\"shortcut icon\">\n",
             'var'       => 'href',
         ),
         'rss' => array(
@@ -59,7 +59,7 @@ class f_v_helper_head
         'js' => array(
             'mode'      => 'list',
             'template'  => "\t<script src=\"{src}\" type=\"text/javascript\"{attr}>{content}</script>\n",
-            'var'       => 'href',
+            'var'       => 'src',
             'val'       => array('attr' => '', 'content' => ''),
         ),
         'jscode' => array(
@@ -82,7 +82,7 @@ class f_v_helper_head
             'var'       => 'content',
             'prepend'   => "\t<style type=\"text/css\">\n",
             'separator' => "\n",
-            'append'    => "\n</style>\n",
+            'append'    => "\n\t</style>\n",
         ),
         'cssblock' => array(
             'mode'      => 'list',
@@ -234,7 +234,7 @@ class f_v_helper_head
 
     public function js($sUri, $sContent = null)
     {
-        return $this->head('js', array('href' => $sUri, 'content' => $sContent));
+        return $this->head('js', array('src' => $sUri, 'content' => $sContent));
     }
 
     public function jscode($sContent)

@@ -166,10 +166,25 @@ class c_index extends f_c_action
         //$this->debug->show();
     }
 
+    public function index3Action()
+    {
+        $this->render->off();
+        
+        $o1 = new m_article();
+        $o1->selectAll();
+
+        $o2 = new m_fine2_article();
+        $o2->selectAll();
+
+        $this->debugshow();
+
+    }
+
     public function flashAction()
     {
         $this->flash('My message', f_c_helper_flash::STATUS_INFO);
     }
+
     public function flash2Action()
     {
         f_debug::dump($this->flash->get());

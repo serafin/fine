@@ -76,8 +76,8 @@ class f_m implements IteratorAggregate, Countable
                 self::$_metadata[$class]['key'] = in_array($key, self::$_metadata[$class]['field']) ? $key : null;
             }
             else {
-                self::$_metadata[$class]['prefix'] = 'm_' . $part[1] . '_';
-                self::$_metadata[$class]['db']     = 'db_' . $part[1];
+                self::$_metadata[$class]['prefix'] = 'm_' . $part[0] . '_';
+                self::$_metadata[$class]['db']     = 'db_' . $part[0];
                 self::$_metadata[$class]['table']  = $part[1];
                 $key = $part[1] . '_id';
                 self::$_metadata[$class]['key'] = in_array($key, self::$_metadata[$class]['field']) ? $key : null;
