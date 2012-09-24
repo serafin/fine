@@ -1,6 +1,6 @@
 <?php
 
-class f_paging extends f_c
+class f_paging
 {
 
     /**
@@ -54,6 +54,12 @@ class f_paging extends f_c
     protected $_uriParam = 'page';
 
     /**
+     * Marker do generowania adresu kiedy uri zostanie ustawione jako string
+     * @var string
+     */
+    protected $_uriVar = '{page}';
+
+    /**
      * Adres dla helpera widoku do generowania linkow
      * @var array|string
      */
@@ -98,7 +104,7 @@ class f_paging extends f_c
     public function __construct(array $config = array())
     {
         foreach ($config as $k => $v) {
-            $this->{$k} = $v;
+            $this->{$k}($v);
         }
     }
 
@@ -118,10 +124,20 @@ class f_paging extends f_c
             }
 
             $this->_pages  = (int) ceil($this->_all / $this->_limit);
-            $this->_page   = ($this->_page > 0 && $this->_page < $this->_pages) ? $this->_page : 0;
+
+            $this->_page   = ($this->_page > 0 && $this->_page < $this->_pages)
+                           ? $this->_page
+                           : 0;
+
             $this->_offset = $this->_limit * $this->_page;
-            $this->_prev   = ($this->_page > 0) ? $this->_page - 1 : null;
-            $this->_next   = ($this->_page < $this->_pages - 1) ? $this->_page + 1 : null;
+
+            $this->_prev   = ($this->_page > $this->_firstPage) 
+                           ? $this->_page - 1 + $this->_firstPage
+                           : null;
+            
+            $this->_next   = ($this->_page < $this->_pages - 1)
+                           ? $this->_page + 1 + $this->_firstPage
+                           : null;
         }
 
         return $this;
@@ -302,6 +318,25 @@ class f_paging extends f_c
         }
 
         $this->_uriParam = $sUriParam;
+        return $this;
+    }
+
+    /**
+     * Marker do generowania adresu kiedy uri zostanie ustawione jako string
+     *
+     * Mozna jako uri podac string np. /news/list/page/{page}
+     * jezeli uriVar ustawiny jest na `{page}` to helper widoku podminu marker na aktualna strone
+     *
+     * @param type $sUriVariable
+     * @return \f_paging
+     */
+    public function uriVar($sUriVariable = null)
+    {
+        if (func_num_args() == 0) {
+            return $this->_uriVar;
+        }
+
+        $this->_uriVar = $sUriVariable;
         return $this;
     }
 

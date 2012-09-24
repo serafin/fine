@@ -180,6 +180,36 @@ class c_index extends f_c_action
 
     }
 
+    public function index4Action()
+    {
+        $o = new f_paging();
+        $o->firstPage($_GET['firstPage']);
+        $o->all($_GET['all']);
+        $o->limit($_GET['limit']);
+        $o->page($_GET['page']);
+
+
+
+        $o->paging();
+
+        $out .= "firstPage = " .  $o->firstPage() . "\n";
+        $out .= "all = " .  $o->all() . "\n";
+        $out .= "limit = " .  $o->limit() . "\n";
+        $out .= "page = " .  $o->page() . "\n";
+        $out .= "\n";
+        $out .= "prev = " .  $o->prev() . "\n";
+        $out .= "page = " .  $o->page() . "\n";
+        $out .= "next = " .  $o->next() . "\n";
+        $out .= "offset = " .  $o->offset() . "\n";
+        $out .= "limit = " .  $o->limit() . "\n";
+
+
+        $this->response->header('Content-Type', 'text/html')->body($o->render());
+        $this->render->off();
+
+
+    }
+
     public function flashAction()
     {
         $this->flash('My message', f_c_helper_flash::STATUS_INFO);
