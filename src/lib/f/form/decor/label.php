@@ -40,7 +40,7 @@ class f_form_decor_label extends f_form_decor_tag
 
     public function render()
     {
-        if ($this->object->type() == 'checkbox' && $this->object->isArray()) {
+        if ($this->object->type() == 'checkbox' && $this->object->multi()) {
             return $this->buffer;
         }
 

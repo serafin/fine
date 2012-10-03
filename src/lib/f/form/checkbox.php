@@ -5,7 +5,6 @@ class f_form_checkbox extends f_form_element
 
     protected $_type      = 'checkbox';
     protected $_helper    = 'formCheckbox';
-    protected $_attr      = array('class' => 'form-checkbox');
     protected $_decorForm = array(
         'helper' => 'f_form_decor_helper',
         'label'  => array('f_form_decor_label', 'placement' => 'PLACEMENT_EMBRACE'),
@@ -16,7 +15,7 @@ class f_form_checkbox extends f_form_element
 
     public function decorDefault()
     {
-        if ($this->_form !== null && !$this->_isArray) {
+        if ($this->_form !== null && !$this->_multi) {
             $this->_decor = $this->_decorForm;
         }
         else {

@@ -1,6 +1,5 @@
 <?php
 
-/** @todo implements zrobic */
 class f_form /* implements ArrayAccess, IteratorAggregate, Countable */
 {
     /**
@@ -28,6 +27,7 @@ class f_form /* implements ArrayAccess, IteratorAggregate, Countable */
     protected $_decor = array(
         'formBody' => 'f_form_decor_formBody',
         'form'     => 'f_form_decor_form',
+        'tag'      => array('f_form_decor_tag', 'attr' => array('class' => 'box-form')),
     );
     protected $_helper = 'form';
     
@@ -253,7 +253,7 @@ class f_form /* implements ArrayAccess, IteratorAggregate, Countable */
             case 2:
 
                 if ($sValue === null) {
-                    unset($style[$sName]);
+                    unset($style[$asName]);
                 }
                 else {
                     $style[$asName] = $sValue;
@@ -340,39 +340,50 @@ class f_form /* implements ArrayAccess, IteratorAggregate, Countable */
         return $this;
     }
 
-    public function decor($aosuDecor)
+    public function decor($asDecor)
     {
-        if (func_num_args() == 0) {
-            $this->_decor = array();
+        if (is_array($asDecor)) {
+            $this->_decor = $asDecor;
             return $this;
         }
-        if (is_array($aosuDecor)) {
-            foreach ($aosuDecor as $k => $v) {
-                if (is_integer($k)) {
+
+        if (is_string($asDecor)) {
+            if ($this->_decor === true) {
+                $this->decorDefault();
+            }
+            if (!is_object($this->_decor[$asDecor])) {
+                if (is_string($this->_decor[$asDecor])) {
+                    $this->_decor[$asDecor] = new $this->_decor[$asDecor];
+                }
+                else if (is_array($this->_decor[$asDecor])) {
+                    $class = array_shift($this->_decor[$asDecor]);
+                    $this->_decor[$asDecor] = new $class($this->_decor[$asDecor]);
+                }
+            }
+            return $this->_decor[$asDecor];
+        }
+
+        return $this;
+    }
+
+    public function addDecor($aoDecor)
+    {
+        if (is_array($aoDecor)) {
+            foreach ($aoDecor as $k => $v) {
+                if (is_int($k)) {
                     $this->_decor[] = $v;
                 }
                 else {
                     $this->_decor[$k] = $v;
                 }
             }
-            return $this;
         }
-        if (is_string($aosuDecor)) {
-            if (!is_object($this->_decor[$aosuDecor])) {
-                if (is_string($this->_decor[$aosuDecor])) {
-                    $this->_decor[$aosuDecor] = new $this->_decor[$abnosDecor];
-                }
-                else if (is_array($this->_decor[$aosuDecor])) {
-                    $class = array_shift($this->_decor[$aosuDecor]);
-                    $this->_decor[$aosuDecor] = new $class($this->_decor[$aosuDecor]);
-                }
-            }
-            return $this->_decor[$aosuDecor];
+        else {
+            $this->_decor[] = $aoDecor;
         }
-
-        $this->_decor[] = $aosuDecor;
         return $this;
     }
+
 
     public function removeDecor($sName = null)
     {

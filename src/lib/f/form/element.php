@@ -14,7 +14,7 @@ class f_form_element
     protected $_attr          = array();
     protected $_option        = array();
     protected $_separator     = '';
-    protected $_isArray       = false;
+    protected $_multi         = false;
     protected $_required      = false;
     protected $_requiredClass = 'f_valid_notEmpty';
     protected $_breakOnFail   = true;
@@ -83,7 +83,7 @@ class f_form_element
             'ignoreRender'  => $this->_ignoreRender,
             'ignoreVal'     => $this->_ignoreVal,
             'ignoreValid'   => $this->_ignoreValid,
-            'isArray'       => $this->_isArray,
+            'multi'         => $this->_multi,
             'required'      => $this->_required,
             'requiredClass' => $this->_requiredClass,
             'breakOnFail'   => $this->_breakOnFail,
@@ -126,18 +126,18 @@ class f_form_element
         }
         if (substr($sName, -2) == '[]') {
             $this->_name    = substr($sName, 0, -2);
-            $this->_isArray = true;
+            $this->_multi = true;
         }
         else {
             $this->_name    = $sName;
-            $this->_isArray = false;
+            $this->_multi = false;
         }
         return $this;
     }
 
     public function nameRaw()
     {
-        return $this->_name . ($this->_isArray ? '[]' : '');
+        return $this->_name . ($this->_multi ? '[]' : '');
     }
 
     /**
@@ -333,11 +333,11 @@ class f_form_element
             case 1:
 
                 if ($asName === null) {
-                    $this->_isArray = false;
+                    $this->_multi = false;
                     $this->_option  = array();
                 }
                 else if (is_array($asName)) {
-                    $this->_isArray = true;
+                    $this->_multi = true;
                     foreach ($asName as $k => $v) {
                         $this->_option[$k] = $v;
                     }
@@ -400,22 +400,22 @@ class f_form_element
      * Ustala czy wartość elementu to tablica
      * @return $this
      */
-    public function isArray($bIsArray = null)
+    public function multi($bIsMulti = null)
     {
-        if ($bIsArray === null) {
-            return $this->_isArray;
+        if ($bIsMulti === null) {
+            return $this->_multi;
         }
-        $this->_isArray = $bIsArray;
+        $this->_multi = $bIsMulti;
         return $this;
     }
 
     /**
-     * Ustala czy element jest wymagany
+     * Ustala/pobiera czy element jest wymagany
      *
      * @param boolean $bRequired Czy element jest wymagany
      * @return this
      */
-    public function required($bRequired = true)
+    public function required($bRequired = null)
     {
 
         // getter
@@ -434,7 +434,19 @@ class f_form_element
 
         reset($this->_valid);
         $first = current($this->_valid);
-        $class = is_array($first) ? $first[0] : get_class($first);
+        if (is_array($first)) {
+            $class = $first[0];
+        }
+        else if (is_object($first)) {
+            $class = get_class($first);
+        }
+        else if (is_string($first)) {
+            $class = $first;
+        }
+        else {
+            $class = '';
+        }
+
         if ($this->_required) {
             if ($class != $this->_requiredClass) {
                 array_unshift($this->_valid, array($this->_requiredClass));
@@ -551,7 +563,6 @@ class f_form_element
 
         }
 
-        f_debug::dump($this->_val, 'isValid | ' . get_class($this));
         return $bValid;
     }
     
@@ -599,50 +610,50 @@ class f_form_element
         return $this;
     }
 
-    public function decor($abnosDecor)
+    public function decor($asDecor)
     {
-        /** @todo refactor nazwa zmiennej, dodac metode do usuwania decorow, usuwanie to przypisanei tablicy*/
-        if ($abnosDecor === null || $abnosDecor === true) {
-            $this->_decor = $abnosDecor;
+        if (is_array($asDecor)) {
+            $this->_decor = $asDecor;
             return $this;
         }
-        if (is_array($abnosDecor)) {
+
+        if (is_string($asDecor)) {
             if ($this->_decor === true) {
                 $this->decorDefault();
             }
-            foreach ($abnosDecor as $k => $v) {
-                if (is_integer($k)) {
+            if (!is_object($this->_decor[$asDecor])) {
+                if (is_string($this->_decor[$asDecor])) {
+                    $this->_decor[$asDecor] = new $this->_decor[$asDecor];
+                }
+                else if (is_array($this->_decor[$asDecor])) {
+                    $class = array_shift($this->_decor[$asDecor]);
+                    $this->_decor[$asDecor] = new $class($this->_decor[$asDecor]);
+                }
+            }
+            return $this->_decor[$asDecor];
+        }
+        
+        return $this;
+    }
+
+    public function addDecor($aoDecor)
+    {
+        if (is_array($aoDecor)) {
+            foreach ($aoDecor as $k => $v) {
+                if (is_int($k)) {
                     $this->_decor[] = $v;
                 }
                 else {
                     $this->_decor[$k] = $v;
                 }
             }
-            return $this;
         }
-        if (is_string($abnosDecor)) {
-            if ($this->_decor === true) {
-                $this->decorDefault();
-            }
-            if (!is_object($this->_decor[$abnosDecor])) {
-                if (is_string($this->_decor[$abnosDecor])) {
-                    $this->_decor[$abnosDecor] = new $this->_decor[$abnosDecor];
-                }
-                else if (is_array($this->_decor[$abnosDecor])) {
-                    $class = array_shift($this->_decor[$abnosDecor]);
-                    $this->_decor[$abnosDecor] = new $class($this->_decor[$abnosDecor]);
-                }
-            }
-            return $this->_decor[$abnosDecor];
+        else {
+            $this->_decor[] = $aoDecor;
         }
-        
-        if ($this->_decor === true) {
-            $this->decorDefault();
-        }
-        $this->_decor[] = $abnosDecor;
         return $this;
     }
-    
+
     public function removeDecor($sName = null)
     {
         if (func_num_args() == 0) {
