@@ -52,7 +52,6 @@ class container extends f_c_container
     
     protected function _env()
     {
-        return $this->env = 'dev';
         return $this->env = $_SERVER['ENV'] == 'dev' ? 'dev' : 'prod';
     }
 
