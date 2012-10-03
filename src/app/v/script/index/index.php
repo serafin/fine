@@ -1,2 +1,3 @@
-<p>v/script</p>
-<? $this->_c->c->render->layout('index') ?>
+<h1><?= htmlspecialchars($this->msg) ?></h1>
+
+<p>Fine v<?= f::VERSION ?></p>
