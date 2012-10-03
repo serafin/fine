@@ -1,6 +1,6 @@
 <?php
 
-class f_form /* implements ArrayAccess, IteratorAggregate, Countable */
+class f_form implements ArrayAccess, IteratorAggregate, Countable
 {
     /**
      * Method type constants
@@ -117,6 +117,10 @@ class f_form /* implements ArrayAccess, IteratorAggregate, Countable */
      */
     public function element($aoElement = null)
     {
+        if (func_num_args() == 0) {
+            return $this->_;
+        }
+
         if (is_array($aoElement)) {
             foreach ($aoElement as $oElement) {
                 $this->_addElement($oElement);
@@ -271,8 +275,6 @@ class f_form /* implements ArrayAccess, IteratorAggregate, Countable */
         return $this;
     }
 
-
-
     /**
      * Pobiera błędy napotkane przy walidacji
      *
@@ -368,6 +370,10 @@ class f_form /* implements ArrayAccess, IteratorAggregate, Countable */
 
     public function addDecor($aoDecor)
     {
+        if ($this->_decor === true) {
+            $this->decorDefault();
+        }
+
         if (is_array($aoDecor)) {
             foreach ($aoDecor as $k => $v) {
                 if (is_int($k)) {
@@ -517,7 +523,6 @@ class f_form /* implements ArrayAccess, IteratorAggregate, Countable */
         return $this;
     }
 
-
     /* implements ArrayAccess */
 
     public function offsetExists($sName)
@@ -542,6 +547,24 @@ class f_form /* implements ArrayAccess, IteratorAggregate, Countable */
     {
         $this->_removeElement($sName);
     }
+
+    /* implements Countable */
+
+    public function count()
+    {
+        return count($this->_);
+    }
+
+    /* implements ArrayIterator */
+    
+    public function getIterator()
+    {
+        return new ArrayIterator($this->_);
+    }
+
+
+
+    /* private api */
 
     protected function _addElement($oElement, $sName = null)
     {

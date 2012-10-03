@@ -1,13 +1,13 @@
 <?php
 
-class f_form_decor_append extends f_form_decor_default
+class f_form_decor_prepend extends f_form_decor_default
 {
 
     protected $_placement = self::PLACEMENT_PREPEND;
     protected $_content;
 
     /**
-     * @return f_form_decor_append
+     * @return f_form_decor_prepend
      */
     public static function _(array $config = array())
     {
