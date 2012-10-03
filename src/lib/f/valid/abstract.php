@@ -147,8 +147,8 @@ abstract class f_valid_abstract
     public function error()
     {
         if (!$this->_translator) {
-            if (isset(f::$c->_t)) {
-                $this->_translator = f::$c->_t;
+            if (isset(f::$c->t)) {
+                $this->_translator = f::$c->t;
             }
         }
 
@@ -159,7 +159,7 @@ abstract class f_valid_abstract
                 $msg = $this->_msg[$key];
                 
                 if ($this->_translator) {
-                    $msg = $this->_translator->t($msg);
+                    $msg = $this->_translator->helper($msg);
                 }
                 
                 if ($this->_varVal !== null) {

@@ -70,7 +70,7 @@ class f_paging
      * Jezeli w adresie pierwsza strona ma byc jako liczba 1 to _firstPage musi miec wartosc 1
      * @var type 
      */
-    protected $_firstPage = 0;
+    protected $_firstPage = 1;
 
     /**
      * Kontener dla dodatkowych parametrow

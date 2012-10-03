@@ -19,11 +19,11 @@ class f_valid_formElementEqual extends f_valid_abstract
     protected $_desc;
     protected $_name;
 
-    public function _(array $config = array())
+    public static function _(array $config = array())
     {
         return new self($config);
     }
-
+    
     public function element($oElement = null)
     {
         if (func_num_args() == 0) {
