@@ -40,16 +40,22 @@ class f_form_decor_label extends f_form_decor_tag
 
     public function render()
     {
-        if ($this->object->type() == 'checkbox' && $this->object->multi()) {
-            return $this->buffer;
-        }
-
-
         $label = $this->object->label();
 
         if ($label === null) {
             return $this->buffer;
         }
+
+        $type = $this->object->type();
+
+        if ($this->object->multi()                          // jezeli mutli
+            && ($type == 'checkbox' || $type == 'radio')    // checkbox lub radio
+            && $this->_tag == 'label'                       // tag to label
+            && $this->_placement == self::PLACEMENT_EMBRACE // umiejscowienie to objecie
+        ) {
+            $this->_tag = null; // to wylaczam tag, bo f_v_helper_form{Checkbox|Radio} z opcjami (multi) dodaje <label>
+        }
+
 
         if ($this->_tag === null) {
 
@@ -81,7 +87,6 @@ class f_form_decor_label extends f_form_decor_tag
             $this->_prepare();
 
             switch ($this->_gravity) {
-
 
                 case self::GRAVITY_LEFT:
                     $this->_decoration  .= $label . $this->_separator;
