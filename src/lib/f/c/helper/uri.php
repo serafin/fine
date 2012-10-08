@@ -15,6 +15,9 @@ class f_c_helper_uri
     protected $_resolveRange  = self::RESOLVE_RANGE_BASE;
     protected $_separator     = '/';
 
+    protected $_requestNum   = array();
+    protected $_requestAssoc = array();
+
     public static function parse($sUri)
     {
         static $keys = array('scheme'   => 0, 'user'     => 0, 'pass'     => 0, 'host'     => 0,
@@ -93,6 +96,53 @@ class f_c_helper_uri
         return $this->_resolve($sUri);
     }
 
+    public function resolveRequest($sUri)
+    {
+        // prepare main uri according to `resolveRange`
+        switch ($this->_resolveRange) {
+            case self::RESOLVE_RANGE_ABS:
+                $parsed = self::parse($sUri);
+                $uri   = $parsed['path'] ;
+
+                if (isset($parsed['query'])) {
+                    $uri .=  '?' . $parsed['query'];
+                }
+                break;
+
+            case self::RESOLVE_RANGE_BASE:
+                $uri = substr($sUri, strlen(f::$c->uriBase));
+                break;
+
+            case self::RESOLVE_RANGE_PARAM:
+                $uri = $sUri;
+                break;
+
+            default:
+                throw new f_c_exception_domain('Invalid `resolveRange`');
+        }
+
+        // resolve numeric and assoc request
+        $this->_requestNum   = array();
+        $this->_requestAssoc = array();
+
+        list($sPath, $sQuery) = explode('?', $uri, 2);
+
+        $param = explode($this->_separator, $sPath);
+
+        for ($i = 0; isset($param[$i]); $i += 2) {
+
+            $j = $i + 1;
+
+            $this->_requestNum += array($param[$i] => $param[$j]);
+        }
+
+        if (isset($sQuery)) {
+            parse_str($sQuery, $this->_requestAssoc);
+        }
+
+        return $this->resolve($sUri);
+    }
+
     public function assemble($asUri)
     {
         switch ($this->_assembleRange) {
@@ -133,6 +183,47 @@ class f_c_helper_uri
     public function assembleParam($asUri)
     {
         return $this->_assemble($asUri);
+    }
+
+    public function assembleRequest($aUriParamToChange = null)
+    {
+        $numeric  = array();
+        $change   = (array)$aUriParamToChange;
+
+        // numeric
+        foreach ($this->_requestNum as $k => $v) {
+            if (isset($change[$k])) {
+                $v = $change[$k];
+            }
+            $numeric[] = urlencode($k) . $this->_separator . urldecode($v);
+        }
+        $uri = implode($this->_separator, $numeric);
+
+        // assoc
+        if ($this->_requestAssoc) {
+            $assoc = $this->_requestAssoc;
+            foreach ($change as $k => $v) {
+                if (isset($change[$k])) {
+                    $assoc[$k] = $change[$k];
+                }
+            }
+            $uri .= '?' . http_build_query($assoc);
+        }
+
+        switch ($this->_assembleRange) {
+
+            case self::ASSEMBLE_RANGE_PARAM:
+                return $uri;
+
+            case self::ASSEMBLE_RANGE_BASE:
+                return f::$c->uriBase . $uri;
+
+            case self::ASSEMBLE_RANGE_ABS:
+                return f::$c->uriAbs . $uri;
+
+            default :
+                throw new f_c_exception_domain('Invalid `assembleRange`');
+        }
     }
 
     protected function _resolve($sUri)

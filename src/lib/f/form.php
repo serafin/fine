@@ -32,7 +32,6 @@ class f_form implements ArrayAccess, IteratorAggregate, Countable
     protected $_helper = 'form';
     
     protected $_error;
-    
 
     /**
      * Tworzy i konfiguruje obiekt formularza
@@ -91,48 +90,6 @@ class f_form implements ArrayAccess, IteratorAggregate, Countable
     }
 
     /**
-     * Ustala/pobiera akcje formularza - adres gdzie formularz ma zostać wysłany (wartość atrybutu action elementu form)
-     *
-     * @param array|string $asAction Adres
-     * @return string|$this
-     */
-    public function action($asAction = null)
-    {
-        if ($asAction === null) {
-            return $this->_attr['action'];
-        }
-
-        if (!is_string($asAction)) {
-            $asAction = f::$c->uri->helper($asAction);
-        }
-        $this->_attr['action'] = $asAction;
-        return $this;
-    }
-
-    /**
-     * Dodaje element lub elementy
-     *
-     * @param array|object $aosElement
-     * @return $this
-     */
-    public function element($aoElement = null)
-    {
-        if (func_num_args() == 0) {
-            return $this->_;
-        }
-
-        if (is_array($aoElement)) {
-            foreach ($aoElement as $oElement) {
-                $this->_addElement($oElement);
-            }
-        }
-        else {
-            $this->_addElement($aoElement);
-        }
-        return $this;
-    }
-
-    /**
      * Ustawianie lub pobieranie lub usuwanie atrybutow
      *
      * @param array|string $asName
@@ -182,6 +139,35 @@ class f_form implements ArrayAccess, IteratorAggregate, Countable
 
                 throw new f_form_exception_badMethodCall('Too many arguments');
         }
+    }
+
+    /**
+     * Ustala/pobiera akcje formularza - adres gdzie formularz ma zostać wysłany (wartość atrybutu action elementu form)
+     *
+     * @param array|string $asAction Adres
+     * @return string|$this
+     */
+    public function action($asAction = null)
+    {
+        if ($asAction === null) {
+            return $this->_attr['action'];
+        }
+
+        if (!is_string($asAction)) {
+            $asAction = f::$c->uri->helper($asAction);
+        }
+        $this->_attr['action'] = $asAction;
+        return $this;
+    }
+
+    public function method($tMethod = null)
+    {
+        if (func_num_args() == 0) {
+            return $this->_attr['method'];
+        }
+
+        $this->_attr['method'] = $tMethod;
+        return $this;
     }
 
     public function id($sId = null)
@@ -267,7 +253,7 @@ class f_form implements ArrayAccess, IteratorAggregate, Countable
             default:
 
                 throw new f_form_exception_badMethodCall('Too many arguments');
-                
+
         }
 
         $this->_attr['style'] = f_c_helper_arrayImplode::helper($style, ';', ':');
@@ -321,6 +307,29 @@ class f_form implements ArrayAccess, IteratorAggregate, Countable
         }
         
         return $isValid;
+    }
+
+    /**
+     * Dodaje element lub elementy
+     *
+     * @param array|object $aosElement
+     * @return $this
+     */
+    public function element($aoElement = null)
+    {
+        if (func_num_args() == 0) {
+            return $this->_;
+        }
+
+        if (is_array($aoElement)) {
+            foreach ($aoElement as $oElement) {
+                $this->_addElement($oElement);
+            }
+        }
+        else {
+            $this->_addElement($aoElement);
+        }
+        return $this;
     }
 
     /**
@@ -561,8 +570,6 @@ class f_form implements ArrayAccess, IteratorAggregate, Countable
     {
         return new ArrayIterator($this->_);
     }
-
-
 
     /* private api */
 
