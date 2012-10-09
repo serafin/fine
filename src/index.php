@@ -29,7 +29,7 @@ class index extends f_c
         $this->{$this->env}();
 
         // pretty uris
-        $_GET = $this->uri->resolve($_SERVER['REQUEST_URI']);
+        $_GET = $this->uri->resolveRequest($_SERVER['REQUEST_URI']);
 
         // run controller action by request
         $this->dispacher->run();

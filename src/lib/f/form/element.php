@@ -611,30 +611,43 @@ class f_form_element
         return $this;
     }
 
-    public function decor($asDecor)
+    public function decor($asDecor = null, $oaDecor = null)
     {
-        if (is_array($asDecor)) {
-            $this->_decor = $asDecor;
-            return $this;
+        switch (func_num_args()) {
+
+            case 0:
+                return $this->_decor;
+
+            case 1:
+                if (is_array($asDecor)) {
+                    $this->_decor = $asDecor;
+                    return $this;
+                }
+
+                if (is_string($asDecor)) {
+                    if ($this->_decor === true) {
+                        $this->decorDefault();
+                    }
+                    if (!is_object($this->_decor[$asDecor])) {
+                        if (is_string($this->_decor[$asDecor])) {
+                            $this->_decor[$asDecor] = new $this->_decor[$asDecor];
+                        }
+                        else if (is_array($this->_decor[$asDecor])) {
+                            $class = array_shift($this->_decor[$asDecor]);
+                            $this->_decor[$asDecor] = new $class($this->_decor[$asDecor]);
+                        }
+                    }
+                    return $this->_decor[$asDecor];
+                }
+                
+            case 2:
+                $this->_decor[$asDecor] = $oaDecor;
+                return $this;
+
+
         }
 
-        if (is_string($asDecor)) {
-            if ($this->_decor === true) {
-                $this->decorDefault();
-            }
-            if (!is_object($this->_decor[$asDecor])) {
-                if (is_string($this->_decor[$asDecor])) {
-                    $this->_decor[$asDecor] = new $this->_decor[$asDecor];
-                }
-                else if (is_array($this->_decor[$asDecor])) {
-                    $class = array_shift($this->_decor[$asDecor]);
-                    $this->_decor[$asDecor] = new $class($this->_decor[$asDecor]);
-                }
-            }
-            return $this->_decor[$asDecor];
-        }
-        
-        return $this;
+
     }
 
     public function addDecor($aoDecor)
