@@ -15,8 +15,8 @@ class f_c_helper_uri
     protected $_resolveRange  = self::RESOLVE_RANGE_BASE;
     protected $_separator     = '/';
 
-    protected $_requestNum   = array();
-    protected $_requestAssoc = array();
+    protected $_requestParam = array();
+    protected $_requestQuery = array();
 
     public static function parse($sUri)
     {
@@ -122,8 +122,8 @@ class f_c_helper_uri
         }
 
         // resolve numeric and assoc request
-        $this->_requestNum   = array();
-        $this->_requestAssoc = array();
+        $this->_requestParam   = array();
+        $this->_requestQuery = array();
 
         list($sPath, $sQuery) = explode('?', $uri, 2);
 
@@ -133,11 +133,11 @@ class f_c_helper_uri
 
             $j = $i + 1;
 
-            $this->_requestNum += array($param[$i] => $param[$j]);
+            $this->_requestParam += array($param[$i] => $param[$j]);
         }
 
         if (isset($sQuery)) {
-            parse_str($sQuery, $this->_requestAssoc);
+            parse_str($sQuery, $this->_requestQuery);
         }
 
         return $this->resolve($sUri);
@@ -185,27 +185,31 @@ class f_c_helper_uri
         return $this->_assemble($asUri);
     }
 
-    public function assembleRequest($aUriParamToChange = null)
+    public function assembleRequest($aParam = null, $aQuery = null)
     {
         $numeric  = array();
-        $change   = (array)$aUriParamToChange;
+        $aParam = (array)$aParam;
+        $aQuery = (array)$aQuery;
 
         // numeric
-        foreach ($this->_requestNum as $k => $v) {
-            if (isset($change[$k])) {
-                $v = $change[$k];
+        foreach ($this->_requestParam as $k => $v) {
+            if (isset($aParam[$k])) {
+                $v = $aParam[$k];
+                unset($aParam[$k]);
             }
             $numeric[] = urlencode($k) . $this->_separator . urldecode($v);
         }
+        foreach ($aParam as $k => $v) {
+            $numeric[] = urlencode($k) . $this->_separator . urldecode($v);
+        }
+
         $uri = implode($this->_separator, $numeric);
 
         // assoc
-        if ($this->_requestAssoc) {
-            $assoc = $this->_requestAssoc;
-            foreach ($change as $k => $v) {
-                if (isset($change[$k])) {
-                    $assoc[$k] = $change[$k];
-                }
+        if ($this->_requestQuery || $aQuery) {
+            $assoc = $this->_requestQuery;
+            foreach ($aQuery as $k => $v) {
+                $assoc[$k] = $aQuery[$k];
             }
             $uri .= '?' . http_build_query($assoc);
         }
