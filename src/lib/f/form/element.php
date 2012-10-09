@@ -148,6 +148,7 @@ class f_form_element
      */
     public function val($mValue = null)
     {
+
         if (func_num_args() == 0) {
             return $this->_val;
         }
@@ -173,9 +174,9 @@ class f_form_element
             }
             
         }
-        
+
         $this->_val = $mValue;
-        
+
         return $this;
     }
 
@@ -318,7 +319,7 @@ class f_form_element
         }
 
         $this->_attr['style'] = f_c_helper_arrayImplode::helper($style, ';', ':');
-        
+
         return $this;
     }
 
@@ -337,7 +338,7 @@ class f_form_element
                     $this->_option  = array();
                 }
                 else if (is_array($asName)) {
-                    $this->_multi = true;
+                    //$this->_multi = true;
                     foreach ($asName as $k => $v) {
                         $this->_option[$k] = $v;
                     }
@@ -638,6 +639,9 @@ class f_form_element
 
     public function addDecor($aoDecor)
     {
+        if ($this->_decor === true) {
+            $this->decorDefault();
+        }
         if (is_array($aoDecor)) {
             foreach ($aoDecor as $k => $v) {
                 if (is_int($k)) {
@@ -654,6 +658,25 @@ class f_form_element
         return $this;
     }
 
+    public function addDecorAfter($sAfter, $aDecor)
+    {
+        if ($this->_decor === true) {
+            $this->decorDefault();
+        }
+        
+        $aTmp = array();
+        foreach($this->_decor as $k => $v){
+            $aTmp[$k] = $v;
+            if($k == $sAfter){
+                $aTmp += $aDecor;
+            }
+        }
+        
+        $this->_decor = $aTmp;
+        
+        return $this;
+    }
+    
     public function removeDecor($sName = null)
     {
         if (func_num_args() == 0) {

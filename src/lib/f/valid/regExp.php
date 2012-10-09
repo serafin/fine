@@ -32,7 +32,7 @@ class f_valid_regExp extends f_valid_abstract
         $sValue = (string) $mValue;
         $this->_val($sValue);
 
-        if (!@preg_match($this->pattern, $sValue)) {
+        if (!@preg_match($this->_pattern, $sValue)) {
             $this->_error(self::NOT_MATCH);
             return false;
         }

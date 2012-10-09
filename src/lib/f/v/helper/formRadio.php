@@ -7,11 +7,13 @@ class f_v_helper_formRadio extends f_v_helper_formElement
                            $aOption = array(), $sSeparator = null)
     {
 
-        $return        = array();
-        $basePrepend   = "";
-        $baseAppend    = "";
-        $baseSeparator = "";
-        $baseLabel     = array();
+        $return           = array();
+        $basePrepend      = "";
+        $baseAppend       = "";
+        $baseInnerPrepend = "";
+        $baseInnerAppend  = "";
+        $baseSeparator    = "";
+        $baseLabel        = array();
         if (isset($aAttr['_prepend'])) {
             $basePrepend = $aAttr['_prepend'];
             unset($aAttr['_prepend']);
@@ -19,6 +21,14 @@ class f_v_helper_formRadio extends f_v_helper_formElement
         if (isset($aAttr['_append'])) {
             $baseAppend = $aAttr['_append'];
             unset($aAttr['_append']);
+        }
+        if (isset($aAttr['_innerprepend'])) {
+            $baseInnerPrepend = $aAttr['_innerprepend'];
+            unset($aAttr['_innerprepend']);
+        }
+        if (isset($aAttr['_innerappend'])) {
+            $baseInnerAppend = $aAttr['_innerappend'];
+            unset($aAttr['_innerappend']);
         }
         if (isset($aAttr['_separator'])) {
             $baseSeparator = $aAttr['_separator'];
@@ -31,11 +41,13 @@ class f_v_helper_formRadio extends f_v_helper_formElement
 
         foreach ($aOption as $key => $option) {
 
-            $prepend   = $basePrepend;
-            $append    = $baseAppend;
-            $separator = $baseSeparator;
-            $label     = $baseLabel;
-            $input     = array(
+            $prepend      = $basePrepend;
+            $append       = $baseAppend;
+            $innerprepend = $baseInnerPrepend;
+            $innerappend  = $baseInnerAppend;
+            $separator    = $baseSeparator;
+            $label        = $baseLabel;
+            $input        = array(
                 'type'  => 'radio',
                 'name'  => $sName,
                 'value' => $key,
@@ -60,6 +72,14 @@ class f_v_helper_formRadio extends f_v_helper_formElement
                     $append = $option['_append'];
                     unset($option['_append']);
                 }
+                if (isset($option['_innerprepend'])) {
+                    $innerprepend = $option['_innerprepend'];
+                    unset($option['_innerprepend']);
+                }
+                if (isset($option['_innerappend'])) {
+                    $innerappend = $option['_innerappend'];
+                    unset($option['_innerappend']);
+                }
                 if (isset($option['_separator'])) {
                     $separator = $option['_separator'];
                     unset($option['_separator']);
@@ -73,13 +93,15 @@ class f_v_helper_formRadio extends f_v_helper_formElement
                 $input += $option;
             }
 
-            $return[] = "<label" . $this->_renderAttr($label) . ">"
-                      . $prepend
+            $return[] = $prepend
+                      . "<label" . $this->_renderAttr($label) . ">"
+                      . $innerprepend
                       . "<input" . $this->_renderAttr($input) . " />"
                       . $separator
                       . $text
-                      . $append
-                      . "</label>";
+                      . $innerappend
+                      . "</label>"
+                      . $append;
 
         }
 
