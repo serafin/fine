@@ -16,7 +16,8 @@ class f_form_checkbox extends f_form_element
 
     public function decorDefault()
     {
-        if (!$this->_multi) {
+        if (!$this->_multi && $this->_form) {
+
             $this->_decor = $this->_decorNotMulti;
         }
         else {
