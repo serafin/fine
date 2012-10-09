@@ -18,6 +18,7 @@ class f_v_helper_paging
         $width    = $paging->param('width'); // liczba linkow pomiedzy aktualna strona i spacja
         $href     = $paging->param('href');
         $onclick  = $paging->param('onclick');
+        $style    = $paging->param('style');
         $link     = array();
 
         if (!($all > 0)) {
@@ -103,19 +104,37 @@ class f_v_helper_paging
             . '</li> ';
         }
 
-        $out = '<div class="box-paging"><ul class="paging-ul">';
-        foreach ($link as $i) {
-            if ($i == ' ') {
-                $out .= '<li class="paging-li paging-space"> ... </li> ';
+        
+        if($style && $style == 'bootstrap'){
+            $out = '<div class="pagination"><ul>';
+            foreach ($link as $i) {
+                if ($i == ' ') {
+                    $out .= '<li class="disabled"><a> ... </a></li> ';
+                }
+                else if ($i == $page) {
+                    $out .= '<li class="active"><a>' . $i . '</a></li> ';
+                }
+                else {
+                    $out .= str_replace($var, $i, $itemtpl);
+                }
             }
-            else if ($i == $page) {
-                $out .= '<li class="paging-li paging-current">' . $i . '</li> ';
-            }
-            else {
-                $out .= str_replace($var, $i, $itemtpl);
-            }
+            $out .= '</ul></div>';
         }
-        $out .= '</ul><div class="paging-end"></div></div>';
+        else {        
+            $out = '<div class="box-paging"><ul class="paging-ul">';
+            foreach ($link as $i) {
+                if ($i == ' ') {
+                    $out .= '<li class="paging-li paging-space"> ... </li> ';
+                }
+                else if ($i == $page) {
+                    $out .= '<li class="paging-li paging-current">' . $i . '</li> ';
+                }
+                else {
+                    $out .= str_replace($var, $i, $itemtpl);
+                }
+            }
+            $out .= '</ul><div class="paging-end"></div></div>';
+        }
 
         return $out;
     }
