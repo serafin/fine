@@ -8,6 +8,7 @@ class f_v_helper_paging
 
         /* setup */
 
+        $out      = '';
         $all      = $paging->all();          // liczba wszystkich elementow
         $page     = $paging->page();         // aktualna strona
         $first    = $paging->firstPage();    // pierwsza strona, standardowo 1
@@ -22,7 +23,7 @@ class f_v_helper_paging
         $link     = array();
 
         if (!($all > 0)) {
-            return;
+            return '';
         }
 
         if (!$width) {
@@ -33,7 +34,7 @@ class f_v_helper_paging
         /*  table of pages np. 1 [ ] 3 4 5 [6] 7 8 9 [ ] 1234 */
 
         if (!($pages > 1)) {
-            return; // nie ma wiecej strony niz 1 to nie generujemy stronicowania
+            return ''; // nie ma wiecej strony niz 1 to nie generujemy stronicowania
         }
 
         /* df */
@@ -85,13 +86,8 @@ class f_v_helper_paging
         }
         else {
             if (!$uri) {
-                $uri = array();
-                foreach ($_GET as $k => $v) {
-                    if (is_int($k)) {
-                        continue;
-                    }
-                    $uri[$k] = $v;
-                }
+                $uri =  f::$c->uri->assembleRequest(array($uriParam => '___page___'));
+                $uri = str_replace('___page___', $var, $uri);
             }
 
             if (is_array($uri)) {
