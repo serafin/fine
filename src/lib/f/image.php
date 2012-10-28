@@ -50,7 +50,7 @@ class f_image
      * Statyczny konstruktor
      *
      * @param array $config
-     * @return self
+     * @return f_image
      */
     public static function _(array $config = array())
     {

@@ -33,8 +33,20 @@ class f_form implements ArrayAccess, IteratorAggregate, Countable
     
     protected $_error;
 
+
     /**
-     * Tworzy i konfiguruje obiekt formularza
+     * Statyczny konstruktor
+     *
+     * @param array $config
+     * @return \f_form
+     */
+    public static function _(array $config = array())
+    {
+        return new self($config);
+    }
+
+    /**
+     * Konstruktor
      *
      * @param array $aConfig Tablica gdzie kluczem jest nazwa funkcji tej klasy a wartością pierwszy argument
      */
