@@ -324,7 +324,7 @@ class f_form_element
     }
 
 
-    public function option($asName = null)
+    public function option($asName = null, $asValue = null)
     {
         switch (func_num_args()) {
             case 0:
@@ -343,8 +343,16 @@ class f_form_element
                         $this->_option[$k] = $v;
                     }
                 }
+                else if (is_string($asName)) {
+                    return $this->_option[$asName];
+                }
                 return $this;
 
+            case 2:
+                
+                $this->_option[$asName] = $asValue;
+                return $this;
+                
             default:
                 
                 throw new f_form_exception_badMethodCall('Too many arguments');

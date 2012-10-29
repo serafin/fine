@@ -68,7 +68,7 @@ class container extends f_c_container
     protected function _flash()
     {
         $this->flash = new f_c_helper_flash();
-        $this->flash->storage(&$_SESSION['flash']);
+        $this->flash->storage($_SESSION['flash']);
         return $this->flash;
     }
 

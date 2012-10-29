@@ -9,40 +9,62 @@ class f_event
     protected $_cancel = false;
 
     /**
-     * @param array $aConfig
-     *      id*      => ID zdarzenia
-     *      subject* => podmiot
-     *      val      => wartosc
-     *      param    => tablica parametrow
+     * Statyczny konstruktor
+     * 
+     * @param array $config
+     * @return f_event
+     */
+    public static function _(array $config = array())
+    {
+        return new self($config);
+    }
+    
+    /**
+     * Konstruktor
+     * 
+     * @param array $config
      */
     public function  __construct(array $config = array())
     {
-        $this->_id        = $config['id'];
-        $this->_subject   = $config['subject'];
-        $this->_val       = $config['val'];
-        
-        foreach ((array)$config['param'] as $k => $v) {
-            $this->{$k} = $v;
+        foreach ($config as $k => $v) {
+            $this->{$k}($v);
         }
     }
-
-    public function subject()
+    
+    public function __call($name, $arguments)
     {
-        return $this->_subject;
+        if (count($arguments) == 0) {
+            return $this->{$name};
+        }
+        $this->{$name} = $arguments[0];
+        return $this;
+    }
+    
+    public function subject($oSubject = null)
+    {
+        if (func_num_args() == 0) {
+            return $this->_subject;
+        }
+        $this->_subject = $oSubject;
+        return $this;
     }
 
-    public function id()
+    public function id($sId = null)
     {
-        return $this->_id;
+        if (func_num_args() == 0) {
+            return $this->_id;
+        }
+        $this->_id = $sId;
+        return $this;
     }
 
     public function cancel($bCancel = null)
     {
-        if (func_num_args()) {
-            $this->_cancel = (boolean)$bCancel;
-            return $this;
+        if (func_num_args() == 0) {
+            return $this->_cancel;
         }
-        return $this->_cancel === false ? false : true;
+        $this->_cancel = (boolean)$bCancel;
+        return $this;
     }
 
     public function val($mVal = null)
@@ -51,7 +73,7 @@ class f_event
             return $this->_val;
         }
         $this->_val = $mVal;
-        return $this;;
+        return $this;
     }
 
 }

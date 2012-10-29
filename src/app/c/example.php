@@ -86,6 +86,35 @@ class c_example extends f_c_action
         $this->response->body->status = 'ok';
         $this->response->body->data   = array();
     }
+    
+    public function fFormDecorEventAction()
+    {
+        $form = new f_form(array(
+            'element' => array(
+                new f_form_radio(array('name' => 'radio', 'option' => array('a' => 'A', 'b' => 'B', 'c' => array('_text' => 'C')))),
+                new f_form_text(array('name' => 'other', 'ignoreRender' => true, 'decor' => array('f_form_decor_helper'))),
+            )
+        ));
+        
+        $this->event->on('attach_other', array($this, 'fFormDecorEventAttachOther'));
+        $attach = array(
+            'f_form_decor_event', 'event' => f_event::_()->id('attach_other')->other($form->other)->radio($form->radio),
+        );
+        
+        $form->radio->removeDecor()->decor(array($attach, 'f_form_decor_helper'));
+        
+        $form->radio->separator('<br />');
+        $form->val(array('radio' => 'c', 'other' => 'and my mind moves away'));
+        
+        $this->response->body = $form->render();
+    }
+    
+    public function fFormDecorEventAttachOther(f_event $event)
+    {
+        $option            = $event->radio()->option('c');
+        $option['_append'] = $event->other()->render();
+        $event->radio()->option('c', $option);
+    }
 
     public function fValidFileAction()
     {
