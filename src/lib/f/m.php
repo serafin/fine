@@ -801,14 +801,7 @@ class f_m implements IteratorAggregate, Countable
             }
         }
 
-        if ($aData) {
-            foreach ($aData as $k => $v) {
-                if (! is_int($k) && ! in_array($k, $this->_field)) {
-                    unset($aData[$k]);
-                }
-            }
-        }
-        else {
+        if (!$aData) {
             $aData = $this->val();
         }
         
