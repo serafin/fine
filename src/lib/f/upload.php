@@ -143,12 +143,12 @@ class f_upload implements IteratorAggregate
 
 	public function tmpName()
 	{
-        $this->_value('tmp_name');
+         return $this->_value('tmp_name');
 	}
 
 	public function size()
 	{
-        $this->_value('size');
+        return $this->_value('size');
 	}
 
 	public function type()

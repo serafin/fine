@@ -679,6 +679,24 @@ class f_form_element
         return $this;
     }
 
+    public function addDecorBefore($sBefore, $aDecor)
+    {        
+        if ($this->_decor === true) {
+            $this->decorDefault();
+        }
+        f_debug::dump($this->_decor);
+        $aTmp = array();
+        foreach($this->_decor as $k => $v){           
+            if($k == $sBefore){
+                $aTmp += $aDecor;
+            }
+            $aTmp[$k] = $v;
+        }
+        $this->_decor = $aTmp;
+        
+        return $this;
+    }
+    
     public function addDecorAfter($sAfter, $aDecor)
     {
         if ($this->_decor === true) {
@@ -697,6 +715,7 @@ class f_form_element
         
         return $this;
     }
+    
     
     public function removeDecor($sName = null)
     {

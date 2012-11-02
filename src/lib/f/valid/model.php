@@ -166,7 +166,7 @@ class f_valid_model extends f_valid_abstract
         if (func_num_args() == 0) {
             return $this->_valToCompare;
         }
-        $this->_param = $isCompareValue;
+        $this->_valToCompare = $isCompareValue;
         return $this;
     }
 
@@ -183,7 +183,7 @@ class f_valid_model extends f_valid_abstract
         if (func_num_args() == 0) {
             return $this->_method;
         }
-        $this->_param = $sMethod;
+        $this->_method = $sMethod;
         return $this;
     }
 

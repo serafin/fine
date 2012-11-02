@@ -858,7 +858,7 @@ class f_m implements IteratorAggregate, Countable
     {
         if ($aisParam === null) {
             if ($this->{$this->_key} !== null) {
-                $aisParam = $this->{$this->_key};
+                $aisParam = array($this->_key => $this->{$this->_key});
             }
             else {
                 throw new LogicException("Oczekiwany warunek kasacji rekordow");
