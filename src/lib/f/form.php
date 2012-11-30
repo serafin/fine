@@ -591,7 +591,7 @@ class f_form implements ArrayAccess, IteratorAggregate, Countable
             $sName = $oElement->name();
         }
 
-        if ($sName === null) {
+        if ($sName === null || isset($this->_[$sName])) {
             $this->_[] = $oElement;
         }
         else {

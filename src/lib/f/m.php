@@ -791,8 +791,8 @@ class f_m implements IteratorAggregate, Countable
      */
     public function update($aData = null, $aisParam = null)
     {
-        if ($aisParam === null) {
-            if ($this->{$this->_key} !== null) {
+        if ($aisParam === null && !$this->_param) {
+            if ($this->_key !== null) {
                 $aisParam = array($this->_key => $this->{$this->_key});
             }
             else {
@@ -849,8 +849,8 @@ class f_m implements IteratorAggregate, Countable
      */
     public function delete($aisParam = null)
     {
-        if ($aisParam === null) {
-            if ($this->{$this->_key} !== null) {
+        if ($aisParam === null && !$this->_param) {
+            if ($this->_key !== null) {
                 $aisParam = array($this->_key => $this->{$this->_key});
             }
             else {
