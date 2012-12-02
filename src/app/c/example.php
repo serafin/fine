@@ -82,10 +82,28 @@ class c_example extends f_c_action
     {
         $this->responseAjax();
 
-        $this->response->body = new stdClass();
+        $this->response->body         = new stdClass();
         $this->response->body->status = 'ok';
         $this->response->body->data   = array();
     }
+    
+    public function fFoapServerAction()
+    {
+        $server = new f_foap_server();
+        $server->object(new m_user());
+        $server->event(f_event::_()->id('app_server_call'));
+        $server->response($this->response);
+        $server->handle();
+        
+    }
+    
+    public function fFoapClient1Action()
+    {
+        $client = new f_foap_client();
+        $client->uri($this->uri->assembleAbs(array('example', 'fFoapServer')));
+        $client->param('key', 'abcdef1234567890');
+        $client->object()->fetch(1234);
+    }    
     
     public function fFormDecorEventAction()
     {

@@ -7,6 +7,7 @@ class f_event
     protected $_subject;
     protected $_val;
     protected $_cancel = false;
+    protected $_dispacher;
 
     /**
      * Statyczny konstruktor
@@ -73,6 +74,25 @@ class f_event
             return $this->_val;
         }
         $this->_val = $mVal;
+        return $this;
+    }
+    
+    public function dispacher($oDispacher = null)
+    {
+        if (func_num_args() == 0) {
+            return $this->_dispacher;
+        }
+        $this->_dispacher = $oDispacher;
+        return $this;
+    }
+    
+    public function run()
+    {
+        /* @var $dispacher f_event_dispacher */
+        $dispacher = $this->_dispacher ? $this->_dispacher : f::$c->event;
+        
+        $dispacher->run($this);
+        
         return $this;
     }
 
