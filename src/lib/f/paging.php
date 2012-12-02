@@ -120,7 +120,7 @@ class f_paging
         if ($this->_all > 0) {
 
             if ($this->_page === null) {
-                $this->_page = (int) f::$c->request->get($this->_uriParam);
+                $this->_page = (int) f::$c->request->get($this->_uriParam) - $this->_firstPage;
             }
 
             $this->_pages  = (int) ceil($this->_all / $this->_limit);

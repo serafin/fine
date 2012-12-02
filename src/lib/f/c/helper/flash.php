@@ -6,6 +6,7 @@ class f_c_helper_flash extends f_c
     const STATUS_INFO    = 'STATUS_INFO';
     const STATUS_SUCCESS = 'STATUS_SUCCESS';
     const STATUS_ERROR   = 'STATUS_ERROR';
+    const STATUS_WARNING = 'STATUS_WARNING';
 
     protected $_storage;
 

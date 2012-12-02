@@ -80,7 +80,6 @@ class f_form_decor_errorMatrix extends f_form_decor_tag
 
     public function render()
     {
-
         // errors
         $errors = array();
         if ($this->_ignoreOwner === false && $this->object->ignoreError() === false) {

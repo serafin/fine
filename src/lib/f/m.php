@@ -791,8 +791,8 @@ class f_m implements IteratorAggregate, Countable
      */
     public function update($aData = null, $aisParam = null)
     {
-        if ($aisParam === null) {
-            if ($this->{$this->_key} !== null) {
+        if ($aisParam === null && !$this->_param) {
+            if ($this->_key !== null) {
                 $aisParam = array($this->_key => $this->{$this->_key});
             }
             else {
@@ -801,14 +801,7 @@ class f_m implements IteratorAggregate, Countable
             }
         }
 
-        if ($aData) {
-            foreach ($aData as $k => $v) {
-                if (! is_int($k) && ! in_array($k, $this->_field)) {
-                    unset($aData[$k]);
-                }
-            }
-        }
-        else {
+        if (!$aData) {
             $aData = $this->val();
         }
         
@@ -856,9 +849,9 @@ class f_m implements IteratorAggregate, Countable
      */
     public function delete($aisParam = null)
     {
-        if ($aisParam === null) {
-            if ($this->{$this->_key} !== null) {
-                $aisParam = $this->{$this->_key};
+        if ($aisParam === null && !$this->_param) {
+            if ($this->_key !== null) {
+                $aisParam = array($this->_key => $this->{$this->_key});
             }
             else {
                 throw new LogicException("Oczekiwany warunek kasacji rekordow");

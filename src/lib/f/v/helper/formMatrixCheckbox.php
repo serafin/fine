@@ -31,7 +31,7 @@ class f_v_helper_formMatrixCheckbox extends f_v_helper_formElement
         foreach($aOption['col'] as $k => $v){
             $head .= '<th>'.$v.'</th>';
         }
-        
+
         return '<table><thead><tr>'.$head.'</tr></thead><tbody><tr>'.implode('</tr><tr>', $return).'</tr></tbody></table>';
     }
 
