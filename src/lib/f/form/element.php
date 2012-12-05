@@ -531,7 +531,6 @@ class f_form_element
      */
     public function isValid($mValue = null)
     {
-
         if (func_num_args() === 1) {
             $this->val($mValue);
         }
@@ -543,7 +542,7 @@ class f_form_element
         }
 
         $bValid = true;
-
+        
         foreach ($this->_valid as $k => $valid) {
 
             // lazy load validotor
@@ -684,7 +683,7 @@ class f_form_element
         if ($this->_decor === true) {
             $this->decorDefault();
         }
-        f_debug::dump($this->_decor);
+
         $aTmp = array();
         foreach($this->_decor as $k => $v){           
             if($k == $sBefore){

@@ -32,7 +32,9 @@ class f_v_helper_formMatrixRadio extends f_v_helper_formElement
             $head .= '<th>'.$v.'</th>';
         }
 
-        return '<table><thead><tr>'.$head.'</tr></thead><tbody><tr>'.implode('</tr><tr>', $return).'</tr></tbody></table>';
+        $class = $aOption['tabClass']['class'] ? ' class="'.$aOption['tabClass']['class'].'"' : '';
+        
+        return '<table'.$class.'><thead><tr>'.$head.'</tr></thead><tbody><tr>'.implode('</tr><tr>', $return).'</tr></tbody></table>';
     }
 
 }
