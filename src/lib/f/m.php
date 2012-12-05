@@ -791,14 +791,15 @@ class f_m implements IteratorAggregate, Countable
      */
     public function update($aData = null, $aisParam = null)
     {
-        if ($aisParam === null && !$this->_param) {
-            if ($this->_key !== null) {
-                $aisParam = array($this->_key => $this->{$this->_key});
-            }
-            else {
-                throw new LogicException("Oczekiwany warunek modyfikowania rekordow.");
-                return;
-            }
+        if (!$aisParam && !$this->_param && $this->_key !== null) {
+            $aisParam = array($this->_key => $this->{$this->_key});
+        }
+        else if (isset($aisParam) && !is_array($aisParam) && $this->_key !== null) {
+            $aisParam = array($this->_key => $aisParam);
+        }
+        
+        if (!$aisParam  && !$this->_param) {
+            throw new LogicException("Oczekiwany warunek modyfikowania rekordow.");
         }
 
         if (!$aData) {
@@ -849,16 +850,18 @@ class f_m implements IteratorAggregate, Countable
      */
     public function delete($aisParam = null)
     {
-        if ($aisParam === null && !$this->_param) {
-            if ($this->_key !== null) {
-                $aisParam = array($this->_key => $this->{$this->_key});
-            }
-            else {
-                throw new LogicException("Oczekiwany warunek kasacji rekordow");
-                return;
-            }
+        if (func_num_args() != 0 && !is_array($aisParam) && $this->_key) {
+            $aisParam = array($this->_key => $aisParam);
         }
-        $this->_db->query("DELETE FROM `{$this->_table}`".$this->_sql($aisParam, false, false, true));
+        else if (func_num_args() == 0 && !$this->_param && $this->_key !== null) {
+            $aisParam = array($this->_key => $this->{$this->_key});
+        }
+        
+        if (!$this->_param && !$aisParam) {
+            throw new LogicException("Oczekiwany warunek kasacji rekordow");
+        }
+        
+        $this->_db->query("DELETE FROM `{$this->_table}`" . $this->_sql($aisParam, false, false, true));
         return $this;
     }
 
@@ -1066,16 +1069,36 @@ class f_m implements IteratorAggregate, Countable
     }
 
     /**
-     * @param type $aConfig
-     * @return f_paging
+     * Ustala/pobiera obiekt lub konfiguracje stronnicowania
+     * 
+     * @param f_paging|array $aoPaging
+     * @return f_m|f_paging
      */
-    public function paging()
+    public function paging($aoPaging = null)
     {
-        if ($this->_paging === null) {
-            $this->_paging = new f_paging();
+        if (func_num_args() == 0) { // getter
+            if ($this->_paging === null) {
+                $this->_paging = new f_paging();
+            }
+            return $this->_paging;
         }
-
-        return $this->_paging;
+        else { // setter
+            if (is_object($aoPaging)) {
+                if (!$aoPaging instanceof f_paging) {
+                    throw new f_m_exception_invalidArgument("Oczekiwano argumentu o typie f_paging");
+                }
+                $this->_paging = $aoPaging;
+            }
+            else {
+                if ($this->_paging === null) {
+                    $this->_paging = new f_paging();
+                }
+                foreach ((array)$aoPaging as $k => $v) {
+                    $this->_paging->{$k}($v);
+                }
+            }
+            return $this;
+        }
     }
 
     /* friend api */

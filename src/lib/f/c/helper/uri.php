@@ -285,12 +285,12 @@ class f_c_helper_uri
             }
         }
 
-        $uri = implode($this->_separator, $numeric + $assoc);
-
+        $uri = implode($this->_separator, array_merge($numeric, $assoc));
+        
         if ($noscalar) {
             $uri .= '?' . http_build_query($noscalar);
         }
-
+        
         return $uri;
     }
 
