@@ -5,7 +5,7 @@ class f_upload_tmp
     
     const DIR = './data/tmp/';
     
-    protected $_tmp;
+    protected $_path;
     protected $_upload;
 
 
@@ -15,38 +15,32 @@ class f_upload_tmp
         
     }
     
-    public function destroy()
+    public function path()
     {
         
     }
     
-    public function upload()
+    public function option()
     {
+    }
+    
+    public function upload($oUpload = null)
+    {
+        if (func_num_args() == 0) {
+            if ($this->_upload == null) {
+                $this->_upload = new f_upload();
+            }
+            return $this->_upload;
+        }
+        
+        $this->_upload = $oUpload;
+        return $this;
         
     }
     
     public function destroyAll($iSeconds = 604800) 
     {
         
-    }
-    
-    public function name()
-    {
-        
-    }
-    
-    public function nameOption($sImageSizeKey)
-    {
-        
-    }
-    
-    public function path()
-    {
-        
-    }
-    
-    public function pathOption()
-    {
     }
     
     public function extension()
@@ -59,10 +53,6 @@ class f_upload_tmp
         
     }
     
-    public function nameOrginal()
-    {
-        
-    }
     
     
 }

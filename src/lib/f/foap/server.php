@@ -81,18 +81,47 @@ class f_foap_server
     
     public function handle()
     {
+        if (!$this->_object) {
+            throw new f_c_exception_internalError();
+        }
+        
         if (!$this->_response) {
             $this->_response = new f_c_response();
         }
         
         $request = json_decode((string)@file_get_contents('php://input'));
         
-        if (!is_object($request) || isset($request->head) || !is_object($request->head)
-            || isset($request->head->type) || $request->head->type != 'request'
+        // validate foap request
+        if (
+            !is_object($request) || !isset($request->head) || !is_object($request->head)
+            || !isset($request->head->type) || !isset($request->head->foap)
         ) {
             $this->_response->code(400)->body('400 Bad Request')->send();
             return;
         }
+        
+        /** @todo check foap version, version is stored in $request->head->foap */
+        
+        // define request, send foap define response
+        if ($request->head->type == 'request_define') {
+            $this->_response
+                ->header('Content-Type', 'application/json')
+                ->body(json_encode(array(
+                    'head' => array(
+                        'foap'  => '1',
+                        'type'  => 'response_define',
+                    ),
+                    'body' => $this->_define(),
+                )))
+                ->send();
+             return;
+        }
+        
+        
+        if ($request->head->type != 'request') {
+            $this->_response->code(400)->body('400 Bad Request')->send();
+        }
+        
         
         if ($this->_event) {
             $this->_event->subject($this)->param($request->head->param)->run();
@@ -101,10 +130,6 @@ class f_foap_server
             }
         }
         
-        $result = isset($request->head->define) && $request->head->define === '1' 
-                ? $this->_define()
-                : call_user_func_array(array($this->_object, $request->body->method), $request->body->arg);
-        
         $this->_response
             ->header('Content-Type', 'application/json')
             ->body(json_encode(array(
@@ -112,12 +137,13 @@ class f_foap_server
                     'foap'  => '1',
                     'type'  => 'response',
                 ),
-                'body' => $result,
+                'body' => call_user_func_array(array($this->_object, $request->body->method), $request->body->arg),
             )))
             ->send();
     }
     
     /**
+     * @todo
      * Zwraca definicje obiektu
      * 
      * Wszystkie metody, arugmentu metod, komentarze metod

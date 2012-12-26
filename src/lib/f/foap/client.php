@@ -1,6 +1,6 @@
 <?php
 
-class c_foap_clinet
+class f_foap_client
 {
     
     protected $_uri;
@@ -65,6 +65,44 @@ class c_foap_clinet
     
     public function call($sName, $aArguments)
     {
+        
+        $request = json_encode(array(
+            'head' => array(
+                'foap'  => '1',
+                'type'  => 'request',
+                'param' => $this->_param,
+            ),
+            'body' => array(
+                'method' => $sName,
+                'arg'    => $aArguments
+            ),
+        ));
+        
+        $uri = f_c_helper_uri::parse($this->_uri);
+        
+        $r = fsockopen($uri['host'], $uri['scheme'] == 'https' ? 443 : 80);
+
+        fwrite($r, 
+            "POST {$uri['path']} HTTP/1.1\r\n"
+            . "Host: {$uri['host']}\r\n"
+            . "Content-Type: application/x-www-form-urlencoded\r\n"
+            . "Content-Length: " . mb_strlen($request) . "\r\n"
+            . "Connection: close\r\n"
+            . "\r\n"
+            . $request);
+
+        $response = "";
+        while (!feof($r)) {
+            $response .= fgets($r, 1024);
+        }
+        
+        fclose($r);
+        
+        $body = '';
+        list(,$body) = explode("\r\n\r\n", $response);
+        $body = json_decode($body);
+        
+        return $body->body;
         
     }
 }
