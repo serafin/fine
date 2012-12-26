@@ -23,7 +23,7 @@ class f_valid_fileExt extends f_valid_abstract
     }
 
     public function ext($asExt = null)
-    {
+    {         
         // getter
         if (func_num_args() == 0) {
             return $this->_ext;
@@ -60,14 +60,14 @@ class f_valid_fileExt extends f_valid_abstract
     public function isValid($mValue)
     {
         // $mValue from $_FILES ?
-        if (!is_string($mValue) && is_array($mValue) && isset($mValue['tmp_name'])) {
-            $mValue = $mValue['tmp_name'];
+        if (!is_string($mValue) && is_array($mValue) && isset($mValue['name'])) {
+            $mValue = $mValue['name'];
         }
 
         $parts = explode('.', (string)$mValue);
         $ext   = (string)(count($parts) > 1 ? end($parts) : '');
         $this->_val($ext);
-
+        
         if ('' === $ext) {
             $this->_error(self::NO_EXTENSION);
             return false;
@@ -79,7 +79,7 @@ class f_valid_fileExt extends f_valid_abstract
             $variants = array_map('strtolower', $variants);
             $ext      = strtolower($ext);
         }
-
+        
         if (!in_array($ext, $variants)) {
             $this->_error(self::NOT_VALID);
             return false;

@@ -231,6 +231,11 @@ class f_v_helper_head
     {
         return $this->head('css', $sUri);
     }
+    
+    public function cssi($sStyle)
+    {
+        $this->css('/public/css/' . $sStyle . '/v' . f::$c->config->public['css'][$sStyle]['v'] . '.css');
+    }
 
     public function js($sUri, $sContent = null)
     {

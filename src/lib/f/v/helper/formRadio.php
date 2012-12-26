@@ -40,7 +40,6 @@ class f_v_helper_formRadio extends f_v_helper_formElement
         }
 
         foreach ($aOption as $key => $option) {
-
             $prepend      = $basePrepend;
             $append       = $baseAppend;
             $innerprepend = $baseInnerPrepend;
