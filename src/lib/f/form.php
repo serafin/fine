@@ -333,14 +333,60 @@ class f_form implements ArrayAccess, IteratorAggregate, Countable
             return $this->_;
         }
 
-        if (is_array($aoElement)) {
-            foreach ($aoElement as $oElement) {
-                $this->_addElement($oElement);
+        $this->_addElement($aoElement);
+        
+        return $this;
+    }
+    
+    /**
+     * Dodaje element(y) po podanym elemencie
+     * 
+     * @param array|f_form_element $aoElement
+     * @param string $sAfterElementName
+     * @return f_form
+     */
+    public function addElementAfter($sAfterElementName, $aoElement)
+    {
+        $tmp = array();
+        
+        foreach ($this->_ as $name => $element) {
+            
+            $tmp[$name] = $element;
+            
+            if ($name == $sAfterElementName) {
+                $this->_addElement($aoElement, null, $tmp);
             }
+            
         }
-        else {
-            $this->_addElement($aoElement);
+        
+        $this->_ = $tmp;
+
+        return $this;
+    }
+
+    /**
+     * Dodaje element(y) przed podanym elementem
+     * 
+     * @param array|f_form_element $aoElement
+     * @param string $sBeforeElementName
+     * @return f_form
+     */
+    public function addElementBefore($sBeforeElementName, $aoElement)
+    {
+        $tmp = array();
+        
+        foreach ($this->_ as $name => $element) {
+            
+            if ($name == $sBeforeElementName) {
+                $this->_addElement($aoElement, null, $tmp);
+            }
+            
+            $tmp[$name] = $element;
+            
         }
+        
+        $this->_ = $tmp;
+
         return $this;
     }
 
@@ -585,21 +631,37 @@ class f_form implements ArrayAccess, IteratorAggregate, Countable
 
     /* private api */
 
-    protected function _addElement($oElement, $sName = null)
+    protected function _addElement($aoElement, $sName = null, &$aTmp = null)
     {
-        if ($sName === null) {
-            $sName = $oElement->name();
-        }
-
-        if ($sName === null || isset($this->_[$sName])) {
-            $this->_[] = $oElement;
-        }
-        else {
-            $this->_[$sName] = $oElement;
-
+        if (!is_array($aoElement)) {
+            $aoElement = array($aoElement);
         }
         
-        $oElement->form($this);
+        $elements = null;
+        if ($aTmp !== null) {
+            $elements = &$aTmp;
+        }
+        else {
+            $elements = &$this->_;
+        }
+        
+        foreach ($aoElement as /* @var $element f_form_element*/ $element) {
+            
+            if ($sName === null) {
+                $sName = $element->name();
+            }
+
+            if ($sName === null || isset($this->_[$sName])) {
+                $elements[] = $element;
+            }
+            else {
+                $elements[$sName] = $element;
+            }
+
+            $element->form($this);
+        }
+        
+        
     }
 
     protected function _removeElement($sName)

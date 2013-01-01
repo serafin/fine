@@ -3,27 +3,38 @@
 class f_upload_tmp
 {
     
-    const DIR = './data/tmp/';
+    const DIR = 'data/tmp/';
     
-    protected $_path;
+    protected $_token;
+    protected $_name;
     protected $_upload;
 
+    /**
+     * Static constructor
+     *
+     * @return f_upload_tmp
+     */
+    public static function _(array $config = array())
+    {
+        return new self($config);
+    }
+    
+    /**
+     * Constructor
+     */
+    function __construct(array $config = array()) 
+    {
+        foreach ($config as $k => $v) {
+            $this->{$k}($v);
+        }
+    }
 
-    public function create()
-    {
-        
-        
-    }
-    
-    public function path()
-    {
-        
-    }
-    
-    public function option()
-    {
-    }
-    
+    /**
+     * Set/get upload
+     * 
+     * @param f_upload $oUpload
+     * @return f_upload_tmp|f_upload
+     */
     public function upload($oUpload = null)
     {
         if (func_num_args() == 0) {
@@ -35,6 +46,67 @@ class f_upload_tmp
         
         $this->_upload = $oUpload;
         return $this;
+    }
+    
+    /**
+     * Set/get path
+     * 
+     * @param string $param
+     * @return f_upload_tmp|string 
+     */
+    public function path($sPath = null) 
+    {
+        if (func_num_args() == 0) {
+            return $this->_path();
+        }
+        
+        $this->_token = '';
+        $this->_name  = '';
+        
+        list($this->_token, , $this->_name) = explode('_', substr($sPath, strlen(self::DIR)), 2);
+        
+        return $this;
+    }
+    
+    /**
+     * Get path witch option
+     * 
+     * @param string $sOption
+     * @return string
+     */
+    public function option($sOption)
+    {
+        return $this->_path($sOption);
+    }
+    
+    public function extension()
+    {
+       return end(explode('.', $this->_name));
+    }
+    
+    public function extensionLower()
+    {
+        return strtolower($this->extension());
+    }
+    
+    public function create()
+    {
+        $upload = $this->upload();
+        
+        if (!$upload->is()) {
+            return $this;
+        }
+        
+        $this->_token = f::$c->token();
+        $this->_name  = $upload->name();
+        
+        $upload->move($this->_path());
+        
+        return $this;
+    }
+    
+    public function destroy()
+    {
         
     }
     
@@ -43,16 +115,9 @@ class f_upload_tmp
         
     }
     
-    public function extension()
+    protected function _path($sOption = '')
     {
-        
+        return self::DIR . $this->_token . '_' . $sOption . '_' . $this->_name;
     }
-    
-    public function extensionLower()
-    {
-        
-    }
-    
-    
     
 }

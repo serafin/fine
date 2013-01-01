@@ -29,13 +29,55 @@ class f_form_decor_tag extends f_form_decor_default
         return $this;
     }
 
-    public function attr($aAttr = null)
+    /**
+     * Ustawianie lub pobieranie lub usuwanie atrybutow
+     *
+     * @param array|string $asName
+     * @param string $sValue
+     * @return f_form_decor_tag
+     */
+    public function attr($asName = null, $sValue = null)
     {
-        if (func_num_args() == 0) {
-            return $this->_attr;
+        switch (func_num_args()) {
+            case 0:
+
+                return $this->_attr;
+
+            case 1:
+
+                if ($asName === null) {
+                    $this->_attr = array();
+                }
+                else if (is_array($asName)) {
+                    foreach ($asName as $k => $v) {
+                        $this->_attr[$k] = $v;
+                    }
+                }
+                else {
+                    return $this->_attr[$asName];
+                }
+                return $this;
+
+            case 2:
+
+                if ($sValue === null) {
+                    if (is_array($asName)) {
+                        foreach ($asName as $k => $v) {
+                            unset($this->_attr[$k]);
+                        }
+                    }
+                    else {
+                        unset($this->_attr[$asName]);
+                    }
+                }
+                else {
+                    $this->_attr[$asName] = $sValue;
+                }
+                return $this;
+
+            default:
+                throw new f_form_exception_badMethodCall('Too many arguments');
         }
-        $this->_attr = $aAttr;
-        return $this;
     }
 
     public function short($bShort = null)
