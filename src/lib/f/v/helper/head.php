@@ -90,6 +90,36 @@ class f_v_helper_head
             'var'       => 'content',
             'val'       => array('attr' => ''),
         ),
+        'ogTitle' => array(
+            'mode'      => 'item',
+            'template'  => "\t<meta property=\"og:title\" content=\"{content}\">\n",
+            'var'       => 'content',
+        ),
+        'ogType' => array(
+            'mode'      => 'item',
+            'template'  => "\t<meta property=\"og:type\" content=\"{content}\">\n",
+            'var'       => 'content',
+        ),
+        'ogUrl' => array(
+            'mode'      => 'item',
+            'template'  => "\t<meta property=\"og:url\" content=\"{content}\">\n",
+            'var'       => 'content',
+        ),
+        'ogImage' => array(
+            'mode'      => 'item',
+            'template'  => "\t<meta property=\"og:image\" content=\"{content}\">\n",
+            'var'       => 'content',
+        ),
+        'ogSiteName' => array(
+            'mode'      => 'item',
+            'template'  => "\t<meta property=\"og:site_name\" content=\"{content}\">\n",
+            'var'       => 'content',
+        ),
+        'fbAppId' => array(
+            'mode'      => 'item',
+            'template'  => "\t<meta property=\"fb:app_id\" content=\"{content}\">\n",
+            'var'       => 'content',
+        ),
     );
     protected $_data = array();
     
@@ -192,6 +222,8 @@ class f_v_helper_head
         unset($this->_data[$sType]);
     }
 
+    /* html main */
+    
     public function charset($sCharset)
     {
         return $this->head('charset', $sCharset);
@@ -217,6 +249,8 @@ class f_v_helper_head
         return $this->head('favicon', $sFavicon);
     }
 
+    /* feeds */
+    
     public function rss($sUri, $sTitle = null)
     {
         return $this->head('rss', array('href' => $sUri, 'title' => $sTitle));
@@ -227,9 +261,21 @@ class f_v_helper_head
         return $this->head('atom', array('href' => $sUri, 'title' =>  $sTitle));
     }
 
+    /* css */
+    
     public function css($sUri)
     {
         return $this->head('css', $sUri);
+    }
+    
+    public function csscode($sContent)
+    {
+        return $this->head('csscode', $sContent);
+    }
+
+    public function cssblock($sContent)
+    {
+        return $this->head('cssblock', $sContent);
     }
     
     public function cssi($sStyle)
@@ -237,6 +283,8 @@ class f_v_helper_head
         $this->css('/public/css/' . $sStyle . '/v' . f::$c->config->public['css'][$sStyle]['v'] . '.css');
     }
 
+    /* js */
+    
     public function js($sUri, $sContent = null)
     {
         return $this->head('js', array('src' => $sUri, 'content' => $sContent));
@@ -252,14 +300,38 @@ class f_v_helper_head
         return $this->head('jsblock', $sContent);
     }
 
-    public function csscode($sContent)
+    /* Open Graph protocol http://ogp.me/ */ 
+    
+    public function ogTitle($sContent)
     {
-        return $this->head('csscode', $sContent);
+        return $this->head('ogTitle', $sContent);
     }
-
-    public function cssblock($sContent)
+    
+    public function ogType($sContent)
     {
-        return $this->head('cssblock', $sContent);
+        return $this->head('ogType', $sContent);
+    }
+    
+    public function ogUrl($sContent)
+    {
+        return $this->head('ogUrl', $sContent);
+    }
+    
+    public function ogImage($sContent)
+    {
+        return $this->head('ogImage', $sContent);
+    }
+    
+    public function ogSiteName($sContent)
+    {
+        return $this->head('ogImage', $sContent);
+    }
+    
+    /* facebook */
+    
+    public function fbAppId($sContent)
+    {
+        return $this->head('fbAppId', $sContent);
     }
     
 }

@@ -57,6 +57,11 @@ class f_form implements ArrayAccess, IteratorAggregate, Countable
         }
     }
 
+    public function __isset($sName) 
+    {
+        return isset($this->_[$sName]);
+    }
+
     /**
      * Zwraca obiekt podanego elementu tego formularza
      *
@@ -227,7 +232,7 @@ class f_form implements ArrayAccess, IteratorAggregate, Countable
         $class = explode(' ', $this->_attr['class']);
         foreach ($class as $k => $v) {
             if ($v == $sName) {
-                unset ($class[$v]);
+                unset($class[$k]);
             }
         }
         $this->_attr['class'] = implode(' ', $class);
@@ -647,15 +652,13 @@ class f_form implements ArrayAccess, IteratorAggregate, Countable
         
         foreach ($aoElement as /* @var $element f_form_element*/ $element) {
             
-            if ($sName === null) {
-                $sName = $element->name();
-            }
-
-            if ($sName === null || isset($this->_[$sName])) {
+            $name = $sName !== null ? $sName : $element->name();
+            
+            if ($name === null || array_key_exists($name, $this->_)) {
                 $elements[] = $element;
             }
             else {
-                $elements[$sName] = $element;
+                $elements[$name] = $element;
             }
 
             $element->form($this);

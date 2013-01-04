@@ -523,6 +523,27 @@ class f_image
 		$this->_resource  = $rImage2;
 		return $this;
 	}
+        
+        function cutAndResize($x1, $y1, $x2, $y2, $iNewWidth, $iNewHeight)
+	{     
+            if ($iNewWidth <= 0 || $iNewHeight <= 0) {
+                $this->_error(self::ERROR_THUMB);
+                return $this;
+            }
+            if (!$rImage = imagecreatetruecolor($iNewWidth, $iNewHeight)) {
+                $this->_error(self::ERROR_THUMB);
+		return $this;
+            }
+            if (!imagecopyresampled($rImage, $this->_resource, 0,0, $x1, $y1, $iNewWidth, $iNewHeight, $x2 - $x1, $y2 - $y1)) {
+		$this->_error(self::ERROR_THUMB);
+		return $this;
+            }
+
+            $this->_width  = $iNewWidth;
+            $this->_height = $iNewHeight;
+            $this->_resource  = $rImage;
+            return $this;
+	}
 
     /* Private api */
 

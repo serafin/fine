@@ -60,7 +60,7 @@ class f_form_decor_error extends f_form_decor_tag
         return $this;
     }
 
-    public function itmeAppend($sItemAppend = null)
+    public function itemAppend($sItemAppend = null)
     {
         if (func_num_args() == 0) {
             return $this->_itemAppend;

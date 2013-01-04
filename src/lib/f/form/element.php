@@ -20,6 +20,7 @@ class f_form_element
     protected $_breakOnFail   = true;
     protected $_error         = array();
     protected $_helper        = 'formText';
+    protected $_param         = array();
     
     /* context form */
     protected $_form;
@@ -40,6 +41,7 @@ class f_form_element
         'desc'   => 'f_form_decor_desc',
         'tag'    => array('f_form_decor_tag', 'attr' => array('class' => 'form-element')),
     );
+    
 
     /**
      * Element formularza
@@ -91,7 +93,48 @@ class f_form_element
             'helper'        => $this->_helper,
             'label'         => $this->_label,
             'desc'          => $this->_desc,
+            'param'         => $this->_param,
         );
+    }
+    
+    /**
+     * Ustala lub pobiera parametry pól formularza
+     *
+     * @param array|string $asKey Pole w ktorym ma byc ustawiony klucz
+     * @param string $sValue Pole w ktorym ma byc ustawiona wartosc
+     * @return array|$this
+     */
+    public function param($asKey = null, $sValue = null)
+    {
+        switch (func_num_args()) {
+
+            case 0:
+                // get all params
+                return $this->_param;
+
+            case 1:
+                // set params from array
+                if (is_array($asKey)) {
+                    foreach ($asKey as $k => $v) {
+                        if (is_int($k)) {
+                            $this->_param[] = $v;
+                        }
+                        else {
+                            $this->_param[$k] = $v;
+                        }
+                    }
+                    return $this;
+                }
+
+                // get param by key
+                return $this->_param[$asKey];
+
+            case 2:
+                // set param
+                $this->_param[$asKey] = $sValue;
+                return $this;
+        }
+
     }
 
     /**
@@ -803,6 +846,8 @@ class f_form_element
             return $this;
         }
     }
+    
+    
 
 
 }

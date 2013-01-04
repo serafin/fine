@@ -235,6 +235,7 @@ class f_error
         $oView->line      = $this->line;
         $oView->trace     = $this->trace;
         $oView->error     = $this;
+        ob_end_clean();
         echo $oView->renderPath('./lib/f/error/exception.view');
 
 
