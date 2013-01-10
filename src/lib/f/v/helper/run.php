@@ -3,7 +3,7 @@
 class f_v_helper_run
 {
 
-    public static function helper($sController, $sAction,  $aParams = null)
+    public static function helper($sController, $sAction,  $aParams = array())
     {
 		$sClass = "c_$sController";
 		$oController = new $sClass;

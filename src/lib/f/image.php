@@ -561,7 +561,8 @@ class f_image
         }
 
         // 2. Wedlug rozszerzenia
-        $type = $this->extension2Type(strtolower(end(explode('.', $this->_file)))); // wedlug rozszerzenia
+        $parts = explode('.', $this->_file);
+        $type  = $this->extension2Type(strtolower(end($parts))); // wedlug rozszerzenia
         if ($type !== null) {
             return $type;
         }

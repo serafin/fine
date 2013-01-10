@@ -414,30 +414,54 @@ class f_form implements ArrayAccess, IteratorAggregate, Countable
         return $this;
     }
 
-    public function decor($asDecor)
+    public function decor($asDecor = null, $oaDecor = null)
     {
-        if (is_array($asDecor)) {
-            $this->_decor = $asDecor;
-            return $this;
+        switch (func_num_args()) {
+
+            case 0:
+                return $this->_decor;
+
+            case 1:
+                if (is_array($asDecor)) {
+                    $this->_decor = $asDecor;
+                    return $this;
+                }
+
+                if (is_string($asDecor)) {
+                    if ($this->_decor === true) {
+                        $this->decorDefault();
+                    }
+                    if (!is_object($this->_decor[$asDecor])) {
+                        if (is_string($this->_decor[$asDecor])) {
+                            $this->_decor[$asDecor] = new $this->_decor[$asDecor];
+                        }
+                        else if (is_array($this->_decor[$asDecor])) {
+                            $class = array_shift($this->_decor[$asDecor]);
+                            $this->_decor[$asDecor] = new $class($this->_decor[$asDecor]);
+                        }
+                    }
+                    return $this->_decor[$asDecor];
+                }
+                
+            case 2:
+                $this->_decor[$asDecor] = $oaDecor;
+                return $this;
+
+
         }
 
-        if (is_string($asDecor)) {
-            if ($this->_decor === true) {
-                $this->decorDefault();
-            }
-            if (!is_object($this->_decor[$asDecor])) {
-                if (is_string($this->_decor[$asDecor])) {
-                    $this->_decor[$asDecor] = new $this->_decor[$asDecor];
-                }
-                else if (is_array($this->_decor[$asDecor])) {
-                    $class = array_shift($this->_decor[$asDecor]);
-                    $this->_decor[$asDecor] = new $class($this->_decor[$asDecor]);
-                }
-            }
-            return $this->_decor[$asDecor];
-        }
 
-        return $this;
+    }
+    
+    /**
+     * Czy dekorator istnieje
+     * 
+     * @param string $sName
+     * @return boolean
+     */
+    public function isDecor($sName)
+    {
+        return $this->_decor[$sName];
     }
 
     public function addDecor($aoDecor)
@@ -445,7 +469,6 @@ class f_form implements ArrayAccess, IteratorAggregate, Countable
         if ($this->_decor === true) {
             $this->decorDefault();
         }
-
         if (is_array($aoDecor)) {
             foreach ($aoDecor as $k => $v) {
                 if (is_int($k)) {
@@ -462,7 +485,43 @@ class f_form implements ArrayAccess, IteratorAggregate, Countable
         return $this;
     }
 
+    public function addDecorBefore($sBefore, $aDecor)
+    {        
+        if ($this->_decor === true) {
+            $this->decorDefault();
+        }
 
+        $aTmp = array();
+        foreach($this->_decor as $k => $v){           
+            if($k == $sBefore){
+                $aTmp += $aDecor;
+            }
+            $aTmp[$k] = $v;
+        }
+        $this->_decor = $aTmp;
+        
+        return $this;
+    }
+    
+    public function addDecorAfter($sAfter, $aDecor)
+    {
+        if ($this->_decor === true) {
+            $this->decorDefault();
+        }
+        
+        $aTmp = array();
+        foreach($this->_decor as $k => $v){
+            $aTmp[$k] = $v;
+            if($k == $sAfter){
+                $aTmp += $aDecor;
+            }
+        }
+        
+        $this->_decor = $aTmp;
+        
+        return $this;
+    }
+    
     public function removeDecor($sName = null)
     {
         if (func_num_args() == 0) {
@@ -472,6 +531,11 @@ class f_form implements ArrayAccess, IteratorAggregate, Countable
             unset($this->_decor[$sName]);
         }
         return $this;
+    }
+
+    public function decorDefault()
+    {
+//        $this->_decor = isset($this->_form) ? $this->_decorForm : $this->_decorElement;
     }
 
     /**

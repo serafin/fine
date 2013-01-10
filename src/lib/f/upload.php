@@ -159,7 +159,8 @@ class f_upload implements IteratorAggregate
     public function extension()
     {
         if (strstr($this->name(), '.')) {
-            return end(explode('.', $this->name()));
+            $parts = explode('.', $this->name());
+            return end($parts);
         }
         else {
             return '';

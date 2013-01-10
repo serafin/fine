@@ -63,7 +63,7 @@ class f_upload_tmp
         $this->_token = '';
         $this->_name  = '';
         
-        list($this->_token, , $this->_name) = explode('_', substr($sPath, strlen(self::DIR)), 2);
+        list($this->_token, , $this->_name) = explode('_', substr($sPath, strlen(self::DIR)), 3);
         
         return $this;
     }
@@ -105,14 +105,33 @@ class f_upload_tmp
         return $this;
     }
     
+    public function save($sNewPath) 
+    {
+        copy($this->_path(), $sNewPath);
+        return $this;
+    }
+    
     public function destroy()
     {
         
     }
     
-    public function destroyAll($iSeconds = 604800) 
+    public function destroyAll($iOlderThan = 604800) 
     {
+        $now = time();
         
+        foreach (new DirectoryIterator(self::DIR) as /* @var $file SplFileInfo */ $file) {
+            
+            if ($file->isDot()) {
+                continue;
+            }
+            
+            if ($file->getMTime() >= $now - $iOlderThan) {
+                continue;
+            }
+            
+            unlink($file->getPathname());
+        }
     }
     
     protected function _path($sOption = '')

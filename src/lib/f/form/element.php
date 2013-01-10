@@ -699,6 +699,17 @@ class f_form_element
 
 
     }
+    
+    /**
+     * Czy dekorator istnieje
+     * 
+     * @param string $sName
+     * @return boolean
+     */
+    public function isDecor($sName)
+    {
+        return $this->_decor[$sName];
+    }
 
     public function addDecor($aoDecor)
     {
@@ -757,7 +768,6 @@ class f_form_element
         
         return $this;
     }
-    
     
     public function removeDecor($sName = null)
     {
