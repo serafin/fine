@@ -16,12 +16,21 @@ class f_v_helper_head
             'prepend'   => "\t<title>",
             'separator' => " | ",
             'append'    => "</title>\n",
+            'reverse'   => false,
         ),
         'keywords' => array(
             'mode'      => 'list',
             'template'  => "{words}",
             'var'       => 'words',
             'prepend'   => "\t<meta name=\"keywords\" content=\"",
+            'separator' => ', ',
+            'append'    => "\" />\n",
+        ),
+        'robots' => array(
+            'mode'      => 'list',
+            'template'  => "{param}",
+            'var'       => 'param',
+            'prepend'   => "\t<meta name=\"robots\" content=\"",
             'separator' => ', ',
             'append'    => "\" />\n",
         ),
@@ -110,6 +119,11 @@ class f_v_helper_head
             'template'  => "\t<meta property=\"og:image\" content=\"{content}\">\n",
             'var'       => 'content',
         ),
+        'ogDescription' => array(
+            'mode'      => 'item',
+            'template'  => "\t<meta property=\"og:description\" content=\"{content}\">\n",
+            'var'       => 'content',
+        ),
         'ogSiteName' => array(
             'mode'      => 'item',
             'template'  => "\t<meta property=\"og:site_name\" content=\"{content}\">\n",
@@ -119,6 +133,21 @@ class f_v_helper_head
             'mode'      => 'item',
             'template'  => "\t<meta property=\"fb:app_id\" content=\"{content}\">\n",
             'var'       => 'content',
+        ),
+        'canonical' => array(
+            'mode'      => 'item',
+            'template'  => "\t<link rel=\"canonical\" href=\"{content}\" />\n",
+            'var'       => 'content'
+        ),
+        'next' => array(
+            'mode'      => 'item',
+            'template'  => "\t<link rel=\"next\" href=\"{content}\" />",
+            'var'       => 'content'
+        ),
+        'prev' => array(
+            'mode'      => 'item',
+            'template'  => "\t<link rel=\"prev\" href=\"{content}\" />",
+            'var'       => 'content'
         ),
     );
     protected $_data = array();
@@ -183,6 +212,11 @@ class f_v_helper_head
         else {
             
             $aOutput = array();
+            
+            if ($tpl['reverse']) {
+                $data = array_reverse($data);
+            }
+            
             foreach ($data as $i) {
                 $i       += (array)$tpl['val'];
                 $sOutput = $tpl['template'];
@@ -217,9 +251,19 @@ class f_v_helper_head
         return $this;
     }
     
-    public function remove($sType)
+    public function remove($sType = null)
     {
+        // remove all
+        if (func_num_args() == 0) {
+            foreach ($this->template as $type => $template) {
+                unset($this->_data[$type]);
+            }
+            return $this;
+        }
+        
+        // remove one type
         unset($this->_data[$sType]);
+        return $this;
     }
 
     /* html main */
@@ -242,6 +286,11 @@ class f_v_helper_head
     public function description($sDescription)
     {
         return $this->head('description', $sDescription);
+    }
+
+    public function robots($sRobots)
+    {
+        return $this->head('robots', $sRobots);
     }
 
     public function favicon($sFavicon)
@@ -327,11 +376,31 @@ class f_v_helper_head
         return $this->head('ogImage', $sContent);
     }
     
+    public function ogDescription($sContent)
+    {
+        return $this->head('ogDescription', $sContent);
+    }
+    
+    public function next($sContent)
+    {
+        return $this->head('next', $sContent);
+    }
+    
+    public function prev($sContent)
+    {
+        return $this->head('prev', $sContent);
+    }
+    
     /* facebook */
     
     public function fbAppId($sContent)
     {
         return $this->head('fbAppId', $sContent);
+    }
+    
+    public function canonical($sContent)
+    {
+        return $this->head('canonical', $sContent);
     }
     
 }

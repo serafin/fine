@@ -3,7 +3,7 @@
 class f_c_helper_wash
 {
 
-	public static function helper($sText, $cSpace = '_', $sAllow = '.()')
+	public static function helper($sText, $cSpace = '-', $sAllow = '.()')
 	{
         // pl2en
         $sText = f_c_helper_pl2en::helper($sText);

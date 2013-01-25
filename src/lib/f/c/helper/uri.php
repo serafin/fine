@@ -204,7 +204,7 @@ class f_c_helper_uri
         }
 
         $uri = implode($this->_separator, $numeric);
-
+        
         // assoc
         if ($this->_requestQuery || $aQuery) {
             $assoc = $this->_requestQuery;

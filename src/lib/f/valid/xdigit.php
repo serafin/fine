@@ -7,7 +7,7 @@ class f_valid_xdigit extends f_valid_abstract
     const NOT_XDIGIT   = 'NOT_XDIGIT';
 
     protected $_msg = array(
-        slef::STRING_EMPTY => 'Wymagana wartość',
+        self::STRING_EMPTY => 'Wymagana wartość',
         self::NOT_XDIGIT   => 'Wymagana wartość heksadecymalna (0-9, a-f, A-F np. 00ff00)',
     );
 

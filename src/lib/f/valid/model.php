@@ -216,33 +216,35 @@ class f_valid_model extends f_valid_abstract
 
         $a = $this->_model->{$this->_method}();
         $b = $this->_valToCompare;
-
         switch ($this->_compare) {
 
             case self::COMPARE_EQUAL:
-                return $a == $b;
-
+                $bReturn = $a == $b;
+                break;
             case self::COMPARE_NOT_EQUAL:
-                return $a != $b;
-
+                $bReturn = $a != $b;
+                break;
             case self::COMPARE_LESS_THAN:
-                return $a < $b;
-
+                $bReturn =  $a < $b;
+                break;
             case self::COMPARE_GREATER_THAN:
-                return $a > $b;
-
+                $bReturn =  $a > $b;
+                break;
             case self::COMPARE_LESS_THAN_OR_EQUAL:
-                return $a <= $b;
-
+                $bReturn =  $a <= $b;
+                break;
             case self::COMPARE_GREATER_THAN_OR_EQUAL:
-                return $a >= $b;
-
+                $bReturn = $a >= $b;
+                break;
             default:
                 throw new f_valid_exception_logic("Nie prawidlowa wartosc dla wlasnosci `operator()`");
 
         }
 
-        return true;
+        if($bReturn == false){
+            $this->_error(self::NOT_VALID);
+        }
+        return $bReturn;
     }
 
     /* helpers */
