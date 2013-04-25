@@ -28,7 +28,7 @@ class f_config
         // setter
 
         if ($this->___path !== null) {
-
+            
             // clear config cache
             foreach ((array)$this as $k => $v) {
                 unset($this->{$k});

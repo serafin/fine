@@ -7,6 +7,17 @@ class f_foap_client
     protected $_param;
     protected $_object;
 
+    public static function _(array $config = array())
+    {
+        return new self($config);
+    }
+
+    public function __construct(array $config = array())
+    {
+        foreach ($config as $k => $v) {
+            $this->{$k}($v);
+        }
+    }
 
     public function uri($sUri = null)
     {
@@ -63,10 +74,10 @@ class f_foap_client
         return $this->_object;
     }
     
-    public function call($sName, $aArguments)
+    public function call($sName, $aArguments = array())
     {
         
-        $request = json_encode(array(
+        $request = serialize(array(
             'head' => array(
                 'foap'  => '1',
                 'type'  => 'request',
@@ -98,11 +109,11 @@ class f_foap_client
         
         fclose($r);
         
-        $body = '';
-        list(,$body) = explode("\r\n\r\n", $response);
-        $body = json_decode($body);
+        list(, $body) = explode("\r\n\r\n", $response, 2);
         
-        return $body->body;
+        $body = unserialize($body);
+        
+        return $body['body'];
         
     }
 }

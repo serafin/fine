@@ -42,6 +42,6 @@ class f_c_helper_redirect extends f_c
 
     public function uri($asUri = '')
     {
-        $this->raw($this->_c->uri->assembleAbs($asUri));
+        $this->raw($this->_c->uri->assemble($asUri));
     }
 }

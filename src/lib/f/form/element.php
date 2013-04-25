@@ -136,6 +136,12 @@ class f_form_element
         }
 
     }
+    
+    public function removeParam($key)
+    {
+        unset($this->_param[$key]);
+        return $this;
+    }
 
     /**
      * Friendly method for f_form
@@ -402,7 +408,7 @@ class f_form_element
                 
         }
     }
-
+    
     public function separator($sSeparator = null)
     {
         if (func_num_args() === 0) {

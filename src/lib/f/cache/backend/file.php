@@ -58,6 +58,10 @@ class f_cache_backend_file implements f_cache_backend_interface
             return false;
         }
 
+        if ($iTime == 0) { // jezeli czas jest rowny 0 to nie sprawdzamy czasu waznosci cacheu
+            return true;
+        }
+        
         return (filemtime($path) + $iTime >= time());
     }
 
@@ -102,6 +106,10 @@ class f_cache_backend_file implements f_cache_backend_interface
 
         if (!is_file($path)) {
             return false;
+        }
+        
+        if ($iTime == 0) {
+            return unserialize(file_get_contents($path));
         }
 
         if (filemtime($path) + $iTime < time()) {

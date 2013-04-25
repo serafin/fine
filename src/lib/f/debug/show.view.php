@@ -105,19 +105,23 @@ $ec = " onclick=\"(this.nextSibling.nextSibling.style.display=='' ? this.nextSib
                         break;
 
                     case f_debug::LOG_TYPE_TABLE:
-                        $data .= '<table><thead><tr>';
-                        foreach (array_keys(current($log['data'])) as $key) {
-                            $data .= '<th class="f_debug-th">' .  htmlspecialchars(f_debug::scalar($key)) . '</th>';
-                        }
-                        $data .= '</tr></thead><tbody>';
-                        foreach($log['data'] as $i) {
-                            $data .= '<tr>';
-                            foreach($i as $j) {
-                                $data .= '<td class="f_debug-td">' .  htmlspecialchars(f_debug::scalar($j)) . '</td>';
+                        
+                        if (is_array($log['data']) && is_array(current($log['data']))) {
+                            $data .= '<table><thead><tr>';
+                            foreach (array_keys(current($log['data'])) as $key) {
+                                $data .= '<th class="f_debug-th">' .  htmlspecialchars(f_debug::scalar($key)) . '</th>';
                             }
-                            $data .= '</tr>';
+                            $data .= '</tr></thead><tbody>';
+                            foreach($log['data'] as $i) {
+                                $data .= '<tr>';
+                                foreach($i as $j) {
+                                    $data .= '<td class="f_debug-td">' .  htmlspecialchars(f_debug::scalar($j)) . '</td>';
+                                }
+                                $data .= '</tr>';
+                            }
+                            $data .= '</tbody></table>';
                         }
-                        $data .= '</tbody></table>';
+                        
                         break;
 
                     case f_debug::LOG_TYPE_CODE_HTML:
@@ -173,7 +177,9 @@ $ec = " onclick=\"(this.nextSibling.nextSibling.style.display=='' ? this.nextSib
 
                     case f_debug::LOG_TYPE_TABLE:
                         reset($log['data']);
-                        $preview = str_replace("\n", " ", implode(" ", array_keys(current($log['data']))));
+                        if (is_array($log['data']) && is_array(current($log['data']))) {
+                            $preview = str_replace("\n", " ", implode(" ", array_keys(current($log['data']))));
+                        }
                         break;
 
                     case f_debug::LOG_TYPE_CODE_HTML:

@@ -15,7 +15,6 @@
  *      - when method `begin` does not throws f_sis_exception_running (if `throwException` is on).
  * ## Sis ends:
  *      - when php script ends,
- *      - if sis object `__destruct` mehtod is called (eg. unset($sis)),
  *      - on demand using method `end`.
  *
  * ## How it works
@@ -61,16 +60,6 @@ class f_sis
     {
         foreach ($config as $k => $v) {
             $this->{$k}($v);
-        }
-    }
-
-    /**
-     * Destructor
-     */
-    public function __destruct()
-    {
-        if ($this->_cleanup) {
-            $this->end();
         }
     }
 

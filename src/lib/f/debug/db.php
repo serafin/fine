@@ -35,6 +35,7 @@ class f_debug_db
 
         if (in_array($name, array('query', 'row', 'rows', 'col', 'cols', 'val', 'rowNum', 'rowsNum', 'lastInsertId'))) {
             
+            
             $debug->timer()->start();
             $return = call_user_func_array(array($this->_db, $name), $arguments);
             $debug->timer()->stop();
@@ -47,7 +48,7 @@ class f_debug_db
             
             if (is_resource($result)) { // select
 
-                $iSelected  = $this->_db->countSelected();
+                $iSelected = $this->_db->countSelected();
 
                 if ($iSelected) {
 
@@ -67,6 +68,8 @@ class f_debug_db
                         $j++;
                     }
                     $debug->log($rows, 'Selected rows: ' . $iSelected , f_debug::LOG_TYPE_TABLE);
+                    mysql_data_seek($result, 0);
+                    
                 }
                 
             }

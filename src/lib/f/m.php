@@ -295,6 +295,10 @@ class f_m implements IteratorAggregate, Countable
             foreach ($this->_field as $i) {
                 $a[$i] = $this->{$i};
             }
+            if ($this->_key != null) {
+                $a[$this->_key] = $this->id();
+            }
+            
             return $a;
         }
         else if ($asRestrictionField === null) {
@@ -414,8 +418,12 @@ class f_m implements IteratorAggregate, Countable
 
     }
 
-    public function paramPaging()
+    public function paramPaging(f_paging $paging = null)
     {
+        if ($paging !== null) {
+            $this->paging($paging);
+        }
+        
         $this->paging()
                 ->all($this->fetchCount())
                 ->paging();
@@ -454,7 +462,7 @@ class f_m implements IteratorAggregate, Countable
      */
     public function select($aisParam = null)
     {
-        if (func_num_args() != 0 && !is_array($aisParam) && $this->_key) {
+        if (func_num_args() != 0 && !is_array($aisParam) && !$this->_param && $this->_key) {
             $aisParam = array($this->_key => $this->_db->escape($aisParam));
         }
 
@@ -513,9 +521,12 @@ class f_m implements IteratorAggregate, Countable
      * @param array|integer|string|null $aisParam Parametry
      * @return $this
      */
-    public function selectVal($aParam = null)
+    public function selectVal($aisParam = null)
     {
-        $this->_ = $this->_db->val($this->_sql($aParam, true, true, true));
+        if (func_num_args() != 0 && !is_array($aisParam) && !$this->_param && $this->_key) {
+            $aisParam = array($this->_key => $this->_db->escape($aisParam));
+        }
+        $this->_ = $this->_db->val($this->_sql($aisParam, true, true, true));
         return $this;
     }
 
@@ -633,9 +644,9 @@ class f_m implements IteratorAggregate, Countable
      * @param array|integer|string|null $aisParam Parametry
      * @return string
      */
-    public function fetchVal($aParam = null)
+    public function fetchVal($aisParam = null)
     {
-        $this->selectVal($aParam);
+        $this->selectVal($aisParam);
         return $this->_;
     }
 
@@ -698,14 +709,7 @@ class f_m implements IteratorAggregate, Countable
     public function insert($aData = null)
     {
         
-        if (func_num_args()) {
-            foreach ($aData as $k => $v) {
-                if (! is_int($k) && ! in_array($k, $this->_field)) {
-                    unset($aData[$k]);
-                }
-            }
-        }
-        else {
+        if (!$aData) {
             $aData = $this->val();
         }
 
@@ -1259,7 +1263,7 @@ class f_m implements IteratorAggregate, Countable
 
             // this model
             foreach ($field as $k => $v) {
-                $select[] =  "`$v`" . (is_int($k) ? '' : ' as ' . $k);
+                $select[] =  "$v" . (is_int($k) ? '' : ' as ' . $k);
             }
 
             // joins

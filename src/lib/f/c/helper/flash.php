@@ -51,8 +51,6 @@ class f_c_helper_flash extends f_c
     {
         $msgs = $this->_storage;
 
-        $this->remove();
-
         return $msgs;
     }
 
@@ -61,10 +59,16 @@ class f_c_helper_flash extends f_c
         return (boolean) $this->_storage;
     }
 
-    public function remove()
+    public function remove($index = null)
     {
-        $this->_storage = array();
-        return $this;
+        if ($index === null) {
+            $this->_storage = array();
+            return $this;
+        }
+        else {
+            unset($this->_storage[$index]);
+            return $this;
+        }
     }
 
     public function redirect($sUri)

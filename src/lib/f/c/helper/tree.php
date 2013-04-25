@@ -6,14 +6,25 @@ class f_c_helper_tree implements f_di_asNew_interface
     public $id     = array();
     public $parent = array();
     
-    protected $_root   = 0;
-    protected $_child  = 'child';
-    protected $_id     = 'id';
-    protected $_parent = 'parent';
+    protected $_root       = 0;
+    protected $_child      = 'child';
+    protected $_id         = 'id';
+    protected $_parent     = 'parent';
 
-    public function __construct($aConfig = array())
+    /**
+     * Static construktor
+     * 
+     * @param array $config
+     * @return f_c_helper_tree
+     */
+    public static function _(array $config = array())
     {
-        foreach ($aConfig as $k => $v) {
+        return new self($config);
+    }
+    
+    public function __construct(array $config = array())
+    {
+        foreach ($config as $k => $v) {
             $this->{$k}($v);
         }
     }
@@ -32,7 +43,7 @@ class f_c_helper_tree implements f_di_asNew_interface
         }
         return $this;
     }
-
+    
     public function id($sId = null)
     {
         if ($sId === null) {
@@ -91,7 +102,7 @@ class f_c_helper_tree implements f_di_asNew_interface
     protected function _tree($parent)
     {
         $aReturn = array();
-        foreach ($this->parent[$parent] as $i) {
+        foreach ((array)$this->parent[$parent] as $i) {
             $a = $this->id[$i];
             if (isset($this->parent[$i])) {
                 $a[$this->_child] = $this->_tree($i);

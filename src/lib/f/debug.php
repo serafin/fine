@@ -112,6 +112,15 @@ class f_debug
         return $geshi->parse_code();
 
     }
+    
+    public static function backtrace() 
+    {
+        $a = debug_backtrace();
+        foreach ($a as $k=>$v) {
+        	unset($a[$k]['object']);
+        }
+        f_debug::dump($a);
+    }
 
     public static function dump($mVar, $sLabel = null, $bEcho = true)
     {
@@ -246,7 +255,13 @@ class f_debug
             return;
         }
 
-        if (count($this->log) >= $this->_limit) {
+        if (count($this->log) == $this->_limit) {
+             $this->log[] = array('data' => $this->_limit, 'label' => 'f_debug limit hit!', 'type' => self::LOG_TYPE_VAL,
+                     'style' => self::LOG_STYLE_WARNING, 'tree' => null, 'offset' => $this->_offset->get());
+            return;
+        }
+        
+        if (count($this->log) > $this->_limit) {
             return;
         }
 

@@ -113,7 +113,13 @@ class f_upload_tmp
     
     public function destroy()
     {
-        
+        foreach (new DirectoryIterator(self::DIR) as /* @var $file SplFileInfo */ $file) {
+            $len = strlen($this->_token . '_');
+            if (strncmp($this->_token . '_', $file->getFilename(), $len) != 0) {
+                continue;
+            }
+            unlink($file->getPathname());
+        }
     }
     
     public function destroyAll($iOlderThan = 604800) 

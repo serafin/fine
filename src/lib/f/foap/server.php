@@ -89,12 +89,12 @@ class f_foap_server
             $this->_response = new f_c_response();
         }
         
-        $request = json_decode((string)@file_get_contents('php://input'));
+        $request = unserialize((string)@file_get_contents('php://input'));
         
         // validate foap request
         if (
-            !is_object($request) || !isset($request->head) || !is_object($request->head)
-            || !isset($request->head->type) || !isset($request->head->foap)
+            !is_array($request) || !isset($request['head']) || !is_array($request['head'])
+            || !isset($request['head']['type']) || !isset($request['head']['foap'])
         ) {
             $this->_response->code(400)->body('400 Bad Request')->send();
             return;
@@ -103,10 +103,10 @@ class f_foap_server
         /** @todo check foap version, version is stored in $request->head->foap */
         
         // define request, send foap define response
-        if ($request->head->type == 'request_define') {
+        if ($request['head']['type'] == 'request_define') {
             $this->_response
-                ->header('Content-Type', 'application/json')
-                ->body(json_encode(array(
+                ->header('Content-Type', 'text/plain')
+                ->body(serialize(array(
                     'head' => array(
                         'foap'  => '1',
                         'type'  => 'response_define',
@@ -118,27 +118,27 @@ class f_foap_server
         }
         
         
-        if ($request->head->type != 'request') {
+        if ($request['head']['type'] != 'request') {
             $this->_response->code(400)->body('400 Bad Request')->send();
         }
         
         
         if ($this->_event) {
-            $this->_event->subject($this)->param($request->head->param)->run();
+            $this->_event->subject($this)->param($request['head']['param'])->run();
             if ($this->_event->cancel()) {
                 return;
             }
         }
         
+        $responseBody = serialize(array(
+            'head' => array('foap'  => '1', 'type'  => 'response'),
+            'body' => call_user_func_array(array($this->_object, $request['body']['method']), $request['body']['arg']),
+        ));
+        
         $this->_response
-            ->header('Content-Type', 'application/json')
-            ->body(json_encode(array(
-                'head' => array(
-                    'foap'  => '1',
-                    'type'  => 'response',
-                ),
-                'body' => call_user_func_array(array($this->_object, $request->body->method), $request->body->arg),
-            )))
+            ->header('Content-Type', 'text/plain')
+            ->header('Content-Length', mb_strlen($responseBody))
+            ->body($responseBody)
             ->send();
     }
     

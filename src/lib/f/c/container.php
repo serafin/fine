@@ -14,7 +14,7 @@ class f_c_container extends f_di
     {
         // get service/helper from DI Cointainer
         $object = parent::__get($sName);
-        if ($object) {
+        if ($object !== null) {
            return $object;
         }
 

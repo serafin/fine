@@ -23,7 +23,7 @@ class f_foap_client_object
         }
     }
 
-    public function __call($name, $arguments)
+    public function __call($name, $arguments = array())
     {
         return $this->_client->call($name, $arguments);
     }

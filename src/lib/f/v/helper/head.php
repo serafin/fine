@@ -65,6 +65,12 @@ class f_v_helper_head
             'var'       => 'href',
             'val'       => array('attr' => ''),
         ),
+        'cssIE7' => array(
+            'mode'      => 'list',
+            'template'  => "\t<!--[if IE 7]><link rel=\"stylesheet\" type=\"text/css\" href=\"{href}\" {attr}/><![endif]-->\n",
+            'var'       => 'href',
+            'val'       => array('attr' => ''),
+        ),
         'js' => array(
             'mode'      => 'list',
             'template'  => "\t<script src=\"{src}\" type=\"text/javascript\"{attr}>{content}</script>\n",
@@ -317,6 +323,11 @@ class f_v_helper_head
         return $this->head('css', $sUri);
     }
     
+    public function cssIE7($sUri)
+    {
+        return $this->head('cssIE7', $sUri);
+    }
+    
     public function csscode($sContent)
     {
         return $this->head('csscode', $sContent);
@@ -329,7 +340,7 @@ class f_v_helper_head
     
     public function cssi($sStyle)
     {
-        $this->css('/public/css/' . $sStyle . '/v' . f::$c->config->public['css'][$sStyle]['v'] . '.css');
+        return $this->css('/public/css/' . $sStyle . '/v' . f::$c->config->public['css'][$sStyle]['v'] . '.css');
     }
 
     /* js */

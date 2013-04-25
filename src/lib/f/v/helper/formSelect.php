@@ -63,7 +63,7 @@ class f_v_helper_formSelect extends f_v_helper_formElement
                 $input += $option;
             }
 
-            $return[] = "<option" . $this->_renderAttr($input + $tag) . ">"
+            $return[] = "<option" . f_v_helper_formElement::_renderAttr($input + $tag) . ">"
                       . $prepend
                       . $text
                       . $append
@@ -75,7 +75,7 @@ class f_v_helper_formSelect extends f_v_helper_formElement
         if (substr($sName, -2) == '[]') {
             $select['multiple'] = 'multiple';
         }
-        return '<select' . $this->_renderAttr($select + $aAttr) . '>'
+        return '<select' . f_v_helper_formElement::_renderAttr($select + $aAttr) . '>'
              . implode($sSeparator, $return)
              . '</select>';
     }
