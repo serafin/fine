@@ -192,6 +192,26 @@ class f_db_mysql
         }
         throw $this->_exceptionQuery();
     }
+    
+    /**
+     * Zwraca wyselekcjonowane rekordy jako dwu wymiarową tablice
+     * gdzie kluczem jest pierwsze pole a wartością jest tablica asocjacyjna
+     *
+     * @param string $sQuery Zapytanie SQL
+     * @return array|flase Tablica lub falsz
+     */
+    public function keyed($sQuery)
+    {
+        $this->_query = $sQuery;
+        if (($this->_result = mysql_query($sQuery, $this->_connect))) {
+            $a = array();
+            while ($i = mysql_fetch_row($this->_result)) {
+                $a[$i[0]] = $i;
+            }
+            return $a;
+        }
+        throw $this->_exceptionQuery();
+    }
 
     /**
      * Zwraca wartosc klucza głownego ostatnio dodanego rekordu

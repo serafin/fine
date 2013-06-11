@@ -542,6 +542,19 @@ class f_m implements IteratorAggregate, Countable
         $this->_ = $this->_db->val("SELECT COUNT($sExpr)".$this->_sql($aParam, false, true, true));
         return $this;
     }
+    
+        
+    /**
+     * Pobiera dwu wymiarową tablice gdzie kluczem jest pierwsze pole a wartością tablica asocjacyjna
+     *
+     * @param array|integer|string|null $aisParam Parametry
+     * @return $this
+     */
+    public function selectKeyed($aParam = null)
+    {
+        $this->_ = $this->_db->keyed($this->_sql($aParam, true, true, true));
+        return $this;
+    } 
 
     /**
      * Selekcjonuje rekordy, ktore pobierane sa metoda next()
@@ -586,7 +599,7 @@ class f_m implements IteratorAggregate, Countable
         $this->val($row);
         $this->{$this->_key} = $row[$this->_key];
         return $this;
-    }
+    }  
 
     /* fetch - select + return data */
 
@@ -662,7 +675,19 @@ class f_m implements IteratorAggregate, Countable
         $this->selectCount($aParam, $sExpr);
         return $this->_;
     }
-
+       
+    /**
+     * Pobiera dwu wymiarową tablice gdzie kluczem jest pierwsze pole a wartością tablica asocjacyjna
+     *
+     * @param array|integer|string|null $aisParam Parametry
+     * @return array
+     */
+    public function fetchKeyed($aParam = null)
+    {
+        $this->selectKeyed($aParam);
+        return $this->_;
+    } 
+    
     /**
      * Pobiera kolejny rekod zapytania wykonanego przez metode selectLoop()
      *
@@ -694,7 +719,8 @@ class f_m implements IteratorAggregate, Countable
         $this->val($row);
         $this->{$this->_key} = $row[$this->_key];
         return $this;
-    }
+    } 
+    
 
     /* queries - insert, update, delete */
 
