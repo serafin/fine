@@ -429,6 +429,8 @@ class f_m implements IteratorAggregate, Countable
                 ->paging();
         
         $this->param(self::PARAM_PAGING, $this->paging());
+        
+        return $this;
     }
 
     public function isParam($sKey)
@@ -599,7 +601,7 @@ class f_m implements IteratorAggregate, Countable
         $this->val($row);
         $this->{$this->_key} = $row[$this->_key];
         return $this;
-    }  
+    }
 
     /* fetch - select + return data */
 
@@ -719,8 +721,7 @@ class f_m implements IteratorAggregate, Countable
         $this->val($row);
         $this->{$this->_key} = $row[$this->_key];
         return $this;
-    } 
-    
+    }
 
     /* queries - insert, update, delete */
 
@@ -873,7 +874,9 @@ class f_m implements IteratorAggregate, Countable
 
     /**
      * Usuwa rekord lub rekordy
-     * Gdy brak jakiegokolwiek warunku zapytanie DELETE nie zostanie wykonane, aby usunąć wszystkie rekordy użyj metody deleteAll
+     * 
+     * Gdy brak jakiegokolwiek warunku zapytanie DELETE nie zostanie wykonane
+     * Aby usunąć wszystkie rekordy wykonaj delete(array('1')) wtedy wygeneruje sie zapytanie DELETE FROM table WHERE 1
      *
      * @param array|integer|string|null $aisParam Parametry
      * @return int 0 - sucess, 1 - Bład zapytania DELETE, <2,n> - Błąd w metodzie przeciązającej tą metode;
@@ -892,12 +895,6 @@ class f_m implements IteratorAggregate, Countable
         }
         
         $this->_db->query("DELETE FROM `{$this->_table}`" . $this->_sql($aisParam, false, false, true));
-        return $this;
-    }
-
-    public function deleteAll()
-    {
-        $this->delete(array('1'));
         return $this;
     }
 
@@ -1239,7 +1236,7 @@ class f_m implements IteratorAggregate, Countable
 
                         case 'BETWEEN':
                         case 'NOT BETWEEN':
-                            $where[] = "`$paramKey` $comparisonOperator"
+                            $where[] = "$paramKey $comparisonOperator"
                                      . " '{$this->_db->escape($paramValue[0])}'"
                                      . " AND '{$this->_db->escape($paramValue[1])}'";
                             break;
@@ -1249,11 +1246,11 @@ class f_m implements IteratorAggregate, Countable
                             foreach ($paramValue as $k => $v) {
                                 $paramValue[$k] = $this->_db->escape($v);
                             }
-                            $where[] = "`$paramKey` $comparisonOperator ('" . implode("','", $paramValue) . "')";
+                            $where[] = "$paramKey $comparisonOperator ('" . implode("','", $paramValue) . "')";
                             break;
 
                         default:
-                            $where[] = "`$paramKey` $comparisonOperator '{$this->_db->escape($paramValue)}'";
+                            $where[] = "$paramKey $comparisonOperator '{$this->_db->escape($paramValue)}'";
                             break;
 
                     }
