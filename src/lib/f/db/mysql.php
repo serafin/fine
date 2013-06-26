@@ -9,7 +9,7 @@ class f_db_mysql
 
     public function connect($sHostname, $sUsername, $sPassword)
     {
-        if (($this->_connect = mysql_connect($sHostname, $sUsername, $sPassword, true))) {
+        if (($this->_connect = @mysql_connect($sHostname, $sUsername, $sPassword, true))) {
             return $this;
         }
         throw new f_db_exception_connection($this->errorMsg(), $this->errorNo());
@@ -305,12 +305,12 @@ class f_db_mysql
 
     public function errorMsg()
     {
-        return mysql_error($this->_connect);
+        return @mysql_error($this->_connect);
     }
 
     public function errorNo()
     {
-        return mysql_errno($this->_connect);
+        return @mysql_errno($this->_connect);
     }
 
     /**

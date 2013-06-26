@@ -51,7 +51,7 @@ class c_data extends f_c_action
             $this->notFound();
         }
 
-        $sModel = "m_$this->data";
+        $sModel = "m_{$this->data}";
         $this->model = new $sModel;
         $this->model->select($this->id);
         

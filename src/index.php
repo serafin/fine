@@ -32,7 +32,7 @@ class index extends f_c
         $_GET = $this->uri->resolveRequest($_SERVER['REQUEST_URI']);
 
         // run controller action by request
-        $this->dispacher->run();
+        $this->dispatcher->run();
 
         // render if not renderd before (render attaches output result to response)
         $this->render->renderOnce();

@@ -1,6 +1,6 @@
 <?php
 
-class f_event_dispacher
+class f_event_dispatcher
 {
 
     protected $_listener = array();

@@ -204,9 +204,9 @@ class f_c_render extends f_c
         
         // auto resolve view script if not set
         if ($this->_level['view']['file'] === null) {
-            $this->_level['view']['file'] = str_replace('_', DIRECTORY_SEPARATOR, $this->dispacher->controller())
+            $this->_level['view']['file'] = str_replace('_', DIRECTORY_SEPARATOR, $this->dispatcher->controller())
                                           . DIRECTORY_SEPARATOR
-                                          . str_replace('_', DIRECTORY_SEPARATOR, $this->dispacher->action());
+                                          . str_replace('_', DIRECTORY_SEPARATOR, $this->dispatcher->action());
         }
 
         // render all levels

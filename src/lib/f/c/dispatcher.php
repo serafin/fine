@@ -1,10 +1,10 @@
 <?php
 
-class f_c_dispacher extends f_c
+class f_c_dispatcher extends f_c
 {
 
-    const EVENT_DISPACHER_PRE  = 'dispacher_pre';
-    const EVENT_DISPACHER_POST = 'dispacher_post';
+    const EVENT_DISPATCHER_PRE  = 'dispatcher_pre';
+    const EVENT_DISPATCHER_POST = 'dispatcher_post';
 
     /**
      * @var string Nazwa kontrolera
@@ -49,7 +49,7 @@ class f_c_dispacher extends f_c
     /**
      *
      * @param array $config
-     * @return f_c_dispacher 
+     * @return f_c_dispatcher 
      */
     public static function _(array $config = array()) 
     {
@@ -173,9 +173,9 @@ class f_c_dispacher extends f_c
             $this->_action = 'index';
         }
 
-        /** @event dispacher_pre */
-        if ($this->event->is(self::EVENT_DISPACHER_PRE)) {
-            $this->event->run($event = new f_event(array('id' => self::EVENT_DISPACHER_PRE, 'subject' => $this)));
+        /** @event dispatcher_pre */
+        if ($this->event->is(self::EVENT_DISPATCHER_PRE)) {
+            $this->event->run($event = new f_event(array('id' => self::EVENT_DISPATCHER_PRE, 'subject' => $this)));
             if ($event->cancel()) {
                 return;
             }
@@ -194,9 +194,9 @@ class f_c_dispacher extends f_c
             'dir'        => $this->_dir,
         );
 
-        /** @event dispacher_end */
-        if ($this->event->is(self::EVENT_DISPACHER_POST)) {
-            $this->event->run(new f_event(array('id' => self::EVENT_DISPACHER_POST, 'subject' => $this)));
+        /** @event dispatcher_end */
+        if ($this->event->is(self::EVENT_DISPATCHER_POST)) {
+            $this->event->run(new f_event(array('id' => self::EVENT_DISPATCHER_POST, 'subject' => $this)));
         }
 
     }

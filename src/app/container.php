@@ -34,7 +34,7 @@ class container extends f_c_container
     {
         $this->debug    = new f_debug();
         $this->db       = new f_debug_db(array('db' => $this->db, 'label' => '$f::c->db->'));
-        f_debug_dispacher::_()->register();
+        f_debug_dispatcher::_()->register();
 
         $this->debug->on();
         $this->debug->phpPredefinedVariables();
@@ -42,12 +42,12 @@ class container extends f_c_container
         return $this->debug;
     }
 
-    protected function _dispacher()
+    protected function _dispatcher()
     {
-        $this->dispacher = new f_c_dispacher();
-        $this->dispacher->controller($this->request->get(0));
-        $this->dispacher->action($this->request->get(1));
-        return $this->dispacher;
+        $this->dispatcher = new f_c_dispatcher();
+        $this->dispatcher->controller($this->request->get(0));
+        $this->dispatcher->action($this->request->get(1));
+        return $this->dispatcher;
     }
     
     protected function _env()
@@ -62,7 +62,7 @@ class container extends f_c_container
 
     protected function _event()
     {
-        return $this->event = new f_event_dispacher();
+        return $this->event = new f_event_dispatcher();
     }
 
     protected function _flash()
@@ -95,7 +95,7 @@ class container extends f_c_container
     protected function _render()
     {
         $this->render             = new f_c_render();
-        $this->render->dispacher  = $this->dispacher;
+        $this->render->dispatcher  = $this->dispatcher;
         $this->render->viewObject = $this->v;
         $this->render->response   = $this->response;
         return $this->render;
