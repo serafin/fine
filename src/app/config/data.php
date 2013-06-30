@@ -2,7 +2,7 @@
 
 return array(
     'model' => array(
-        'img' => array(
+        'imgsize' => array(
             't200x150',                    // wartosc `[rt][0-9]{1,4}x[0-9]{1,4}` np. r640x480 (tylko jpg)
             'big' => array(                // lub klucz z dokladnymi parametrami
                 'w'      => '200',         // szerokosc, wymagane

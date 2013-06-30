@@ -429,6 +429,8 @@ class f_m implements IteratorAggregate, Countable
                 ->paging();
         
         $this->param(self::PARAM_PAGING, $this->paging());
+        
+        return $this;
     }
 
     public function isParam($sKey)
@@ -542,6 +544,19 @@ class f_m implements IteratorAggregate, Countable
         $this->_ = $this->_db->val("SELECT COUNT($sExpr)".$this->_sql($aParam, false, true, true));
         return $this;
     }
+    
+        
+    /**
+     * Pobiera dwu wymiarową tablice gdzie kluczem jest pierwsze pole a wartością tablica asocjacyjna
+     *
+     * @param array|integer|string|null $aisParam Parametry
+     * @return $this
+     */
+    public function selectKeyed($aParam = null)
+    {
+        $this->_ = $this->_db->keyed($this->_sql($aParam, true, true, true));
+        return $this;
+    } 
 
     /**
      * Selekcjonuje rekordy, ktore pobierane sa metoda next()
@@ -662,7 +677,19 @@ class f_m implements IteratorAggregate, Countable
         $this->selectCount($aParam, $sExpr);
         return $this->_;
     }
-
+       
+    /**
+     * Pobiera dwu wymiarową tablice gdzie kluczem jest pierwsze pole a wartością tablica asocjacyjna
+     *
+     * @param array|integer|string|null $aisParam Parametry
+     * @return array
+     */
+    public function fetchKeyed($aParam = null)
+    {
+        $this->selectKeyed($aParam);
+        return $this->_;
+    } 
+    
     /**
      * Pobiera kolejny rekod zapytania wykonanego przez metode selectLoop()
      *
@@ -847,7 +874,9 @@ class f_m implements IteratorAggregate, Countable
 
     /**
      * Usuwa rekord lub rekordy
-     * Gdy brak jakiegokolwiek warunku zapytanie DELETE nie zostanie wykonane, aby usunąć wszystkie rekordy użyj metody deleteAll
+     * 
+     * Gdy brak jakiegokolwiek warunku zapytanie DELETE nie zostanie wykonane
+     * Aby usunąć wszystkie rekordy wykonaj delete(array('1')) wtedy wygeneruje sie zapytanie DELETE FROM table WHERE 1
      *
      * @param array|integer|string|null $aisParam Parametry
      * @return int 0 - sucess, 1 - Bład zapytania DELETE, <2,n> - Błąd w metodzie przeciązającej tą metode;
@@ -866,12 +895,6 @@ class f_m implements IteratorAggregate, Countable
         }
         
         $this->_db->query("DELETE FROM `{$this->_table}`" . $this->_sql($aisParam, false, false, true));
-        return $this;
-    }
-
-    public function deleteAll()
-    {
-        $this->delete(array('1'));
         return $this;
     }
 
@@ -1213,7 +1236,7 @@ class f_m implements IteratorAggregate, Countable
 
                         case 'BETWEEN':
                         case 'NOT BETWEEN':
-                            $where[] = "`$paramKey` $comparisonOperator"
+                            $where[] = "$paramKey $comparisonOperator"
                                      . " '{$this->_db->escape($paramValue[0])}'"
                                      . " AND '{$this->_db->escape($paramValue[1])}'";
                             break;
@@ -1223,11 +1246,11 @@ class f_m implements IteratorAggregate, Countable
                             foreach ($paramValue as $k => $v) {
                                 $paramValue[$k] = $this->_db->escape($v);
                             }
-                            $where[] = "`$paramKey` $comparisonOperator ('" . implode("','", $paramValue) . "')";
+                            $where[] = "$paramKey $comparisonOperator ('" . implode("','", $paramValue) . "')";
                             break;
 
                         default:
-                            $where[] = "`$paramKey` $comparisonOperator '{$this->_db->escape($paramValue)}'";
+                            $where[] = "$paramKey $comparisonOperator '{$this->_db->escape($paramValue)}'";
                             break;
 
                     }

@@ -35,6 +35,10 @@ class c_data extends f_c_action
         $ext = end(explode(".", $this->file));
         list($this->id, $this->token, $this->size) = explode("_", substr($this->file, 0, - (strlen($ext)+1)), 3);
         
+        if (!$this->config->data[$this->data]['imgsize'][$this->size] && !in_array($this->size,$this->config->data[$this->data]['imgsize'])) {
+            $this->notFound();
+        }
+        
         //sprawdzanie czy konfiguracja pełna czy skrócona
         if(is_array($this->config->data[$this->data]['imgsize'][$this->size])){ 
             $this->config =  $this->config->data[$this->data]['imgsize'][$this->size];
@@ -47,7 +51,7 @@ class c_data extends f_c_action
             $this->notFound();
         }
 
-        $sModel = "m_$this->data";
+        $sModel = "m_{$this->data}";
         $this->model = new $sModel;
         $this->model->select($this->id);
         
@@ -83,7 +87,7 @@ class c_data extends f_c_action
 
         f_image::_()
             ->load("data/{$this->data}/{$this->id}_{$this->token}.{$ext}")
-            ->{$type}($width, $height, !$extend)
+            ->{$type}($width, $height, $extend)
             ->save("data/$this->data/{$this->id}_{$this->token}_{$this->size}.{$ext}", $quality)
             ->render($quality)
         ;

@@ -7,7 +7,7 @@ class f_event
     protected $_subject;
     protected $_val;
     protected $_cancel = false;
-    protected $_dispacher;
+    protected $_dispatcher;
 
     /**
      * Statyczny konstruktor
@@ -77,21 +77,21 @@ class f_event
         return $this;
     }
     
-    public function dispacher($oDispacher = null)
+    public function dispatcher($oDispatcher = null)
     {
         if (func_num_args() == 0) {
-            return $this->_dispacher;
+            return $this->_dispatcher;
         }
-        $this->_dispacher = $oDispacher;
+        $this->_dispatcher = $oDispatcher;
         return $this;
     }
     
     public function run()
     {
-        /* @var $dispacher f_event_dispacher */
-        $dispacher = $this->_dispacher ? $this->_dispacher : f::$c->event;
+        /* @var $dispatcher f_event_dispatcher */
+        $dispatcher = $this->_dispatcher ? $this->_dispatcher : f::$c->event;
         
-        $dispacher->run($this);
+        $dispatcher->run($this);
         
         return $this;
     }

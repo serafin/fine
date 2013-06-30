@@ -7,7 +7,7 @@ class f_filter_callback
 {
 
     protected $_event;
-    protected $_dispacher;
+    protected $_dispatcher;
     protected $_subject;
     protected $_callback;
 
@@ -25,12 +25,12 @@ class f_filter_callback
         return $this;
     }
 
-    public function dispacher($oEventDispacher = null)
+    public function dispatcher($oEventDispatcher = null)
     {
         if (func_num_args() == 0) {
-            return $this->_dispacher;
+            return $this->_dispatcher;
         }
-        $this->_dispacher = $oEventDispacher;
+        $this->_dispatcher = $oEventDispatcher;
         return $this;
     }
 
@@ -54,16 +54,16 @@ class f_filter_callback
 
     public function filter($mInput)
     {
-        // event dispacher
+        // event dispatcher
         if ($this->_event !== null) {
 
-            /* @var $dispacher f_event_dispacher */
+            /* @var $dispatcher f_event_dispatcher */
 
-            $dispacher = $this->_dispacher !== null ? $this->_dispacher : f::$c->event;
+            $dispatcher = $this->_dispatcher !== null ? $this->_dispatcher : f::$c->event;
             $subject   = $this->_subject !== null ? $this->_subject : $this;
             $event     = new f_event(array('id' => $this->_event, 'subject' => $subject, 'val' => $mInput));
 
-            $dispacher->run($event);
+            $dispatcher->run($event);
 
             return $event->val();
 
