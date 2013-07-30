@@ -4,9 +4,9 @@ return array(
     'dev' => array(
         'db' => array (
             'host'    => 'localhost',
-            'name'    => 'fine2',
-            'user'    => 'radek',
-            'pass'    => 'mai284',
+            'name'    => 'XXXXXXXXXXXXXXX',
+            'user'    => 'XXXXXXXXXXXXXXX',
+            'pass'    => 'XXXXXXXXXXXXXXX',
             'charset' => 'utf8'
         ),
         'error' => array(
