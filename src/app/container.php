@@ -52,7 +52,7 @@ class container extends f_c_container
     
     protected function _env()
     {
-        return $this->env = $_SERVER['ENV'] == 'dev' ? 'dev' : 'prod';
+        return $this->env = array_key_exists('ENV', $_SERVER) ? ($_SERVER['ENV'] == 'dev' ? 'dev' : 'prod') : 'prod';
     }
 
     protected function _error()
@@ -95,7 +95,7 @@ class container extends f_c_container
     protected function _render()
     {
         $this->render             = new f_c_render();
-        $this->render->dispatcher  = $this->dispatcher;
+        $this->render->dispatcher = $this->dispatcher;
         $this->render->viewObject = $this->v;
         $this->render->response   = $this->response;
         return $this->render;

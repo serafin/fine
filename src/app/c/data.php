@@ -15,12 +15,12 @@ class c_data extends f_c_action
          */
 
         if (isset($this->param)) {
-            $this->data    = $this->param['data'];
-            $this->file    = $this->param['file'];
+            $this->data = $this->param['data'];
+            $this->file = $this->param['file'];
         }
         else {
-            $this->data    = $_GET[1];
-            $this->file    = $_GET[2];
+            $this->data = $_GET[1];
+            $this->file = $_GET[2];
         }
         
         if (file_exists($_SERVER['DOCUMENT_ROOT']  . '/data/' . $this->data . '/' . $this->file)) {
@@ -93,7 +93,7 @@ class c_data extends f_c_action
         ;
 
     }
-    
+
     public function tmpAction()
     {   
         list($token, $option, $name) = explode('_', $_GET[2], 3);
@@ -125,7 +125,7 @@ class c_data extends f_c_action
             }
         }
     }
-    
+        
     public static function resolveImgSize($sSize)
     {
         $pattern = '/(?P<w>[0-9]{1,4})x?(?P<h>[0-9]{0,4})([rt]?)/';

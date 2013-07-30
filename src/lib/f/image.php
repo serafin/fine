@@ -4,18 +4,15 @@
  * Przetwarzanie obrazkow 
  *
  * Obslugiwane formaty: gif, jpg, png.
- *
- *
+
  * Obecnie zmiana rozmiaru (metoda `resize`) i zmiana rozmiaru z wycinaniem (metoda `thumb`)
  *
- *
  * Ladowanie pliku odbywa sie wedlug typu zwracanego przez `getimagesize()[2]`.
- *
  *
  */
 class f_image
 {
-
+    
     const TYPE_GIF = 'gif';
     const TYPE_JPG = 'jpg';
     const TYPE_PNG = 'png';
@@ -36,11 +33,11 @@ class f_image
     const ERROR_THUMB_NOT_LOADED      = 'ERROR_THUMB_NOT_LOADED';
     const ERROR_THUMB                 = 'ERROR_THUMB';
 
-	protected $_resource;
-	protected $_file;
-	protected $_typeLoaded;
-	protected $_type;
-	protected $_error             = array();
+    protected $_resource;
+    protected $_file;
+    protected $_typeLoaded;
+    protected $_type;
+    protected $_error             = array();
     protected $_jpgQuality        = 90;
     protected $_renderSendsHeader = true;
 
@@ -56,45 +53,45 @@ class f_image
     {
         return new self($config);
     }
-
-	/**
+    
+    /**
      * Konstruktor
      * 
      * @param array $config 
      */
     public function __construct(array $config = array())
-	{
+    {
         foreach ($config as $k => $v) {
             $this->{$k}($v);
         }
-	}
+    }
 
-	/**
+    /**
      * Destruktor
      *
-	 * Niszczy zasob obrazu, zwalnia pamiec
-	 */
-	public function __destruct()
-	{
-		$this->destroy();
-	}
+     * Niszczy zasob obrazu, zwalnia pamiec
+     */
+    public function __destruct()
+    {
+        $this->destroy();
+    }
 
     /**
      * Tworzy kopie 
      *
      * @return f_image Nowy obiekty z kopia zasobu
      */
-	public function copy()
-	{
+    public function copy()
+    {
         $copy = imagecreatetruecolor($this->width(), $this->height());
         imagecopy($copy, $this->resource(), 0, 0, 0, 0, $this->width(), $this->height());
         
-		$image = new f_image();
-		$image->resource($copy);
+	$image = new f_image();
+	$image->resource($copy);
         $image->file($this->file());
 
-		return $image;
-	}
+	return $image;
+    }
 
     /* Image properties */
 
@@ -113,6 +110,7 @@ class f_image
 
         // setter
         $this->_file = $sFile;
+        
         return $this;
     }
 
@@ -132,6 +130,7 @@ class f_image
         }
 
         $this->_type = $tType;
+        
         return $this;
     }
 
@@ -140,20 +139,20 @@ class f_image
      *
      * @return int
      */
-	public function width()
-	{
-		return imagesx($this->_resource);
-	}
+    public function width()
+    {
+	return imagesx($this->_resource);
+    }
 
     /**
      * Zwraca wysokosc obrazu
      *
      * @return type
      */
-	public function height()
-	{
-		return imagesy($this->_resource);
-	}
+    public function height()
+    {
+        return imagesy($this->_resource);
+    }
 
     /**
      *  Ustala/pobiera jakosc obrazu dla formatu jpg
@@ -168,6 +167,7 @@ class f_image
         }
 
         $this->_jpgQuality = $iJpgQuality;
+        
         return $this;
     }
 
@@ -200,78 +200,76 @@ class f_image
 
             default:
                 return $tDefaultType;
-
         }
     }
 
 
-	/**
-	 * Laduje obraz z pliku
-	 *
-	 * @param string $sFile Plik
-	 * @return $this
-	 */
-	function load($sFile = null)
-	{
+    /**
+     * Laduje obraz z pliku
+     *
+     * @param string $sFile Plik
+     * @return $this
+     */
+    function load($sFile = null)
+    {
         $this->_error = array();
         
         if (func_num_args() == 1) {
             $this->file($sFile);
         }
 
-		if (!is_file($this->_file)) {
-			$this->_error(self::ERROR_LOAD_NO_FILE);
-			return $this;
-		}
-
-		list(,,$type) = getimagesize($this->_file);
-
-		switch ($type) {
-
-			case IMAGETYPE_GIF:
-				$this->_resource   = imagecreatefromgif($this->_file);
-                $this->_typeLoaded = self::TYPE_GIF;
-				break;
-
-			case IMAGETYPE_JPEG:
-                $this->_resource   = imagecreatefromjpeg($this->_file);
-                $this->_typeLoaded = self::TYPE_JPG;
-				break;
-
-			case IMAGETYPE_PNG:
-				$this->_resource   = imagecreatefrompng($this->_file);
-                $this->_typeLoaded = self::TYPE_PNG;
-				break;
-
-			default:
-				$this->_error(self::ERROR_LOAD_UNSUPPORTED_TYPE);
-                return $this;
-
-		}
-
-		if (!$this->_resource) {
-            $this->_typeLoaded = null;
-            $this->_error(self::ERROR_LOAD_NOT_LOADED);
-		}
-
-		return $this;
+	if (!is_file($this->_file)) {
+            $this->_error(self::ERROR_LOAD_NO_FILE);
+            return $this;
 	}
 
-	/**
-	 * Zapisuje obraz jako plik
-	 *
-	 * @param string|null $sFile Plik
-	 * @param integer $iJpgQuality
-	 * @return $this
-	 */
-	function save($sFile = null)
-	{
+	list(,,$type) = getimagesize($this->_file);
+
+	switch ($type) {
+            
+            case IMAGETYPE_GIF:
+		$this->_resource   = imagecreatefromgif($this->_file);
+                $this->_typeLoaded = self::TYPE_GIF;
+		break;
+
+            case IMAGETYPE_JPEG:
+                $this->_resource   = imagecreatefromjpeg($this->_file);
+                $this->_typeLoaded = self::TYPE_JPG;
+		break;
+
+            case IMAGETYPE_PNG:
+            	$this->_resource   = imagecreatefrompng($this->_file);
+                $this->_typeLoaded = self::TYPE_PNG;
+		break;
+
+            default:
+		$this->_error(self::ERROR_LOAD_UNSUPPORTED_TYPE);
+                return $this;
+	}
+
+	if (!$this->_resource) {
+            $this->_typeLoaded = null;
+            $this->_error(self::ERROR_LOAD_NOT_LOADED);
+	}
+
+	return $this;
+    }
+
+    /**
+     * Zapisuje obraz jako plik
+     *
+     * @param string|null $sFile Plik
+     * @param integer $iJpgQuality
+     * @return $this
+     */
+    function save($sFile = null)
+    {
 
         // is resource loaded?
-		if (!$this->_resource) {
-			$this->_error(self::ERROR_SAVE_NOT_LOADED);
-			return $this;
-		}
+	if (!$this->_resource) {
+            $this->_error(self::ERROR_SAVE_NOT_LOADED);
+            return $this;
+	}
 
         // file
         if ($sFile !== null) {
@@ -280,31 +278,31 @@ class f_image
 
         $status = null;
 
-		switch ($this->_resolveType()) {
+	switch ($this->_resolveType()) {
 
-			case self::TYPE_GIF:
-				$status = imagegif($this->_resource, $this->_file);
-				break;
+            case self::TYPE_GIF:
+                $status = imagegif($this->_resource, $this->_file);
+		break;
 
-			case self::TYPE_JPG:
+            case self::TYPE_JPG:
                 $status = imagejpeg($this->_resource, $this->_file, $this->_jpgQuality);
-				break;
+		break;
 
-			case self::TYPE_PNG:
-				$status = imagepng($this->_resource, $this->_file);
-				break;
+            case self::TYPE_PNG:
+                $status = imagepng($this->_resource, $this->_file);
+		break;
 
-			default:
-				$this->_error(self::ERROR_SAVE_UNSUPPORTED_TYPE);
-				return $this;
+            default:
+                $this->_error(self::ERROR_SAVE_UNSUPPORTED_TYPE);
+		return $this;
         }
 
         if ($status === false) {
             $this->_error(self::ERROR_SAVE_NOT_SAVED);
         }
 
-		return $this;
-	}
+	return $this;
+    }
 
     /**
      * Ustala/pobiera czy render* ma wysylac header `Content-Type`
@@ -322,14 +320,13 @@ class f_image
         return $this;
     }
 
-	public function render($tType = null)
-	{
-
+    public function render($tType = null)
+    {
         // is resource loaded?
-		if (!$this->_resource) {
-			$this->_error(self::ERROR_RENDER_NOT_LOADED);
-			return $this;
-		}
+	if (!$this->_resource) {
+            $this->_error(self::ERROR_RENDER_NOT_LOADED);
+            return $this;
+	}
 
         // type
         $type = $this->_resolveType($tType);
@@ -364,193 +361,203 @@ class f_image
             case self::TYPE_PNG:
                 imagepng($this->_resource);
                 break;
-
         }
 
-		return $this;
-	}
+	return $this;
+    }
 
 
-	public function renderGif()
-	{
+    public function renderGif()
+    {
         return $this->render(self::TYPE_GIF);
-	}
+    }
 
-	public function renderJpg()
-	{
+    public function renderJpg()
+    {
         return $this->render(self::TYPE_JPG);
-	}
+    }
 
-	public function renderPng()
-	{
+    public function renderPng()
+    {
         return $this->render(self::TYPE_PNG);
-	}
+    }
 
     /**
-	 * Ustala/pobiera zasob obrazu
-	 *
-	 * @param resource $rImageResourceIdentifier
-	 * @return $this|resource
-	 */
-	public function resource($rImageResourceIdentifier = null)
-	{
+     * Ustala/pobiera zasob obrazu
+     *
+     * @param resource $rImageResourceIdentifier
+     * @return $this|resource
+     */
+    public function resource($rImageResourceIdentifier = null)
+    {
         if (func_num_args() == 0) {
             return $this->_resource;
         }
 
         $this->_error    = array();
-		$this->_resource = $rImageResourceIdentifier;
-		return $this;
-	}
+	$this->_resource = $rImageResourceIdentifier;
+	
+        return $this;
+    }
 
-	/**
-	 * Niszczy zasób obrazu, zwalnia pamięć
-	 *
-	 * @return $this
-	 */
-	public function destroy()
-	{
-		if (!$this->_resource) {
-			return $this;
-		}
-        
-		imagedestroy($this->_resource);
-		$this->_resource = null;
-        $this->_error    = array();
-		return $this;
+    /**
+     * Niszczy zasób obrazu, zwalnia pamięć
+     *
+     * @return $this
+     */
+    public function destroy()
+    {
+        if (!$this->_resource) {
+            return $this;
 	}
+        
+	imagedestroy($this->_resource);
+	$this->_resource = null;
+        $this->_error    = array();
+	
+        return $this;
+    }
 
     /* Errors */
 
-	/**
-	 * Pobiera tablice napotkanych błędów
-	 *
-	 * @return array
-	 */
-	public function error()
-	{
-		return $this->_error;
-	}
+    /**
+     * Pobiera tablice napotkanych błędów
+     *
+     * @return array
+     */
+    public function error()
+    {
+	return $this->_error;
+    }
 
     /* Image processing */
-
-	function resize($iNewWidth, $iNewHeight, $bExtend = true)
-	{
-
-		if (!$this->_resource) {
-			$this->_error(self::ERROR_RESIZE_NOT_LOADED);
-			return $this;
-		}
-
-		if ($iNewWidth <= 0) {
-            throw new f_image_exception_invalidArgument("Szerokosc nowego obrazu musi byc wieksza od zera.");
-		}
-
-		if ($iNewHeight <= 0) {
-            throw new f_image_exception_invalidArgument("Wysokosc nowego obrazu musi byc wieksza od zera.");
-		}
-
-		if ($bExtend === false) {
-			if ($this->width() <= $iNewWidth && $this->height() <= $iNewHeight) {
-				return $this;
-			}
-		}
-		$iWidth  = $iNewWidth;
-		$iHeight = (int)($iWidth * $this->height() / $this->width());
-		if ($iHeight > $iNewHeight) {
-			$iHeight = $iNewHeight;
-			$iWidth  = (int)($iHeight * $this->width() / $this->height());
-		}
-		if (!$rImage = imagecreatetruecolor($iWidth, $iHeight)) {
-			$this->_error(self::ERROR_RESIZE);
-			return $this;
-		}
-		if (!imagecopyresampled($rImage, $this->_resource, 0, 0, 0, 0, $iWidth, $iHeight, $this->width(), $this->height())) {
-			$this->_error(self::ERROR_RESIZE);
-			return $this;
-		}
-		$this->_resource  = $rImage;
-		return $this;
-	}
-
-	function thumb($iNewWidth, $iNewHeight = null)
-	{
-		if (!$this->_resource) {
-			$this->_error(self::ERROR_THUMB_NOT_LOADED);
-			return $this;
-		}
-
-		if ($iNewHeight === null) {
-			$iNewHeight = $iNewWidth;
-		}
-
-		if ($iNewWidth <= 0) {
-            throw new f_image_exception_invalidArgument("Szerokosc nowego obrazu musi byc wieksza od zera.");
-		}
-
-		if ($iNewHeight <= 0) {
-            throw new f_image_exception_invalidArgument("Wysokosc nowego obrazu musi byc wieksza od zera.");
-		}
-
-		$iX = 0;
-		$iY = 0;
-		$iWidth = $iNewWidth;
-		$iHeight = (int)($iWidth * $this->height() / $this->width());
-		if ($iHeight <= $iNewHeight) {
-			$iHeight = $iNewHeight;
-			$iWidth = (int)($iHeight * $this->width() / $this->height());
-			$iX = (int) ($iWidth - $iNewWidth) / 2;
-		}
-		else {
-			$iY = (int) ($iHeight - $iNewHeight) / 2;
-		}
-		if (!$rImage = imagecreatetruecolor($iWidth, $iHeight)) {
-			$this->_error(self::ERROR_THUMB);
-			return $this;
-		}
-		if (!imagecopyresampled($rImage, $this->_resource, 0, 0, 0, 0, $iWidth, $iHeight, $this->width(), $this->height())) {
-			$this->_error(self::ERROR_THUMB);
-			return $this;
-		}
-		if (!$rImage2 = imagecreatetruecolor($iNewWidth, $iNewHeight)) {
-			$this->_error(self::ERROR_THUMB);
-			return $this;
-		}
-		if (!imagecopy($rImage2, $rImage, 0, 0, $iX, $iY,  $iNewWidth, $iNewHeight)) {
-			$this->_error(self::ERROR_THUMB);
-			return $this;
-		}
-		$this->_resource  = $rImage2;
-		return $this;
-	}
-        
-        function cutAndResize($x1, $y1, $x2, $y2, $iNewWidth, $iNewHeight)
-	{     
-            if ($iNewWidth <= 0 || $iNewHeight <= 0) {
-                $this->_error(self::ERROR_THUMB);
-                return $this;
-            }
-            if (!$rImage = imagecreatetruecolor($iNewWidth, $iNewHeight)) {
-                $this->_error(self::ERROR_THUMB);
-		return $this;
-            }
-            if (!imagecopyresampled($rImage, $this->_resource, 0,0, $x1, $y1, $iNewWidth, $iNewHeight, $x2 - $x1, $y2 - $y1)) {
-		$this->_error(self::ERROR_THUMB);
-		return $this;
-            }
-
-            $this->_width  = $iNewWidth;
-            $this->_height = $iNewHeight;
-            $this->_resource  = $rImage;
+    
+    function resize($iNewWidth, $iNewHeight, $bExtend = true)
+    {
+        if (!$this->_resource) {
+            $this->_error(self::ERROR_RESIZE_NOT_LOADED);
             return $this;
 	}
 
+	if ($iNewWidth <= 0) {
+            throw new f_image_exception_invalidArgument("Szerokosc nowego obrazu musi byc wieksza od zera.");
+	}
+
+	if ($iNewHeight <= 0) {
+            throw new f_image_exception_invalidArgument("Wysokosc nowego obrazu musi byc wieksza od zera.");
+	}
+
+	if ($bExtend === false) {
+            if ($this->width() <= $iNewWidth && $this->height() <= $iNewHeight) {
+                return $this;
+            }
+	}
+	
+        $iWidth  = $iNewWidth;
+	$iHeight = (int)($iWidth * $this->height() / $this->width());
+	if ($iHeight > $iNewHeight) {
+            $iHeight = $iNewHeight;
+            $iWidth  = (int)($iHeight * $this->width() / $this->height());
+	}
+	
+        if (!$rImage = imagecreatetruecolor($iWidth, $iHeight)) {
+            $this->_error(self::ERROR_RESIZE);
+            return $this;
+	}
+	
+        if (!imagecopyresampled($rImage, $this->_resource, 0, 0, 0, 0, $iWidth, $iHeight, $this->width(), $this->height())) {
+            $this->_error(self::ERROR_RESIZE);
+            return $this;
+	}
+        $this->_resource  = $rImage;
+	
+        return $this;
+    }
+
+    function thumb($iNewWidth, $iNewHeight = null)
+    {
+        if (!$this->_resource) {
+            $this->_error(self::ERROR_THUMB_NOT_LOADED);
+            return $this;
+	}
+
+	if ($iNewHeight === null) {
+            $iNewHeight = $iNewWidth;
+	}
+
+	if ($iNewWidth <= 0) {
+            throw new f_image_exception_invalidArgument("Szerokosc nowego obrazu musi byc wieksza od zera.");
+	}
+
+	if ($iNewHeight <= 0) {
+            throw new f_image_exception_invalidArgument("Wysokosc nowego obrazu musi byc wieksza od zera.");
+	}
+
+	$iX = 0;
+	$iY = 0;
+	$iWidth = $iNewWidth;
+	$iHeight = (int)($iWidth * $this->height() / $this->width());
+	if ($iHeight <= $iNewHeight) {
+            $iHeight = $iNewHeight;
+            $iWidth = (int)($iHeight * $this->width() / $this->height());
+            $iX = (int) ($iWidth - $iNewWidth) / 2;
+	}
+	else {
+            $iY = (int) ($iHeight - $iNewHeight) / 2;
+	}
+	
+        if (!$rImage = imagecreatetruecolor($iWidth, $iHeight)) {
+            $this->_error(self::ERROR_THUMB);
+            return $this;
+	}
+	
+        if (!imagecopyresampled($rImage, $this->_resource, 0, 0, 0, 0, $iWidth, $iHeight, $this->width(), $this->height())) {
+            $this->_error(self::ERROR_THUMB);
+            return $this;
+	}
+	
+        if (!$rImage2 = imagecreatetruecolor($iNewWidth, $iNewHeight)) {
+            $this->_error(self::ERROR_THUMB);
+            return $this;
+	}
+	
+        if (!imagecopy($rImage2, $rImage, 0, 0, $iX, $iY,  $iNewWidth, $iNewHeight)) {
+            $this->_error(self::ERROR_THUMB);
+            return $this;
+	}
+	$this->_resource  = $rImage2;
+	
+        return $this;
+    }
+        
+    function cutAndResize($x1, $y1, $x2, $y2, $iNewWidth, $iNewHeight)
+    {     
+        if ($iNewWidth <= 0 || $iNewHeight <= 0) {
+            $this->_error(self::ERROR_THUMB);
+            return $this;
+        }
+        if (!$rImage = imagecreatetruecolor($iNewWidth, $iNewHeight)) {
+            $this->_error(self::ERROR_THUMB);
+            return $this;
+        }
+        if (!imagecopyresampled($rImage, $this->_resource, 0,0, $x1, $y1, $iNewWidth, $iNewHeight, $x2 - $x1, $y2 - $y1)) {
+            $this->_error(self::ERROR_THUMB);
+            return $this;
+        }
+
+        $this->_width  = $iNewWidth;
+        $this->_height = $iNewHeight;
+        $this->_resource  = $rImage;
+        
+        return $this;
+    }
+
     /* Private api */
 
-	protected function _error($tError)
-	{
-		$this->_error[] = $tError;
-	}
+    protected function _error($tError)
+    {
+        $this->_error[] = $tError;
+    }
 
     protected function _resolveType($tDefaultType = null)
     {
@@ -579,7 +586,6 @@ class f_image
 
         // 5. Super standardowy np. jezeli zaladujemy obraz przez `resource` nie podajac `type`
         return self::TYPE_JPG;
-
     }
 
 }

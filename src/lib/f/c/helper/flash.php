@@ -50,6 +50,8 @@ class f_c_helper_flash extends f_c
     public function get()
     {
         $msgs = $this->_storage;
+        
+        $this->remove();
 
         return $msgs;
     }

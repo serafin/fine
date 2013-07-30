@@ -4,9 +4,9 @@ return array(
     'dev' => array(
         'db' => array (
             'host'    => 'localhost',
-            'name'    => 'fine',
-            'user'    => 'root',
-            'pass'    => 'follow',
+            'name'    => 'fine2',
+            'user'    => 'radek',
+            'pass'    => 'mai284',
             'charset' => 'utf8'
         ),
         'error' => array(
@@ -22,6 +22,16 @@ return array(
             'level'      => E_ALL ^ E_NOTICE,
             'log'        => true,
             'throwError' => 0,
+        ),
+        'error_notify' => array(
+            'path' => '', /*fe. /statistic/logs/error_log */
+            'email' => array(
+                /* fe.
+                'xxx1@xxxx.xx',
+                'xxx2@xxxx.xx',
+                 * 
+                 */
+             )
         ),
         'db' => array (
             'host'    => 'localhost',

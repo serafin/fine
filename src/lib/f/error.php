@@ -169,12 +169,12 @@ class f_error
             if ($this->exception instanceof ErrorException) {
                 array_shift($this->trace); // removing handler call
             }
-
+            
             $oControllerError = new c_error();
             $oControllerError->error();
             
             $this->onException();
-            if ($this->log()) {
+            if ($this->log() && !($this->exception instanceof RuntimeException)) {
                 error_log($this->_renderExceptionAsString());
             }
             if ($this->render()) {

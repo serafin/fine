@@ -133,7 +133,6 @@ class f_c_dispatcher extends f_c
      */
     public function run()
     {
-
         if (!isset($this->_controller[0])) {
             $this->_controller = 'index';
         }
@@ -166,7 +165,8 @@ class f_c_dispatcher extends f_c
         // index method
         if (! method_exists($this->_object, $method)) {
             $index = str_replace('{action}', 'index', $this->_method);
-            if ($method !== $index && ! method_exists($this->_object, $index)) {
+            
+            if (/*$method !== $index &&*/ ! method_exists($this->_object, $index)) {
                 throw new f_c_exception_notFound();
             }
             $method        = $index;

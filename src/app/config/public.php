@@ -5,7 +5,22 @@ return array(
         'style'  => array(
             'v'  => 1,
             'replace_regexp'  => array(),
-            'sprite' => 'main'
+            'sprite' => 'main',
+        ),
+        
+    ),
+    'js' => array(
+        'style'  => array(
+            'v'  => 1,
+            'file_prepend' => array(
+
+            ),
+            'file' => array(
+                
+            ),
+            'file_append' => array(
+
+            ),
         ),
         
     ),

@@ -280,6 +280,17 @@ class f_m implements IteratorAggregate, Countable
         return $this;
     }
 
+    /**
+     * Czy model zawiera podane pole
+     * 
+     * @param string $sField
+     * @return boolean
+     */
+    public function isField($sField)
+    {
+        return in_array($sField, $this->_field);
+    }
+    
     /* values */
     
     /**

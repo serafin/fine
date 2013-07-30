@@ -359,6 +359,11 @@ class f_v_helper_head
     {
         return $this->head('jsblock', $sContent);
     }
+    
+    public function jsi($sJs)
+    {
+        return $this->js('/public/js/' . $sJs . '/v' . f::$c->config->public['js'][$sJs]['v'] . '.js');
+    }
 
     /* Open Graph protocol http://ogp.me/ */ 
     
