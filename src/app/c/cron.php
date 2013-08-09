@@ -31,11 +31,14 @@ class c_cron extends f_c_action
         // get error notification config
         $config = $this->config->main['error_notify'];
  
-        if ($this->env == 'prod' && !empty($config['path']) && count($config['email']) > 0) {
+        // path to error_log file
+        $path = !empty($config['path']) ? $config['path'] : ini_get('error_log');
+        
+        if ($this->env == 'prod' && !empty($path) && count($config['email']) > 0 && is_writable('./tmp')) {
             
             // get current modifiaction time of error_log file        
             $timemod = '';
-            $file = popen("stat -c %y .." . (substr($config['path'],0,1) != '/' ? '/' : '') . $config['path'], "r");
+            $file = popen("stat -c %y .." . (substr($path, 0, 1) != '/' ? '/' : '') . $path, "r");
             while (!feof($file)) {
                 $timemod .= fread($file, 1024);
             }
@@ -44,19 +47,19 @@ class c_cron extends f_c_action
 
             if (!empty($timemod)) {
                 
-                // temp file with last modification time of error_log file
-                $tmp = './tmp/error_notify/lastmod';
+                // file with last checked modification time of error_log file
+                $tmp = './tmp/error_notify/lastchecked';
                 if (file_exists($tmp)) {
                     $lastmod = file_get_contents($tmp);
                 }
                 else {
-                    mkdir('./tmp/error_notify/',0777);
+                    mkdir('./tmp/error_notify/', 0777);
                     file_put_contents($tmp, $timemod);
                     chmod($tmp, 0777);
                     $lastmod = $timemod - 1;
                 }
                 
-                //last modification time is older than current modifiaction time of error_log file
+                //last checked modification time is older than current modifiaction time of error_log file
                 if ($lastmod && $lastmod < $timemod) {
                     
                     $text =  date('Y-m-d H:i:s', $timemod) . '
@@ -67,7 +70,7 @@ Error Log
 
 ';
                     // read last 100 lines from error_log file
-                    $file = popen("tail -n 100 .." . (substr($config['path'],0,1) != '/' ? '/' : '') . $config['path'], "r");
+                    $file = popen("tail -n 100 .." . (substr($path, 0, 1) != '/' ? '/' : '') . $path, "r");
                     while (!feof($file)) {
                         $text .= fread($file, 1024);
                     }

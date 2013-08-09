@@ -5,6 +5,7 @@ class c_test_error extends f_c_action
     public function indexAction()
     {
         $this->render->off();
+        
         $tmp = array();
         echo $tmp[1];
         set_exception_handler(array($this, 'handleException'));

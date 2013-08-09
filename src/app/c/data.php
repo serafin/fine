@@ -2,6 +2,41 @@
 
 class c_data extends f_c_action
 {
+
+    /* nowy do sprawdzenia
+    public function indexAction()
+    {
+        $this->render->off();
+        
+        $sFileName = $_SERVER['REQUEST_URI'];
+
+        if(file_exists($sFileName)) {
+            f_image::_()->load($sFileName)->render();
+        }
+
+        $img = $this->datafile->createImgSize($sFileName);
+
+        if($img->resource()) {
+            $img->render();
+        }
+        
+        $this->notFound();
+    }
+
+    public function tmpAction()
+    {   
+        $this->render->off();
+        
+        $img = $this->datafile->createTmpImgSize($_SERVER['REQUEST_URI']);
+
+        if($img->resource()) {
+            $img->render();
+        }
+        
+        $this->notFound();
+    }
+     * 
+     */
     
     public function __construct()
     {
@@ -13,32 +48,28 @@ class c_data extends f_c_action
         /**
          * @todo przerobic pod nowego configa
          */
-
+        
         if (isset($this->param)) {
-            $this->data = $this->param['data'];
-            $this->file = $this->param['file'];
+            $this->data    = $this->param['data'];
+            $this->file    = $this->param['file'];
         }
         else {
-            $this->data = $_GET[1];
-            $this->file = $_GET[2];
+            $this->data    = $_GET[1];
+            $this->file    = $_GET[2];
         }
-        
+
         if (file_exists($_SERVER['DOCUMENT_ROOT']  . '/data/' . $this->data . '/' . $this->file)) {
         	f_image::_()->load('data/' . $this->data . '/' . $this->file)->render(95);
         	return;
         }
-        
+
         if (! $this->config->data[$this->data]) {
             $this->notFound();
         }
 
         $ext = end(explode(".", $this->file));
         list($this->id, $this->token, $this->size) = explode("_", substr($this->file, 0, - (strlen($ext)+1)), 3);
-        
-        if (!$this->config->data[$this->data]['imgsize'][$this->size] && !in_array($this->size,$this->config->data[$this->data]['imgsize'])) {
-            $this->notFound();
-        }
-        
+
         //sprawdzanie czy konfiguracja pełna czy skrócona
         if(is_array($this->config->data[$this->data]['imgsize'][$this->size])){ 
             $this->config =  $this->config->data[$this->data]['imgsize'][$this->size];
@@ -51,7 +82,7 @@ class c_data extends f_c_action
             $this->notFound();
         }
 
-        $sModel = "m_{$this->data}";
+        $sModel = "m_$this->data";
         $this->model = new $sModel;
         $this->model->select($this->id);
         
@@ -83,17 +114,16 @@ class c_data extends f_c_action
             else{
                 $quality = 95;
             }
+            
+            f_image::_()
+                ->load("data/{$this->data}/{$this->id}_{$this->token}.{$ext}")
+                ->{$type}($width, $height, !$extend)      
+                ->save("data/$this->data/{$this->id}_{$this->token}_{$this->size}.{$ext}", $quality)
+                ->render($quality)
+            ;
         }            
-
-        f_image::_()
-            ->load("data/{$this->data}/{$this->id}_{$this->token}.{$ext}")
-            ->{$type}($width, $height, $extend)
-            ->save("data/$this->data/{$this->id}_{$this->token}_{$this->size}.{$ext}", $quality)
-            ->render($quality)
-        ;
-
     }
-
+        
     public function tmpAction()
     {   
         list($token, $option, $name) = explode('_', $_GET[2], 3);
@@ -125,7 +155,7 @@ class c_data extends f_c_action
             }
         }
     }
-        
+    
     public static function resolveImgSize($sSize)
     {
         $pattern = '/(?P<w>[0-9]{1,4})x?(?P<h>[0-9]{0,4})([rt]?)/';
@@ -151,4 +181,5 @@ class c_data extends f_c_action
             'extend' => $extend
         );
     }
+    
 }

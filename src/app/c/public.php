@@ -36,7 +36,7 @@ class c_public extends f_c_action
     }
     
     /**
-     * # CSSI (CSS Implode) - Packowanie plikow css w jeden i wersjonowanie.
+     * # CSSI (CSS Implode) - Pakowanie plikow css w jeden i wersjonowanie.
      *
      * ## Wymagania
      *
@@ -68,7 +68,7 @@ class c_public extends f_c_action
     }
     
     /**
-     * # JSI (JS Implode) - Packowanie plikow js w jeden i wersjonowanie.
+     * # JSI (JS Implode) - Pakowanie plikow js w jeden i wersjonowanie.
      *
      * ## Wymagania
      *
@@ -132,7 +132,7 @@ class c_public extends f_c_action
             file_put_contents('public/' . $type . '/' . $this->_dir . '/v' . $version . '.' . $type, $output);
  
             // remove out-of-date cache
-            $outofdate = 'public/' . $type . '/' . $dir . '/v' . ($version - 1) . '.' . $type;
+            $outofdate = 'public/' . $type . '/' . $this->_dir . '/v' . ($version - 1) . '.' . $type;
             if ($version > 1 && is_file($outofdate)) {
                 unlink($outofdate);
             }
@@ -211,4 +211,103 @@ class c_public extends f_c_action
         return $output;
     }
     
+    protected function _implodeFiles2($type)
+    {
+        $isEnvDev = $this->env == 'dev';
+        
+        // setup input /public/{$type}/{$inputDir}/v{$inputVersion}.{$type}
+        $dir      = $_GET[2];
+        $file     = $_GET[3];
+        $filePatten = '/^v[0-9]*\.' . $type . '$/';
+        $version = $type == 'js' ? (int)substr($file, 1, -3) : (int)substr($file, 1, -4);
+
+        // file and version format ok?
+        if (!preg_match($filePatten, $file)) {
+            $this->notFound();
+        }
+        
+        // is this file under JSI/CSSI system?
+        if (!isset($this->config->public[$type][$dir]['v'])) {
+            $this->notFound();
+        }
+
+        // is this current version? if not, go to current file version
+        if ($this->config->public[$type][$dir]['v'] != $version) {
+            $this->redirect->uri(array('public', $type, $dir, 'v' . $this->config->public[$type][$dir]['v'] . '.' . $type));
+        }
+        
+        // output
+        $output = "";
+        
+        // implode files from config
+        foreach(array('file_prepend', 'file', 'file_append') as $v) {
+            if ($this->config->public[$type][$dir][$v]) {
+                foreach ($this->config->public[$type][$dir][$v] as $i) {
+                    if (!preg_match("#^https?://#", $i)) {
+                        $i =  'http://'. $_SERVER['SERVER_NAME']. $i;
+                    }
+
+                    // add comment
+                    if ($isEnvDev) {
+                        $output .= "\n/* {$i} */\n";
+                    }
+
+                    $output .= @file_get_contents($i);
+                    if($type == 'js') {
+                        $output .= ";\n";
+                    }
+
+                    // end adding comment
+                    if ($isEnvDev) {
+                        $output .= "\n\n";
+                    }
+                }
+            }
+        }
+        
+        // implode files from `public` folder
+        foreach (glob("./public/{$type}/{$dir}/*.{$type}") as $i) {
+            // restricted file name
+            if (preg_match($filePatten, basename($i))) {
+                continue;
+            }
+            
+            // add comment
+            if ($isEnvDev) {
+                $output .= "\n/* {$dir}/" .  basename($i) . " */\n";
+            }
+            
+            $output .= file_get_contents($i);
+            
+            // end adding comment
+            if ($isEnvDev) {
+                $output .= "\n\n";
+            }
+        }
+        
+        // replace_regexp
+        if (isset($this->config->public[$type][$dir]['replace_regexp'])) {
+            foreach ($this->config->public[$type][$dir]['replace_regexp'] as $k => $v) {
+                $output = preg_replace($k, $v, $output);
+            }
+        }
+        
+        if (!$isEnvDev) {
+            // save cache
+            file_put_contents('public/' . $type . '/' . $dir . '/v' . $version . '.' . $type, $output);
+ 
+            // remove out-of-date cache
+            $outofdate = 'public/' . $type . '/' . $dir . '/v' . ($version - 1) . '.' . $type;
+            if ($version > 1 && is_file($outofdate)) {
+                unlink($outofdate);
+            }
+        }
+
+        // send file to client
+        $this->response
+            ->header('Content-Type', ($type == 'js' ? 'text/javascript; charset=utf-8' : 'text/css'))
+            ->body($output)
+            ->send();
+        
+    }
 }
