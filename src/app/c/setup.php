@@ -5,7 +5,7 @@ class c_setup extends f_c_action
 
     public function __construct()
     {
-        if (f::$c->env != 'dev') {
+        if (!in_array($this->config->main['env'], array('dev', 'matrix'))) {
             throw new RuntimeException('Setup can by run only in dev env');
         }
         f::$c->render->off();

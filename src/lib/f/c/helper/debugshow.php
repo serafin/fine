@@ -15,7 +15,7 @@ class f_c_helper_debugshow extends f_c
 
     public function show($event)
     {
-        if ($this->env != 'dev' || $this->request->isAjax() || $this->request->isFlash()) {
+        if ($this->config->main['env'] != 'dev' || $this->request->isAjax() || $this->request->isFlash()) {
             return;
         }
         $this->debug->show();

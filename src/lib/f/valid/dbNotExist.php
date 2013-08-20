@@ -4,11 +4,20 @@ class f_valid_dbNotExist extends f_valid_abstract
 {
 
     const EXIST = 'exist';
+    
+    protected $_msg = array(
+        self::EXIST => 'Podana wartość już istnieje',
+    );
 
     public $table;
     public $field;
     public $id;
 
+    public static function _()
+    {
+        return new self;
+    }
+    
     public function __construct($sField, $iId = null, $sTable = null, $aMsg = null)
     {
         if ($sTable === null) {
@@ -17,12 +26,6 @@ class f_valid_dbNotExist extends f_valid_abstract
         $this->table = $sTable;
         $this->field = $sField;
         $this->id = $iId;
-        parent::__construct($aMsg);
-    }
-
-    public function _()
-    {
-        return new self;
     }
 
     public function isValid($mValue)
@@ -30,13 +33,14 @@ class f_valid_dbNotExist extends f_valid_abstract
         $sTable       = $this->table;
         $sField       = $this->field;
         $sValue       = (string) $mValue;
+        
         $sExceptWhere = '';
         if ($this->id !== null) {
-            $sExceptWhere = ' AND ' . $sTable . '_id != ' . db::escape($this->id);
+            $sExceptWhere = ' AND ' . $sTable . '_id != ' . f::$c->db->escape($this->id);
         }
         $this->_val($sValue);
 
-        if (0 < db::one("SELECT COUNT(*) FROM $sTable WHERE $sField = '?'$sExceptWhere", $sValue)) {
+        if (0 < (int)f::$c->db->val("SELECT COUNT(*) FROM $sTable WHERE $sField = '{$sValue}'$sExceptWhere")) {
             $this->_error(self::EXIST);
             return false;
         }

@@ -22,6 +22,7 @@ class c_error extends f_c_action
     public function notFoundAction()
     {
         $this->error->render(false);
+        $this->error->log(false);
         
         $this->render->off();
         
@@ -35,7 +36,7 @@ class c_error extends f_c_action
     {
         $this->render->off();
         
-        if ($this->env == 'dev') {
+        if ($this->config->main['env'] == 'dev') {
             return;
         }
         

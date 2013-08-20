@@ -104,11 +104,14 @@ class f_c_helper_tree implements f_di_asNew_interface
         $aReturn = array();
         foreach ((array)$this->parent[$parent] as $i) {
             $a = $this->id[$i];
+
             if (isset($this->parent[$i])) {
                 $a[$this->_child] = $this->_tree($i);
             }
+            
             $aReturn[] = $a;
         }
+
         return $aReturn;
     }
 

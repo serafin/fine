@@ -13,6 +13,11 @@ class f_c_helper_datafile extends f_c
     const TMP_FOLDER = 'tmp';
     
     /**
+     * default logical folder
+     */
+    const DEFAULT_LOGICAL_FOLDER = 'default';
+    
+    /**
      * multiple of max id-number in quantity folder
      * if set or diffrent from 0, add quantity folder to path
      * 
@@ -59,12 +64,12 @@ class f_c_helper_datafile extends f_c
      */
     public function createImgSizeByModel(f_m $model, $sSize, $bSaveFile = true)
     {
-        list($id, $token, $extOrg, $sTable) = $this->extractDataByModel($model);
+        list($id, $token, $extOrg, $sTable) = $this->extractData($model);
 
         $config = $this->getImgConfig($sTable, $sSize);
 
         if ($config) {
-            $sFilePath = $this->getPathByModel($model);
+            $sFilePath = $this->getPath($model);
             
             $oImg = new f_image();
             $oImg->load("{$sFilePath}{$id}_{$token}.{$extOrg}")
@@ -73,14 +78,16 @@ class f_c_helper_datafile extends f_c
             $ext = (isset($config['ext'])) ? $config['ext'] : $extOrg;
             $oImg->type($ext);
             
-            // call method from c_data if defined
-            if (isset($config['callback'])){            
-                if(!method_exists('c_data', $config['callback'] )){
-                    return false;
-                }
+            // call method from class
+            if (count($config['callback']) > 0){
+                foreach($config['callback'] as $class => $method) {
+                    if(!method_exists($class, $method)){
+                        return false;
+                    }
 
-                $oData = new c_data();
-                $oData->{$config['callback']}($oImg);
+                    $oClass = new $class;
+                    $oClass->{$method}($oImg);
+                }
             }
             
             if ($bSaveFile) {
@@ -197,8 +204,8 @@ class f_c_helper_datafile extends f_c
      */
     public function destroy(f_m $model)
     {
-        list($id, $token, $ext, $table) = $this->extractDataByModel($model);
-        $sFilePath = $this->getPathByModel($model);
+        list($id, $token, $ext, $table) = $this->extractData($model);
+        $sFilePath = $this->getPath($model);
         
         // orginal file
         if (file_exists("{$sFilePath}{$id}_{$token}.{$ext}")) {
@@ -240,21 +247,32 @@ class f_c_helper_datafile extends f_c
             if ($resource) {
                 $table = $model->table();
 
-                if (!$model->{$table . '_id'}) {
+                if (!$model->id()) {
                     return false;
                 }
+                
+                $bFlagSaveModel = false;
                 if (!$model->{$table . '_token'}) {
                     $model->{$table . '_token'} = $this->token();
-                    $model->save();
+                    $bFlagSaveModel = true;
                 }
                 if (!$model->{$table . '_ext'}) {
                     $ext = pathinfo($sSrcFilePath, PATHINFO_EXTENSION);
                     $model->{$table . '_ext'} = $ext ? $ext : '';
+                    $bFlagSaveModel = true;
+                }
+                if($model->isField($table . '_folder')) {
+                    if (!$model->{$table . '_folder'}) {
+                        $model->{$table . '_folder'} = self::DEFAULT_LOGICAL_FOLDER;
+                        $bFlagSaveModel = true;
+                    }
+                }
+                if($bFlagSaveModel) {
                     $model->save();
                 }
 
-                list($id, $token, $ext) = $this->extractDataByModel($model);
-                $sFilePath = $this->getPathByModel($model);
+                list($id, $token, $ext) = $this->extractData($model);
+                $sFilePath = $this->getPath($model);
 
                 if ($this->_setFolders($sFilePath)) { 
                     $sFileName = "{$sFilePath}{$id}_{$token}." . ($ext ? $ext : '');
@@ -280,7 +298,7 @@ class f_c_helper_datafile extends f_c
         if ($img->resource()) {
             $table = $model->table();
 
-            if (!$model->{$table . '_id'}) {
+            if (!$model->id()) {
                 return false;
             }
             
@@ -305,12 +323,18 @@ class f_c_helper_datafile extends f_c
                     $bFlagSaveModel = true;
                 }
             }
+            if($model->isField($table . '_folder')) {
+                if (!$model->{$table . '_folder'}) {
+                    $model->{$table . '_folder'} = self::DEFAULT_LOGICAL_FOLDER;
+                    $bFlagSaveModel = true;
+                }
+            }
             if($bFlagSaveModel) {
                 $model->save();
             }
 
-            list($id, $token, $ext) = $this->extractDataByModel($model);
-            $sFilePath = $this->getPathByModel($model);
+            list($id, $token, $ext) = $this->extractData($model);
+            $sFilePath = $this->getPath($model);
 
             if ($this->_setFolders($sFilePath)) {
                 $sImgName = "{$sFilePath}{$id}_{$token}.{$ext}";
@@ -324,22 +348,35 @@ class f_c_helper_datafile extends f_c
     }
     
     /**
-     * extract file data from model
+     * extract file data
      * 
-     * @param f_m $model
+     * @param f_m/array $aoModel
      * @return array
      */
-    public function extractDataByModel(f_m $model)
+    public function extractData($aoModel)
     {
-        $table = $model->table();
+        if(is_object($aoModel)) {
+            $aData = $aoModel->val();
+            $table = $aoModel->table();
+        }
+        elseif(!empty($aoModel['model'])) {
+            $aData = $aoModel;
+            $table = $aoModel['model'];
+        }
+
+        if(count($aData) > 0 && !empty($table)) {
+            return array(
+                $aData[$table . '_id'], // id
+                $aData[$table . '_token'], // token
+                !empty($aData[$table . '_ext']) ? $aData[$table . '_ext'] : '', // extension
+                $table, // type
+                array_key_exists($table . '_folder', $aData) 
+                    ? (!empty($aData[$table . '_folder']) ? $aData[$table . $table . '_folder'] : self::DEFAULT_LOGICAL_FOLDER) . '/'
+                    : null, // logical folder
+            );
+        }
         
-        return array(
-            $model->id(), // id
-            $model->{$table . '_token'}, // token
-            $model->isField($table . '_ext') ? ($model->{$table . '_ext'} != '' ? $model->{$table . '_ext'} : '') : '', // extension
-            $table, // type
-            $model->isField($table . '_folder') ? ($model->{$table . '_folder'} != '' ? $model->{$table . '_folder'} : null) : null, // logical folder
-        );
+        return false;
     }
     
     /**
@@ -379,32 +416,45 @@ class f_c_helper_datafile extends f_c
             $mainFolder,
         );
     }
-    
+
     /**
      * return file path
      * 
-     * @param f_m $model
+     * @param f_m/ array $aoModel
      * @return string ./data/{model}/{logicalFolder}/{quantityFolder}/
      */
-    public function getPathByModel(f_m $model)
+    public function getPath($aoModel)
     {
-        $table = $model->table();
-        $logicalFolder = $model->isField($table . '_folder') ? ($model->{$table . '_folder'} != '' ? $model->{$table . '_folder'} . '/' : '') : '';
-        $quantityFolder = $this->_getQuantityFolder($model->id());
+        if(is_object($aoModel)) {
+            $aData = $aoModel->val();
+            $table = $aoModel->table();
+        }
+        elseif(!empty($aoModel['model'])) {
+            $aData = $aoModel;
+            $table = $aoModel['model'];
+        }
+        if(count($aData) > 0 && !empty($table)) {
+            $logicalFolder = array_key_exists($table . '_folder', $aData) 
+                ? (!empty($aData[$table . '_folder']) ? $aData[$table . '_folder'] : self::DEFAULT_LOGICAL_FOLDER) . '/'
+                : '';
+            $quantityFolder = $this->_getQuantityFolder($aData[$table . '_id']);
+
+            return './' . self::MAIN_FOLDER . "/{$table}/" . $logicalFolder . $quantityFolder;
+        }
         
-        return './' . self::MAIN_FOLDER . "/{$table}/" . $logicalFolder . $quantityFolder;
+        return false;
     }
     
     /**
      * return uri path to file
      * 
-     * @param f_m $model
+     * @param f_m/array $aoModel
      * @return string /data/{model}/{logicalFolder}/{quantityFolder}/{id}_{token}_{size}.{ext}
      */
-    public function uri(f_m $model, $sSize = null)
+    public function uri($aoModel, $sSize = null)
     {
-        list($id, $token, $ext) = $this->extractDataByModel($model);
-        $sFilePath = $this->getPathByModel($model);
+        list($id, $token, $ext) = $this->extractData($aoModel);
+        $sFilePath = $this->getPath($aoModel);
         
         return substr($sFilePath,1) 
             . "{$id}_{$token}"

@@ -39,12 +39,12 @@ class c_public extends f_c_action
      *
      * ### Srodowisko deweloperskie
      *
-     * Modyfikujemy pliki w folderze. Nie podbijamy wersji cssa/jsa. Po uruchomieniu `/public/css/{folder}/v{$v}.css` plik generuje 
+     * Modyfikujemy pliki w folderze. Nie podbijamy wersji cssa. Po uruchomieniu `/public/css/{folder}/v{$v}.css` plik generuje 
      * sie dynamicznie i nie jest cachowany. W pliku sa dodatkowe komentarze informujace o tym, z ktorego pliku dana tresc jest.
      *
      * ### Srodowisko produkcyjne
      *
-     * Modyfikujemy pliki w folderze. Podbijamy wersje cssa/jsa o jeden. Po uruchomieniu `/public/css/{folder}/v{$v}.css` plik generuje 
+     * Modyfikujemy pliki w folderze. Podbijamy wersje cssa o jeden. Po uruchomieniu `/public/css/{folder}/v{$v}.css` plik generuje 
      * sie dynamicznie i jest cachowany pod adresem `/public/css/{folder}/v{$v}.css`. Przy nastepnym wywolaniu apache podsyla bezposrednio 
      * plik i nie uruchamia skryptu aplikacji, akcji `c_public->cssAction()`. Poprzednia wersja cache jest usuwana. Kiedy wywolamy adres 
      * `/public/css/{folder}/v{$v}.css`, gdzie $v jest rozne od wersji wpisanej w konfigu, to nastapi przekierowa na aktualna wersje cssa. 
@@ -73,12 +73,12 @@ class c_public extends f_c_action
      *
      * ### Srodowisko deweloperskie
      *
-     * Modyfikujemy pliki w folderze. Nie podbijamy wersji cssa/jsa. Po uruchomieniu `/public/js/{folder}/v{$v}.js` plik generuje 
+     * Modyfikujemy pliki w folderze. Nie podbijamy wersji jsa. Po uruchomieniu `/public/js/{folder}/v{$v}.js` plik generuje 
      * sie dynamicznie i nie jest cachowany. W pliku sa dodatkowe komentarze informujace o tym, z ktorego pliku dana tresc jest.
      *
      * ### Srodowisko produkcyjne
      *
-     * Modyfikujemy pliki w folderze. Podbijamy wersje cssa/jsa o jeden. Po uruchomieniu `/public/js/{folder}/v{$v}.js` plik generuje 
+     * Modyfikujemy pliki w folderze. Podbijamy wersje jsa o jeden. Po uruchomieniu `/public/js/{folder}/v{$v}.js` plik generuje 
      * sie dynamicznie i jest cachowany pod adresem `/public/js/{folder}/v{$v}.js`. Przy nastepnym wywolaniu apache podsyla bezposrednio 
      * plik i nie uruchamia skryptu aplikacji, akcji `c_public->jsAction()`. Poprzednia wersja cache jest usuwana. Kiedy wywolamy adres 
      * `/public/js/{folder}/v{$v}.js`, gdzie $v jest rozne od wersji wpisanej w konfigu, to nastapi przekierowa na aktualna wersje jsa. 
@@ -132,7 +132,7 @@ class c_public extends f_c_action
                     
                     // add comment
                     if ($this->_isEnvDev) {
-                        $output .= "\n/* {$i} /\n\n";
+                        $output .= "\n/* {$i} */\n";
                     }
 
                     $output .= @file_get_contents($i);
@@ -201,7 +201,7 @@ class c_public extends f_c_action
                         
                         // add comment
                         if ($this->_isEnvDev) {
-                            $output .= "\n/* {$filepath} \n";
+                            $output .= "\n/* {$filepath} */\n";
                         }
 
                         $output .= file_get_contents($filepath);

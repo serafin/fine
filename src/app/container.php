@@ -33,7 +33,7 @@ class container extends f_c_container
     protected function _debug()
     {
         $this->debug    = new f_debug();
-        $this->db       = new f_debug_db(array('db' => $this->db, 'label' => '$f::c->db->'));
+        $this->db       = new f_debug_db(array('db' => $this->db, 'label' => 'f::$c->db->'));
         f_debug_dispatcher::_()->register();
 
         $this->debug->on();

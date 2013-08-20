@@ -2,6 +2,7 @@
 
 return array(
     'dev' => array(
+        'env' => 'dev',
         'db' => array (
             'host'    => 'localhost',
             'name'    => 'XXXXXXXXXXXXXXX',
@@ -17,6 +18,7 @@ return array(
         ),
     ),
     'prod' => array(
+        'env' => 'prod',
         'error' => array(
             'render'     => false,
             'level'      => E_ALL ^ E_NOTICE,
