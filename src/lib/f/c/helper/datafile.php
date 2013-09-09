@@ -46,7 +46,7 @@ class f_c_helper_datafile extends f_c
         $sModel = "m_{$sTable}";
         $model = new $sModel;
         $model->select($id);
-        
+ 
         if ($model->id()) {
             return $this->createImgSizeByModel($model, $sSize, $bSaveFile);
         }
@@ -212,7 +212,7 @@ class f_c_helper_datafile extends f_c
             unlink("{$sFilePath}{$id}_{$token}.{$ext}");
         }
         
-        // changed file
+        // scaled file
         if($this->config->data[$table]) {
             foreach ($this->config->data[$table] as $i) {
                 foreach ($i as $k => $v) {
@@ -264,6 +264,13 @@ class f_c_helper_datafile extends f_c
                 if($model->isField($table . '_folder')) {
                     if (!$model->{$table . '_folder'}) {
                         $model->{$table . '_folder'} = self::DEFAULT_LOGICAL_FOLDER;
+                        $bFlagSaveModel = true;
+                    }
+                }
+                if($model->isField($table . '_size')) {
+                    if (!$model->{$table . '_size'}) {
+                        $size = filesize($sSrcFilePath);
+                        $model->{$table . '_size'} = $size ? $size : 0;
                         $bFlagSaveModel = true;
                     }
                 }
@@ -339,6 +346,16 @@ class f_c_helper_datafile extends f_c
             if ($this->_setFolders($sFilePath)) {
                 $sImgName = "{$sFilePath}{$id}_{$token}.{$ext}";
                 $img->save($sImgName);
+                
+                if($model->isField($table . '_size')) {
+                    if (!$model->{$table . '_size'}) {
+                        $size = filesize($sImgName);
+                        if($size) {
+                            $model->{$table . '_size'} = $size;
+                            $model->save();
+                        }
+                    }
+                }
 
                 return true;
             }

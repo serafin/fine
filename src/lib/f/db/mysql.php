@@ -205,8 +205,8 @@ class f_db_mysql
         $this->_query = $sQuery;
         if (($this->_result = mysql_query($sQuery, $this->_connect))) {
             $a = array();
-            while ($i = mysql_fetch_row($this->_result)) {
-                $a[$i[0]] = $i;
+            while ($i = mysql_fetch_assoc($this->_result)) {
+                $a[reset($i)] = $i;
             }
             return $a;
         }

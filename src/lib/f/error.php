@@ -174,7 +174,7 @@ class f_error
             $oControllerError->error();
             
             $this->onException();
-            if ($this->log() && !($this->exception instanceof RuntimeException)) {
+            if ($this->log()) {
                 error_log($this->_renderExceptionAsString());
             }
             if ($this->render()) {

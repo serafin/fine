@@ -77,6 +77,12 @@ class f_v_helper_head
             'var'       => 'src',
             'val'       => array('attr' => '', 'content' => ''),
         ),
+        'viewport' => array(
+            'mode'      => 'list',
+            'template'  => "\t<meta name=\"viewport\" content=\"{content}\"/>\n",
+            'var'       => 'content',
+            'val'       => array('attr' => ''),
+        ),
         'jscode' => array(
             'mode'      => 'list',
             'template'  => "{content}",
@@ -343,6 +349,13 @@ class f_v_helper_head
         return $this->css('/public/css/' . $sStyle . '/v' . f::$c->config->public['css'][$sStyle]['v'] . '.css');
     }
 
+    /* meta */
+    
+    public function viewport($sContent)
+    {
+        return $this->head('viewport', array('content' => $sContent));
+    }
+    
     /* js */
     
     public function js($sUri, $sContent = null)

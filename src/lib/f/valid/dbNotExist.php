@@ -8,7 +8,8 @@ class f_valid_dbNotExist extends f_valid_abstract
     protected $_msg = array(
         self::EXIST => 'Podana wartość już istnieje',
     );
-
+    protected $_callback;
+    
     public $table;
     public $field;
     public $id;
@@ -18,7 +19,7 @@ class f_valid_dbNotExist extends f_valid_abstract
         return new self;
     }
     
-    public function __construct($sField, $iId = null, $sTable = null, $aMsg = null)
+    public function __construct($sField, $iId = null, $sTable = null, $aCallback = null)
     {
         if ($sTable === null) {
             list ($sTable) = explode('_', $sField);
@@ -26,6 +27,7 @@ class f_valid_dbNotExist extends f_valid_abstract
         $this->table = $sTable;
         $this->field = $sField;
         $this->id = $iId;
+        $this->_callback = $aCallback;
     }
 
     public function isValid($mValue)
@@ -33,6 +35,15 @@ class f_valid_dbNotExist extends f_valid_abstract
         $sTable       = $this->table;
         $sField       = $this->field;
         $sValue       = (string) $mValue;
+
+        if(count($this->_callback) > 0) {
+            foreach($this->_callback as $class => $method) {
+                if(method_exists($class, $method)) {
+                    $oClass = new $class;
+                    $sValue = $oClass->{$method}($mValue);
+                }
+            }
+        }
         
         $sExceptWhere = '';
         if ($this->id !== null) {
