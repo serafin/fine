@@ -7,6 +7,19 @@ class c_data extends f_c_action
     {
         $this->render->off();
         
+        /*
+        $aUri = explode('?', $_SERVER['REQUEST_URI'], 2);
+        $sFileName = $aUri[0];
+        
+        $aParam = array();
+        if($aUri[1]) {
+            foreach(explode('&', $aUri[1]) as $param) {
+                list($key, $index) = explode('=', $param);
+                $aParam[$key] = $index;
+            }
+        }
+         * 
+         */
         $sFileName = $_SERVER['REQUEST_URI'];
 
         if(file_exists($sFileName)) {

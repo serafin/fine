@@ -64,37 +64,39 @@ class f_c_helper_datafile extends f_c
      */
     public function createImgSizeByModel(f_m $model, $sSize, $bSaveFile = true)
     {
-        list($id, $token, $extOrg, $sTable) = $this->extractData($model);
+        if ($model->id()) {
+            list($id, $token, $extOrg, $sTable) = $this->extractData($model);
 
-        $config = $this->getImgConfig($sTable, $sSize);
+            $config = $this->getImgConfig($sTable, $sSize);
 
-        if ($config) {
-            $sFilePath = $this->getPath($model);
-            
-            $oImg = new f_image();
-            $oImg->load("{$sFilePath}{$id}_{$token}.{$extOrg}")
-                 ->{$config['type']}($config['w'], $config['h'], $config['extend']);
+            if ($config) {
+                $sFilePath = $this->getPath($model);
 
-            $ext = (isset($config['ext'])) ? $config['ext'] : $extOrg;
-            $oImg->type($ext);
-            
-            // call method from class
-            if (count($config['callback']) > 0){
-                foreach($config['callback'] as $class => $method) {
-                    if(!method_exists($class, $method)){
-                        return false;
+                $oImg = new f_image();
+                $oImg->load("{$sFilePath}{$id}_{$token}.{$extOrg}")
+                     ->{$config['type']}($config['w'], $config['h'], $config['extend']);
+
+                $ext = (isset($config['ext'])) ? $config['ext'] : $extOrg;
+                $oImg->type($ext);
+
+                // call method from class
+                if (count($config['callback']) > 0){
+                    foreach($config['callback'] as $class => $method) {
+                        if(!method_exists($class, $method)){
+                            return false;
+                        }
+
+                        $oClass = new $class;
+                        $oClass->{$method}($oImg);
                     }
-
-                    $oClass = new $class;
-                    $oClass->{$method}($oImg);
                 }
-            }
-            
-            if ($bSaveFile) {
-                $oImg->save("{$sFilePath}{$id}_{$token}_{$sSize}.{$ext}");
-            }
 
-            return $oImg;
+                if ($bSaveFile) {
+                    $oImg->save("{$sFilePath}{$id}_{$token}_{$sSize}.{$ext}");
+                }
+
+                return $oImg;
+            }
         }
         
         return false;
@@ -213,12 +215,12 @@ class f_c_helper_datafile extends f_c
         }
         
         // scaled file
-        if($this->config->data[$table]) {
+        if ($this->config->data[$table]) {
             foreach ($this->config->data[$table] as $i) {
                 foreach ($i as $k => $v) {
                     $ext2 = $ext;
-                    if(is_array($v)) {
-                        if($v['ext']) {
+                    if (is_array($v)) {
+                        if ($v['ext']) {
                             $ext2 = $v['ext'];
                         }
                         $v = $k;
@@ -261,20 +263,20 @@ class f_c_helper_datafile extends f_c
                     $model->{$table . '_ext'} = $ext ? $ext : '';
                     $bFlagSaveModel = true;
                 }
-                if($model->isField($table . '_folder')) {
+                if ($model->isField($table . '_folder')) {
                     if (!$model->{$table . '_folder'}) {
                         $model->{$table . '_folder'} = self::DEFAULT_LOGICAL_FOLDER;
                         $bFlagSaveModel = true;
                     }
                 }
-                if($model->isField($table . '_size')) {
+                if ($model->isField($table . '_size')) {
                     if (!$model->{$table . '_size'}) {
                         $size = filesize($sSrcFilePath);
                         $model->{$table . '_size'} = $size ? $size : 0;
                         $bFlagSaveModel = true;
                     }
                 }
-                if($bFlagSaveModel) {
+                if ($bFlagSaveModel) {
                     $model->save();
                 }
 
@@ -318,19 +320,19 @@ class f_c_helper_datafile extends f_c
                 $model->{$table . '_ext'} = $img->type();
                 $bFlagSaveModel = true;
             }
-            if($model->isField($table . '_height')) {
+            if ($model->isField($table . '_height')) {
                 if (!$model->{$table . '_height'}) {
                     $model->{$table . '_height'} = $img->height();
                     $bFlagSaveModel = true;
                 }
             }
-            if($model->isField($table . '_width')) {
+            if ($model->isField($table . '_width')) {
                 if (!$model->{$table . '_width'}) {
                     $model->{$table . '_width'} = $img->width();
                     $bFlagSaveModel = true;
                 }
             }
-            if($model->isField($table . '_folder')) {
+            if ($model->isField($table . '_folder')) {
                 if (!$model->{$table . '_folder'}) {
                     $model->{$table . '_folder'} = self::DEFAULT_LOGICAL_FOLDER;
                     $bFlagSaveModel = true;
@@ -347,10 +349,10 @@ class f_c_helper_datafile extends f_c
                 $sImgName = "{$sFilePath}{$id}_{$token}.{$ext}";
                 $img->save($sImgName);
                 
-                if($model->isField($table . '_size')) {
+                if ($model->isField($table . '_size')) {
                     if (!$model->{$table . '_size'}) {
                         $size = filesize($sImgName);
-                        if($size) {
+                        if ($size) {
                             $model->{$table . '_size'} = $size;
                             $model->save();
                         }
@@ -372,16 +374,16 @@ class f_c_helper_datafile extends f_c
      */
     public function extractData($aoModel)
     {
-        if(is_object($aoModel)) {
+        if (is_object($aoModel)) {
             $aData = $aoModel->val();
             $table = $aoModel->table();
         }
-        elseif(!empty($aoModel['model'])) {
+        elseif (!empty($aoModel['model'])) {
             $aData = $aoModel;
             $table = $aoModel['model'];
         }
 
-        if(count($aData) > 0 && !empty($table)) {
+        if (count($aData) > 0 && !empty($table)) {
             return array(
                 $aData[$table . '_id'], // id
                 $aData[$table . '_token'], // token
@@ -442,15 +444,16 @@ class f_c_helper_datafile extends f_c
      */
     public function getPath($aoModel)
     {
-        if(is_object($aoModel)) {
+        if (is_object($aoModel)) {
             $aData = $aoModel->val();
             $table = $aoModel->table();
         }
-        elseif(!empty($aoModel['model'])) {
+        elseif (!empty($aoModel['model'])) {
             $aData = $aoModel;
             $table = $aoModel['model'];
         }
-        if(count($aData) > 0 && !empty($table)) {
+        
+        if (count($aData) > 0 && !empty($table)) {
             $logicalFolder = array_key_exists($table . '_folder', $aData) 
                 ? (!empty($aData[$table . '_folder']) ? $aData[$table . '_folder'] : self::DEFAULT_LOGICAL_FOLDER) . '/'
                 : '';

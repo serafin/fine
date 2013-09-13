@@ -14,7 +14,7 @@ class f_valid_dbNotExist extends f_valid_abstract
     public $field;
     public $id;
 
-    public static function _()
+    public static function _(array $config = array())
     {
         return new self;
     }
