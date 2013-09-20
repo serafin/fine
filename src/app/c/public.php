@@ -138,13 +138,10 @@ class c_public extends f_c_action
                     $output .= @file_get_contents($i);
 
                     if ($this->_type == 'js') {
-                        $output .= ";";
+                        $output .= ";\n\n";
                     }
 
-                    // end adding comment
-                    if ($this->_isEnvDev) {
-                        $output .= "\n\n";
-                    }
+                    $output .= "\n\n";
                 }
             }
         }
@@ -206,10 +203,11 @@ class c_public extends f_c_action
 
                         $output .= file_get_contents($filepath);
 
-                        // end adding comment
-                        if ($this->_isEnvDev) {
-                            $output .= "\n\n";
+                        if ($this->_type == 'js') {
+                            $output .= ";\n\n";
                         }
+
+                        $output .= "\n\n";
                     }
                 }
             }
