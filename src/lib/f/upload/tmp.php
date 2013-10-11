@@ -98,7 +98,7 @@ class f_upload_tmp
         }
         
         $this->_token = f::$c->token();
-        $this->_name  = $upload->name();
+        $this->_name  = f::$c->wash($upload->name(), '_', ".,-=()\!\@");
         
         $upload->move($this->_path());
         
