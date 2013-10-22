@@ -16,6 +16,17 @@ class f_form_captcha extends f_form_element
         'tag'    => array('f_form_decor_tag', 'attr' => array('class' => 'form-element')),
     );
     
+   /**
+     * Statyczny konstruktor
+     *
+     * @param array $config
+     * @return f_form_captcha
+     */
+    public static function _(array $config = array())
+    {
+        return new self($config);
+    }
+    
     public function __construct(array $config = array())
     {
         parent::__construct($config);

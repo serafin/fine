@@ -21,8 +21,6 @@
  * @property f_c_helper_connectionClose $connectionClose
  * @method f_c_helper_connectionClose connectionClose() connectionClose() 
  * @property f_c_helper_datetime2unixtime $datetime2unixtime
- * @property f_c_helper_de2en $de2en
- * @method string de2en() de2en(type $sString) 
  * @property f_c_helper_debugshow $debugshow
  * @method f_c_helper_debugshow debugshow() debugshow() 
  * @property f_c_helper_fileUnlink $fileUnlink
@@ -38,6 +36,8 @@
  * @property f_c_helper_token $token
  * @property f_c_helper_tree $tree
  * @property f_c_helper_uri $uri
+ * @property f_c_helper_variant $variant
+ * @property f_c_helper_wash $wash
  */
 class f_c 
 {}
@@ -62,9 +62,7 @@ class f_c
  * @method string byte2size() byte2size(type $iSize, type $tUnit, type $iRound) 
  * @property f_c_helper_connectionClose $connectionClose
  * @method f_c_helper_connectionClose connectionClose() connectionClose() 
- * @property f_c_helper_datetime2unixtime $datetime2unixtime
- * @property f_c_helper_de2en $de2en
- * @method string de2en() de2en(type $sString) 
+ * @property f_c_helper_datetime2unixtime $datetime2unixtime 
  * @property f_c_helper_debugshow $debugshow
  * @method f_c_helper_debugshow debugshow() debugshow() 
  * @property f_c_helper_fileUnlink $fileUnlink
@@ -73,13 +71,14 @@ class f_c
  * @property f_c_helper_microtime $microtime
  * @property f_c_helper_notFound $notFound
  * @method void notFound() notFound() 404 Not Found
- * @property f_c_helper_pl2en $pl2en
  * @property f_c_helper_redirect $redirect
  * @property f_c_helper_size2byte $size2byte
  * @property f_c_helper_soundexPl $soundexPl
  * @property f_c_helper_token $token
  * @property f_c_helper_tree $tree
  * @property f_c_helper_uri $uri
+ * @property f_c_helper_variant $variant
+ * @property f_c_helper_wash $wash
  */
 class container 
 {}

@@ -6,6 +6,17 @@ class f_form_matrixRadio extends f_form_element
     protected $_type    = 'radio';
     protected $_helper  = 'formMatrixRadio';
 
+    /**
+     * Statyczny konstruktor
+     *
+     * @param array $config
+     * @return f_form_matrixRadio
+     */
+    public static function _(array $config = array())
+    {
+        return new self($config);
+    }
+    
     public function __construct(array $config = array())
     {
         parent::__construct($config);

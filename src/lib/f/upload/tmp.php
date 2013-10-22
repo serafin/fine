@@ -69,6 +69,16 @@ class f_upload_tmp
     }
     
     /**
+     * Get original file name
+     * 
+     * @return string
+     */
+    public function name()
+    {
+        return urldecode($this->_name);
+    }
+    
+    /**
      * Get path witch option
      * 
      * @param string $sOption
@@ -98,7 +108,7 @@ class f_upload_tmp
         }
         
         $this->_token = f::$c->token();
-        $this->_name  = f::$c->wash($upload->name(), '_', ".,-=()\!\@");
+        $this->_name = urlencode($upload->name());
         
         $upload->move($this->_path());
         

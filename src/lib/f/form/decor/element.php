@@ -6,6 +6,14 @@ class f_form_decor_element extends f_form_decor_default
     protected $_element;
 
     /**
+     * @return f_form_decor_element
+     */
+    public static function _(array $config = array())
+    {
+        return new self($config);
+    }
+    
+    /**
      * Ustawia/pobiera elementy
      *
      * @param array|f_form_element $oaElement Element lub tablica elementow

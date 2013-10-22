@@ -212,7 +212,11 @@ class f_form implements ArrayAccess, IteratorAggregate, Countable
         if (! is_array($asName)) {
             $asName = array($asName);
         }
-
+        
+        if(!isset($this->_attr['class'])) {
+            $this->_attr['class'] = '';
+        }
+        
         foreach ($asName as $k => $v) {
             if ($k != 0 || strlen($this->_attr['class']) > 0) {
                 $this->_attr['class'] .= ' ';

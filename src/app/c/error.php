@@ -5,7 +5,6 @@ class c_error extends f_c_action
 
     public function error()
     {
-        
         switch (get_class($this->error->exception)) {
 
             case f_c_exception_notFound:

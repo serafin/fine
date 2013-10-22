@@ -42,7 +42,17 @@ class f_form_element
         'tag'    => array('f_form_decor_tag', 'attr' => array('class' => 'form-element')),
     );
     
-
+    /**
+     * Statyczny konstruktor
+     *
+     * @param array $config
+     * @return f_form_element
+     */
+    public static function _(array $config = array())
+    {
+        return new self($config);
+    }
+    
     /**
      * Element formularza
      *
@@ -286,7 +296,7 @@ class f_form_element
     {
         // getter
         if (func_num_args() === 0) {
-            return $this->_attr['id'];
+            return isset($this->_attr['id']) ? $this->_attr['id'] : null;
         }
         
         // setter
@@ -307,7 +317,11 @@ class f_form_element
         if (! is_array($asName)) {
             $asName = array($asName);
         }
-
+        
+        if(!isset($this->_attr['class'])) {
+            $this->_attr['class'] = '';
+        }
+        
         foreach ($asName as $k => $v) {
             if ($k != 0 || strlen($this->_attr['class']) > 0) {
                 $this->_attr['class'] .= ' ';

@@ -343,6 +343,38 @@ class f_db_mysql
         }
         return $sQuery;
     }
+    
+    /* Transakcje */
+    
+    /**
+     * Rozpoczyna transakcję
+     *
+     * @return bool
+     */
+    public function startTransaction()
+    {
+        return (bool) $this->query("START TRANSACTION");
+    }
+        
+    /**
+     * Zatwierdza zmiany dokonane w trakcie transakcji
+     *
+     * @return bool
+     */
+    public function commit()
+    {
+        return (bool) $this->query("COMMIT");
+    }
+        
+    /**
+     * Cofa zmiany dokonane w  trakcie transakcji
+     *
+     * @return bool
+     */
+    public function rollback()
+    {
+        return (bool) $this->query("ROLLBACK");
+    }
 
     protected function _exceptionQuery()
     {

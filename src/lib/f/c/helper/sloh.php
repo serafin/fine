@@ -96,7 +96,7 @@ class f_c_helper_sloh implements IteratorAggregate, f_di_asNew_interface
     
     protected function _load($name)
     {
-        if ($this->_being[$name] === true || !isset($this->_being[$name])) {
+        if (!isset($this->_being[$name]) || $this->_being[$name] === true) {
             $class               = sprintf($this->_tpl, $name);
             $module              = new $class;
             $this->_being[$name] = $module;
