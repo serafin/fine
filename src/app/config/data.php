@@ -10,7 +10,7 @@ return array(
                 'ext'      => 'jpg png gif', // opcjonalnie, standardowo jpg
                 'type'     => 'resize',      // lub thumb, opcjonalnie, standardowo resize
                 'extend'   => true,          // lub false, default true
-                'callback' => array('nazwa_klasy' => 'nazwa_metody'), // np. class nazwa_klasy { function nazwa_metody(f_image $oImg){} }
+                'callback' => array(/* dane w formacie callable */), // np. array(new stdClass(), 'nazwa_metody')
               )
         )
     )

@@ -34,7 +34,13 @@ class c_cron extends f_c_action
         // path to error_log file
         $path = !empty($config['path']) ? $config['path'] : ini_get('error_log');
         
-        if ($this->env == 'prod' && !empty($path) && count($config['email']) > 0 && is_writable('./tmp')) {
+        // file with last checked modification time of error_log file
+        $tmp = './tmp/error_notify/lastchecked';
+        
+        // access rights to dir
+        $bAccessRight = file_exists($tmp) ? is_writable($tmp) : is_writable('./tmp');
+        
+        if ($this->env == 'prod' && !empty($path) && count($config['email']) > 0 && $bAccessRight) {
             
             // get current modifiaction time of error_log file        
             $timemod = '';
@@ -46,9 +52,7 @@ class c_cron extends f_c_action
             $timemod = strtotime(reset(explode('.',trim($timemod))));
 
             if (!empty($timemod)) {
-                
-                // file with last checked modification time of error_log file
-                $tmp = './tmp/error_notify/lastchecked';
+
                 if (file_exists($tmp)) {
                     $lastmod = file_get_contents($tmp);
                 }

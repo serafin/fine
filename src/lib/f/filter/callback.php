@@ -3,7 +3,7 @@
 /**
  * @todo dodac obsluge callbacka przez event
  */
-class f_filter_callback
+class f_filter_callback extends f_filter_abstract
 {
 
     protected $_event;

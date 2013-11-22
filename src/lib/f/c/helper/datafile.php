@@ -81,13 +81,10 @@ class f_c_helper_datafile extends f_c
 
                 // call method from class
                 if (count($config['callback']) > 0){
-                    foreach($config['callback'] as $class => $method) {
-                        if(!method_exists($class, $method)){
-                            return false;
+                    foreach($config['callback'] as $callback) {
+                        if (is_callable($callback)) {
+                            call_user_func($callback, $oImg);
                         }
-
-                        $oClass = new $class;
-                        $oClass->{$method}($oImg);
                     }
                 }
 
@@ -480,6 +477,19 @@ class f_c_helper_datafile extends f_c
             . "{$id}_{$token}"
             . ($sSize ? "_{$sSize}" : "")
             . ".{$ext}";
+    }
+
+    /**
+     * check if given file has allowed extension
+     * 
+     * @param f_upload/ f_upload_tmp $oResource
+     * @param array $aAllowedExt
+     * @return boolean
+     */  
+    public function validateFileExt($oResource, $aAllowedExt)
+    {
+        $ext = $oResource->extensionLower();
+        return in_array($ext, $aAllowedExt);
     }
     
     /**
