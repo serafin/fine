@@ -8,6 +8,11 @@ class f_c_helper_datafile extends f_c
     const MAIN_FOLDER = 'data';
     
     /**
+     * public folder with files
+     */
+    const PUBLIC_FOLDER = 'cdn';
+    
+    /**
      * folder with temporary files
      */
     const TMP_FOLDER = 'tmp';
@@ -70,15 +75,13 @@ class f_c_helper_datafile extends f_c
             $config = $this->getImgConfig($sTable, $sSize);
 
             if ($config) {
-                $sFilePath = $this->getPath($model);
-
                 $oImg = new f_image();
-                $oImg->load("{$sFilePath}{$id}_{$token}.{$extOrg}")
+                $oImg->load($this->getPath($model) . "{$id}_{$token}.{$extOrg}")
                      ->{$config['type']}($config['w'], $config['h'], $config['extend']);
 
                 $ext = (isset($config['ext'])) ? $config['ext'] : $extOrg;
                 $oImg->type($ext);
-
+               
                 // call method from class
                 if (count($config['callback']) > 0){
                     foreach($config['callback'] as $callback) {
@@ -87,9 +90,17 @@ class f_c_helper_datafile extends f_c
                         }
                     }
                 }
+                
+                if ($config['quality']) {
+                    $oImg->jpgQuality($config['quality']);
+                }
 
                 if ($bSaveFile) {
-                    $oImg->save("{$sFilePath}{$id}_{$token}_{$sSize}.{$ext}");
+                    $sFilePath = $this->getPath($model, self::PUBLIC_FOLDER);
+                    
+                    if ($this->_setFolders($sFilePath)) {
+                        $oImg->save("{$sFilePath}{$id}_{$token}_{$sSize}.{$ext}");
+                    }
                 }
 
                 return $oImg;
@@ -111,17 +122,17 @@ class f_c_helper_datafile extends f_c
         list(, , , $sFileName) = $this->extractDataByPath($sPath);
         
         list($token, $option, $name) = explode('_', $sFileName, 3);
-        
+
         foreach ($this->config->data as $sTable => $v) {
             $config = $this->getImgConfig($sTable, $option);
-            
+
             if ($config) {
                 $oImg = new f_image();
-                $oImg->load(self::MAIN_FOLDER . '/' . self::TMP_FOLDER . "/{$token}__{$name}")
+                $oImg->load(self::PUBLIC_FOLDER . '/' . self::TMP_FOLDER . "/{$token}__{$name}")
                      ->{$config['type']}($config['w'], $config['h'], !$config['extend']);
-                
+
                 if ($bSaveFile) {
-                    $oImg->save(self::MAIN_FOLDER . '/' . self::TMP_FOLDER . "/{$token}_{$option}_{$name}");
+                    $oImg->save(self::PUBLIC_FOLDER . '/' . self::TMP_FOLDER . "/{$token}_{$option}_{$name}");
                 }
                 
                 return $oImg;
@@ -204,15 +215,17 @@ class f_c_helper_datafile extends f_c
     public function destroy(f_m $model)
     {
         list($id, $token, $ext, $table) = $this->extractData($model);
-        $sFilePath = $this->getPath($model);
         
         // orginal file
+        $sFilePath = $this->getPath($model);
         if (file_exists("{$sFilePath}{$id}_{$token}.{$ext}")) {
             unlink("{$sFilePath}{$id}_{$token}.{$ext}");
         }
         
         // scaled file
         if ($this->config->data[$table]) {
+            $sFilePath = $this->getPath($model, self::PUBLIC_FOLDER);
+            
             foreach ($this->config->data[$table] as $i) {
                 foreach ($i as $k => $v) {
                     $ext2 = $ext;
@@ -281,7 +294,7 @@ class f_c_helper_datafile extends f_c
                 $sFilePath = $this->getPath($model);
 
                 if ($this->_setFolders($sFilePath)) { 
-                    $sFileName = "{$sFilePath}{$id}_{$token}." . ($ext ? $ext : '');
+                    $sFileName = "{$sFilePath}{$id}_{$token}" . ($ext ? '.' . $ext : '');
                     if (file_put_contents($sFileName, $resource)) {
                         return true;
                     }
@@ -387,7 +400,7 @@ class f_c_helper_datafile extends f_c
                 !empty($aData[$table . '_ext']) ? $aData[$table . '_ext'] : '', // extension
                 $table, // type
                 array_key_exists($table . '_folder', $aData) 
-                    ? (!empty($aData[$table . '_folder']) ? $aData[$table . $table . '_folder'] : self::DEFAULT_LOGICAL_FOLDER) . '/'
+                    ? (!empty($aData[$table . '_folder']) ? $aData[$table . '_folder'] : self::DEFAULT_LOGICAL_FOLDER) . '/'
                     : null, // logical folder
             );
         }
@@ -437,9 +450,10 @@ class f_c_helper_datafile extends f_c
      * return file path
      * 
      * @param f_m/ array $aoModel
-     * @return string ./data/{model}/{logicalFolder}/{quantityFolder}/
+     * @param const $folder
+     * @return string ./[data|cdn]/{model}/{logicalFolder}/{quantityFolder}/
      */
-    public function getPath($aoModel)
+    public function getPath($aoModel, $folder = self::MAIN_FOLDER)
     {
         if (is_object($aoModel)) {
             $aData = $aoModel->val();
@@ -456,7 +470,7 @@ class f_c_helper_datafile extends f_c
                 : '';
             $quantityFolder = $this->_getQuantityFolder($aData[$table . '_id']);
 
-            return './' . self::MAIN_FOLDER . "/{$table}/" . $logicalFolder . $quantityFolder;
+            return "./{$folder}/{$table}/" . $logicalFolder . $quantityFolder;
         }
         
         return false;
@@ -471,14 +485,14 @@ class f_c_helper_datafile extends f_c
     public function uri($aoModel, $sSize = null)
     {
         list($id, $token, $ext) = $this->extractData($aoModel);
-        $sFilePath = $this->getPath($aoModel);
+        $sFilePath = $sSize ? $this->getPath($aoModel, self::PUBLIC_FOLDER) : $this->getPath($aoModel);
         
         return substr($sFilePath,1) 
             . "{$id}_{$token}"
             . ($sSize ? "_{$sSize}" : "")
             . ".{$ext}";
     }
-
+    
     /**
      * check if given file has allowed extension
      * 
@@ -575,28 +589,35 @@ class f_c_helper_datafile extends f_c
      */
     protected function _resolveImgSize($sSize)
     {
-        $pattern = '/(?P<w>[0-9]{1,4})x?(?P<h>[0-9]{0,4})([rt]?)/';
+        $pattern = '/(?P<w>[0-9]{1,4})x?(?P<h>[0-9]{0,4})([rt]?)(q?)(?P<q>[0-9]{0,3})/';
         preg_match($pattern, $sSize, $matches);
-        
-        if ($matches['h'] === '') {
-            $matches['h'] = $matches['w'];
-            $matches[3]   = 't';
+
+        $aReturn = array();
+        $aReturn['w'] = $matches['w'];
+        $aReturn['h'] = $matches['h'];
+
+        if ($aReturn['h'] === '') {
+            $aReturn['h'] = $aReturn['w'];
+
+            if (!isset($matches[3]) || $matches[3] === '') {
+                $matches[3] = 't';
+            }
         }
-        if (isset($matches[3]) && ($matches[3] == 't')) {
-            $type = 'thumb';
-            $extend = false;
+        
+        if (isset($matches[3]) && ($matches[3] === 't')) {
+            $aReturn['type'] = 'thumb';
+            $aReturn['extend'] = false;
         }
         else {
-            $type = 'resize';
-            $extend = true;
+            $aReturn['type'] = 'resize';
+            $aReturn['extend'] = true;
         }
         
-        return array(
-            'w'      => $matches['w'],
-            'h'      => $matches['h'],
-            'type'   => $type,
-            'extend' => $extend
-        );
+        if (isset($matches[4]) && $matches[4] == 'q' && isset($matches['q'])) {
+            $aReturn['quality'] = $matches['q'];
+        }
+
+        return $aReturn;
     }
     
     /**

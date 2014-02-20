@@ -81,13 +81,13 @@ class f_cache_backend_file implements f_cache_backend_interface
             mkdir($dir, 0777, true);
         }
 
-        $tmp = tempnam($dir, $sha1);
         $org = $dir . DIRECTORY_SEPARATOR . $sha1;
+        $tmp = $org . '_' . sha1(uniqid(rand(), true));
 
         file_put_contents($tmp, serialize($mData));
 
         rename($tmp, $org);
-        chmod($org, 0666);
+        chmod($org, 0777);
         clearstatcache();
 
         return $this;

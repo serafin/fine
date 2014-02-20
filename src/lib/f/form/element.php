@@ -341,7 +341,7 @@ class f_form_element
         $class = explode(' ', $this->_attr['class']);
         foreach ($class as $k => $v) {
             if ($v == $sName) {
-                unset ($class[$v]);
+                unset ($class[$k]);
             }
         }
         $this->_attr['class'] = implode(' ', $class);

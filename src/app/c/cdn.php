@@ -1,8 +1,8 @@
 <?php
 
-class c_data extends f_c_action
+class c_cdn extends f_c_action
 {
-    
+
     public function indexAction()
     {
         $this->render->off();
@@ -15,7 +15,7 @@ class c_data extends f_c_action
         
         $img->render();
     }
-
+    
     public function tmpAction()
     {   
         $this->render->off();
@@ -27,6 +27,19 @@ class c_data extends f_c_action
         }
         
         $img->render();
+    }
+    
+    public function publicAction()
+    {
+        $this->render->off();
+        
+        if ($_GET[2] != 'css' && $_GET[2] != 'js') {
+            $this->notFound();
+        }
+        
+        $this->publicFiles2oneFile
+            ->fileName($_GET[3])
+            ->{$_GET[2]}();
     }
     
 }
